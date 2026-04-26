@@ -5687,3 +5687,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Same as R-001 — PyYAML missing in dev container makes ag contract coverage degrade to 0% which would block; tests stub the output so unit tests pass
 
+
+### Session: 2026-04-26 17:51 - R-008 ag tui mission-control dashboard
+
+**Why**: Tier 3 autonomous work without observability is faith-based; the dashboard is the thing connecting a user back to multi-hour runs. Quota burn-down ring (R-014) layers on top; this is the substrate.
+
+**Decision**: Pure-Python + Textual split via panel *_lines() shapers — the R-007/R-001/R-002 pytest-free pattern works for TUI testing too; saves users from needing Textual in CI
+
+**What changed**:
+- Shipped tui/ package: pure-stdlib JSONL stream tailer (live-tail with rotation detect), thread-safe DashboardState aggregator (workers/events ring/health/tokens), 5 panel widgets (header/workers/events/health/drilldown) with shared color-hint table, Textual App entrypoint with lazy import, ag tui dispatcher. 28 tests pass without Textual installed (panels use *_lines() shapers as the pure-Python boundary; widget classes only loaded by run_tui()).
+
+**Next steps**:
+- Commit the sprint, then plan next sprint per backlog (Phase 0 fan-out: R-005 chmod, R-009 ag watch, R-010 ag fix, R-011 ag onboard, R-012 structured error msgs, R-013 quota, R-015 hooks register all unblocked)
+
+**Blockers**: Textual + Rich missing in dev container by design — install hint surfaces cleanly when ag tui invoked here
+

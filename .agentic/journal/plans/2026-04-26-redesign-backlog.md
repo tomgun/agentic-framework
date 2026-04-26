@@ -129,7 +129,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-008 · `ag tui` — Textual mission-control dashboard
-**Status:** planned · **Effort:** 12d · **Deps:** R-007
+**Status:** shipped · **Effort:** 12d · **Deps:** R-007
 **Plan ref:** plan §"Observability layer" → "Mission-control view"
 **Goal:** Five-panel terminal dashboard live-tailing JSONL streams. Default frontend for monitoring autonomous work.
 

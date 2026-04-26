@@ -189,6 +189,7 @@ source "$COMMANDS_DIR/plan.sh"
 source "$COMMANDS_DIR/implement.sh"
 source "$COMMANDS_DIR/commit.sh"
 source "$COMMANDS_DIR/push.sh"
+source "$COMMANDS_DIR/tui.sh"
 source "$COMMANDS_DIR/done.sh"
 source "$COMMANDS_DIR/kickoff.sh"
 source "$COMMANDS_DIR/auto.sh"
@@ -284,6 +285,9 @@ case "${1:-help}" in
         ;;
     push)
         shift; cmd_push "$@"
+        ;;
+    tui)
+        shift; cmd_tui "$@"
         ;;
     done)
         shift; cmd_done "$@"
