@@ -37,7 +37,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ## Phase 0 — Tier 0 hardening + observability spine + UX additions (4–5.5 weeks)
 
 ### R-007 · JSONL event spine schema + writer
-**Status:** planned · **Effort:** 2d · **Deps:** —
+**Status:** in_progress · **Effort:** 2d · **Deps:** —
 **Plan ref:** plan §"Observability layer" + §"Canonical event streams"
 **Goal:** Define the canonical JSONL schemas for `events.jsonl`, `delegation.jsonl`, `token-ledger.jsonl`; implement an append-only writer used by all subsequent hooks/CLIs.
 

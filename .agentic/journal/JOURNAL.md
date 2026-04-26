@@ -5642,3 +5642,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None.
 
+
+### Session: 2026-04-26 16:33 - R-007 JSONL event spine
+
+**Why**: Center-of-gravity inversion: agents don't reliably follow in-session rules, so enforcement and observability must live in processes the agent doesn't drive. Every later piece (TUI, quota ring, critic telemetry, intel-invocation tracking) reads from this spine — without it, autonomous Tier 3 work is faith-based
+
+**Decision**: In-house validator over a jsonschema runtime dependency. The schema shape is small and fully under our control, the framework already treats jsonschema as optional in validate_specs.py, and keeping the schema JSON files canonical lets external tools (ajv, CI mirrors) use the same source of truth
+
+**What changed**:
+- Three append-only JSONL streams (events / delegation / token-ledger) now have canonical JSON Schemas plus fcntl.flock-serialized writers. 4 processes × 1000 concurrent events produce exactly 4000 valid lines; 8KB soft cap with truncation marker on the free-form field; in-house validator avoids a hard jsonschema runtime dep while the schema files stay authoritative for ajv/external use. 18 tests pass; runs under pytest or directly. First brick of the v5 observability substrate.
+
+**Next steps**:
+- R-001 (pre-commit gate, 3d) — reads the schema + uses gate_blocked/gate_skipped event types; then R-002 pre-push, then R-008 TUI
+
+**Blockers**: None
+
