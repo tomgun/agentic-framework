@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- F-008 PR-A: skills.sh marketplace scaffold - ready for review (Updated: 2026-04-13 19:13 UTC)
+- V5 contributions backfilled - ready to fan out Phase 0 wave A (R-005 first) (Updated: 2026-04-26 19:31 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

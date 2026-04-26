@@ -5717,3 +5717,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Legacy bash gate's complexity warning at 18 staged files (advisory only, instruction-file backport spans 11 files by nature)
 
+
+### Session: 2026-04-26 19:31 - V5 architectural decision contributions backfilled
+
+**Why**: User explicitly asked to surface contributions from messages on the four topics (real-world projects, market research/M.A., Claude arch doc, transformation), then flagged the missed pushback dynamic — these were the highest-leverage user contributions in the redesign cycle but had no entries in CONTRIBUTIONS.md
+
+**Decision**: Captured pushback as Thread 5 with its own four insights (#17-20) plus updated the Why-it-matters paragraph; positioned the new section before V5 SPRINT 1 to reflect chronology (architecture decision -> first sprint executes it)
+
+**What changed**:
+- Added new V5 ARCHITECTURAL DECISION section to CONTRIBUTIONS.md covering five threads of user insights upstream of Sprint 1: real-world downstream session failure, M.A. autonomy audit, Claude architecture PDF translation, transform-vs-greenfield decision, and iterative pushback against single-agent-hooks defaults. 20 insights total, all sourced from sibling doc + V5 plan + greenfield path doc with line refs. Closes the gap user flagged: prior CONTRIBUTIONS.md only credited Sprint 1 implementation pattern, not the architectural reframe that justified V5 itself
+
+**Next steps**:
+- commit + push to main; resume Phase 0 fan-out wave A starting with R-005
+
+**Blockers**: None
+
