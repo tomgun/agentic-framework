@@ -60,6 +60,9 @@ tests/llm/.test-state
 .agentic/session/.correction_hint_shown
 .agentic/session/.plan-review-skipped
 .agentic/session/.spec-first-skipped
+.agentic/session/.gate-invoked-via-ag
+.agentic/session/.push-invoked-via-ag
+.agentic/session/.plan-approved
 .agentic/session/progress/
 .agentic/session/parallel-logs/
 
@@ -68,6 +71,11 @@ tests/llm/.test-state
 .agentic/intel/token-summary.json
 
 # Note: .agentic/journal/ IS committed (persistent history: manifests, lessons, plans, JOURNAL.md)
+# Exception: append-only JSONL event streams (R-007 spine) are local runtime state
+# until R-209 lands HMAC signing — once forgery is detectable they can be tracked.
+.agentic/journal/events.jsonl
+.agentic/journal/delegation.jsonl
+.agentic/journal/token-ledger.jsonl
 
 # Claude Code generated files (source of truth is .agentic/lib/claude-hooks/hooks.json)
 .claude/hooks.json

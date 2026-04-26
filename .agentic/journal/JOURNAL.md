@@ -5642,3 +5642,78 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None.
 
+
+### Session: 2026-04-26 16:33 - R-007 JSONL event spine
+
+**Why**: Center-of-gravity inversion: agents don't reliably follow in-session rules, so enforcement and observability must live in processes the agent doesn't drive. Every later piece (TUI, quota ring, critic telemetry, intel-invocation tracking) reads from this spine — without it, autonomous Tier 3 work is faith-based
+
+**Decision**: In-house validator over a jsonschema runtime dependency. The schema shape is small and fully under our control, the framework already treats jsonschema as optional in validate_specs.py, and keeping the schema JSON files canonical lets external tools (ajv, CI mirrors) use the same source of truth
+
+**What changed**:
+- Three append-only JSONL streams (events / delegation / token-ledger) now have canonical JSON Schemas plus fcntl.flock-serialized writers. 4 processes × 1000 concurrent events produce exactly 4000 valid lines; 8KB soft cap with truncation marker on the free-form field; in-house validator avoids a hard jsonschema runtime dep while the schema files stay authoritative for ajv/external use. 18 tests pass; runs under pytest or directly. First brick of the v5 observability substrate.
+
+**Next steps**:
+- R-001 (pre-commit gate, 3d) — reads the schema + uses gate_blocked/gate_skipped event types; then R-002 pre-push, then R-008 TUI
+
+**Blockers**: None
+
+
+### Session: 2026-04-26 16:51 - R-001 Tier 0 pre-commit gate (v5 redesign)
+
+**Why**: Months of failed single-agent enforcement; v5 inverts to Tier 0 git-layer enforcement that fires regardless of which agent runs in the session
+
+**Decision**: Stack R-001 branch on R-007 rather than ff-main locally — keeps both branches reviewable; merge to main is a separate user decision
+
+**What changed**:
+- Shipped precommit_gate.py with 6 hardcoded checks (tests, contracts, plan-approved sentinel, JOURNAL freshness, shipped-contract migrations, ag-commit breadcrumb), 31 tests passing without pytest/pyyaml deps. Wired ag commit --skip-gate <reason> for sanctioned audited bypasses; emits gate_blocked / gate_skipped / contract_check / test_run events to events.jsonl. Pre-commit shim installed at .git/hooks/pre-commit; activation in .agentic/hooks/ deferred to R-015 hooks register.
+
+**Next steps**:
+- R-002 prepush gate then R-008 TUI in parallel; eventually R-015 wires this gate into core.hooksPath active path
+
+**Blockers**: PyYAML missing in dev container surfaces a real ag contract check failure — environmental, not introduced by R-001
+
+
+### Session: 2026-04-26 17:05 - R-002 Tier 0 pre-push gate
+
+**Why**: Pre-commit catches per-commit shape; pre-push catches range shape (rebases, amends, force-pushes that would land bad state on shared remote); composing both is v5's defense-in-depth at the git layer
+
+**Decision**: Migration check across full pushed range reuses precommit_gate's line-based YAML helpers via lazy import — DRY without coupling the modules into each other
+
+**What changed**:
+- Shipped prepush_gate.py with 5 hardcoded checks (full integration tests, ag contract coverage threshold parsed from output, drift.sh --docs in formal+, range-walk migration check across <remote>..<local>, ag-push breadcrumb), 22 tests passing without pytest/pyyaml deps. Wired ag push --skip-gate <reason>; emits push_attempt event regardless of outcome (AC7) plus gate_blocked / gate_skipped / contract_check / test_run as in R-001. Pre-push shim installed at .git/hooks/pre-push.
+
+**Next steps**:
+- R-008 Textual TUI next (sequential per user direction)
+
+**Blockers**: Same as R-001 — PyYAML missing in dev container makes ag contract coverage degrade to 0% which would block; tests stub the output so unit tests pass
+
+
+### Session: 2026-04-26 17:51 - R-008 ag tui mission-control dashboard
+
+**Why**: Tier 3 autonomous work without observability is faith-based; the dashboard is the thing connecting a user back to multi-hour runs. Quota burn-down ring (R-014) layers on top; this is the substrate.
+
+**Decision**: Pure-Python + Textual split via panel *_lines() shapers — the R-007/R-001/R-002 pytest-free pattern works for TUI testing too; saves users from needing Textual in CI
+
+**What changed**:
+- Shipped tui/ package: pure-stdlib JSONL stream tailer (live-tail with rotation detect), thread-safe DashboardState aggregator (workers/events ring/health/tokens), 5 panel widgets (header/workers/events/health/drilldown) with shared color-hint table, Textual App entrypoint with lazy import, ag tui dispatcher. 28 tests pass without Textual installed (panels use *_lines() shapers as the pure-Python boundary; widget classes only loaded by run_tui()).
+
+**Next steps**:
+- Commit the sprint, then plan next sprint per backlog (Phase 0 fan-out: R-005 chmod, R-009 ag watch, R-010 ag fix, R-011 ag onboard, R-012 structured error msgs, R-013 quota, R-015 hooks register all unblocked)
+
+**Blockers**: Textual + Rich missing in dev container by design — install hint surfaces cleanly when ag tui invoked here
+
+
+### Session: 2026-04-26 18:10 - Sprint 1 review fixes
+
+**Why**: Code review surfaced bugs + missed conventions; addressing before merge per CLAUDE.md no-merge-with-known-issues policy
+
+**Decision**: VERSION drift left for ag done post-merge — touching VERSION manually mid-sprint violates the 'every merge bumps via ag done' convention
+
+**What changed**:
+- Addressed all reviewer feedback: prepush_gate dead code removed; tui/state monotonic clock + dead branch documented; tui/app double set_interval split into full + quota-only; tests strengthened (ring eviction, malformed YAML, quoted commands, conditional Textual skip); instruction files backport (root + template CLAUDE/cursorrules/copilot/codex + memory-seed + FRAMEWORK_MAP + HOW_IT_WORKS + DEVELOPER_GUIDE); CONTRIBUTIONS.md sprint 1 insights. 103 tests green. validate_framework.sh: 845/846 (pre-existing VERSION drift, not from sprint).
+
+**Next steps**:
+- Commit, push, merge to main per user direction
+
+**Blockers**: Legacy bash gate's complexity warning at 18 staged files (advisory only, instruction-file backport spans 11 files by nature)
+

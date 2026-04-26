@@ -1,0 +1,26 @@
+/* ag tui — mission-control dashboard (R-008).
+   Minimal Textual CSS. Each panel module declares its own DEFAULT_CSS for
+   the basics; this file holds shared theme tweaks. */
+
+Screen {
+    background: $surface;
+    color: $text;
+}
+
+#main {
+    layout: vertical;
+    height: 1fr;
+}
+
+#middle {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#middle > Static {
+    width: 1fr;
+}
+
+EventsPanel {
+    width: 2fr;
+}

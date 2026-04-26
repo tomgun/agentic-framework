@@ -8,6 +8,24 @@
 
 ## Recent Contributions
 
+### V5 SPRINT 1 — Tier 0 External Enforcement + Observability Spine (2026-04-26)
+
+**User insight 1 — "agents do not reliably follow framework rules"**: After months of building 27+ hooks, 30+ skills, 17 pre-commit gates, sentinel files, and LLM behavioral tests — the user articulated that single-agent self-enforcement has a structural ceiling rooted in post-trained model alignment (OpenAI Instruction Hierarchy, Anthropic agentic-misalignment research). The framework had been fighting the model's training. The fix is *not* more rules in the agent's context but separating execution from acceptance, narrowing worker scope, and pushing critical enforcement out of any single session.
+
+**User insight 2 — "Local-first; remote-optional"**: User directed that pure-local development must be a first-class deployment path, not a degraded mode. GitHub/cloud integrations are belt-and-suspenders. This shaped R-002 to honor the same gate semantics on raw `git push` regardless of remote, and shaped R-008 to read JSONL files directly without any cloud SaaS dependency.
+
+**User insight 3 — "keep the changes in one feature branch, then merge all"**: When given the option to branch per R-NNN item or use one sprint branch, the user chose consolidation. This reflects pragmatic R&D — multiple experimental items advance together, review happens at the boundary, history stays clean. Adopted as the v5 sprint pattern.
+
+**User insight 4 — pure-Python boundary for testability**: When R-008 needed Textual (a third-party dep absent from the dev container), user approved option 1: lazy import + graceful fallback over introducing a `pyproject.toml`. This matched the existing R-007 pattern where `events.py` validates without `jsonschema` and the contract YAMLs are parsed line-based without `pyyaml`. Result: every Tier 0 / observability piece runs and tests with stdlib alone.
+
+**User insight 5 — sanctioned-bypass breadcrumb pattern**: Pre-commit hooks cannot observe `git commit --no-verify` (the flag short-circuits hooks). User directed an audit-trail-first approach: `ag commit` drops `.agentic/session/.gate-invoked-via-ag`, the gate consumes it, and any commit *without* the breadcrumb is flagged as raw-git-invoked (informational, not blocking). Pre-push catches the same range regardless. Honest about the limit; defense in depth via composing tiers.
+
+**Design pattern — line-based YAML for shipped-contract guards**: Instead of importing PyYAML in the gate (which would force every user to install it before committing), the gate parses migration entries via line regex. Sufficient for the canonical contract structure; the gate degrades gracefully when YAML structure deviates. Documented in `_count_migration_entries` so future extenders know why.
+
+**Design pattern — pure-Python TUI shapers**: Each panel module exports a `*_lines(snapshot)` shaper plus a `make_panel()` factory. The shaper is testable; the factory lazy-imports Textual only when run. 28 R-008 tests cover the entire data-shaping layer with no Textual installed.
+
+---
+
 ### QUALITY KNOWLEDGE SYSTEM — Rebuild What v2 Deleted (2026-04-10)
 
 **User insight 1 — "how is quality for building production projects guaranteed? from planning to testing"**: User identified the fundamental question: after v2 deleted ~17K lines of quality/workflow docs, what actually ensures code quality for production projects? Investigation revealed `conventions.md` (83 lines) was the only surviving general-purpose quality guide — the v2 commit messages claimed content was "absorbed into conventions.md and v2 role prompts" but this was largely not true.
