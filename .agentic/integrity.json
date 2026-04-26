@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "algorithm": "sha256",
+  "files": {
+    ".agentic/lib/hooks/messages.py": "4554ec1a8890942c64cbf7645aca1a4d9ddd2d7db52291ee23c95e76f9c999b8",
+    ".agentic/lib/hooks/precommit_gate.py": "fb571f178830bb18d12b2aac80f62c50bb2cabe494eba2f92ea51a6852e47c09",
+    ".agentic/lib/hooks/prepush_gate.py": "adf9cf3ab12040e56709fe5563dc862441be2ac806f267d327853f50ca95af5d",
+    ".agentic/lib/integrity.py": "06a12450c253ef57b28a45a543cf43fa259d4127942f5bc11f688e377b9614b1",
+    ".claude/hooks.json": "1efec58a9cac3a42451750488ab787d9da8ee8f20536dad32c4c339c78868df8",
+    ".git/hooks/pre-commit": "d23ca987299772da59535a1f036a0ed3e3c210243df51a28e4b0f0ee770edac7",
+    ".git/hooks/pre-push": "b915149c18e5d2545d9bf2719f7c93041d7fd67e0727fd17c418623ffc22215b"
+  }
+}

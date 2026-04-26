@@ -312,6 +312,48 @@ def _emit_event(*, type: str, session_id: str, payload: dict, feature: Optional[
 # ---------------------------------------------------------------------------
 
 
+def check_integrity(ctx: GateContext) -> GateResult:
+    """AC0 (R-004): hook + agent + .claude config baseline must match the
+    committed `.agentic/integrity.json`. Runs first so an agent that
+    tampered with a later check still trips this one.
+
+    Honest limits:
+      * No baseline file → first-run / not yet baselined; pass with a
+        guidance note. The agent that runs `ag integrity update` mints
+        the first baseline.
+      * Skip via `INTEGRITY_SKIP=1` is honored only under CI (`CI=true`),
+        so an agent inside a local session cannot disable the check.
+    """
+    try:
+        import integrity  # type: ignore  # .agentic/lib/integrity.py
+    except Exception:
+        return GateResult(ac="AC0", failed=False, title="integrity (module missing; skipped)")
+
+    result = integrity.verify_all(ctx.root)
+    if result.skipped:
+        # CI-mode skip — emit an audit event so the bypass is visible.
+        _emit_event(
+            type="integrity_baseline_updated",
+            session_id=ctx.session_id,
+            payload={"action": "verify_skipped_in_ci", "reason": result.skip_reason},
+        )
+        return GateResult(ac="AC0", failed=False, title=f"integrity skip: {result.skip_reason}")
+
+    if not result.baseline_present:
+        # First-run state. Don't block; nudge.
+        return GateResult(
+            ac="AC0", failed=False,
+            title="integrity (no baseline; run `ag integrity update`)",
+        )
+
+    if not result.mismatches:
+        return GateResult(ac="AC0", failed=False, title="integrity verified")
+
+    detail_lines = [f"{m.kind:22s} {m.path}" for m in result.mismatches]
+    detail = "\n".join(["paths failing baseline check:", *detail_lines])
+    return GateResult.from_reason(messages.INTEGRITY_TAMPERED, detail=detail)
+
+
 def _has_code_changes(staged: Iterable[str]) -> bool:
     """True if any staged path looks like real source/test code (not state files)."""
     state_prefixes = (
@@ -772,6 +814,7 @@ def print_passed(results: list[GateResult]) -> None:
 
 
 _CHECKS = [
+    check_integrity,  # R-004: runs first so a tampered later-check is still caught
     check_tests,
     check_contracts,
     check_plan_approved,

@@ -5760,3 +5760,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-26 20:28 - R-004 shipped: hook integrity baseline
+
+**Why**: Closes the second known Tier 0 honest-limit (sibling to R-005 chmod 444): an agent could quietly modify the hook scripts that run the gate itself.
+
+**Decision**: Partial-JSON hashing of settings.json[hooks] only — cosmetic edits to unrelated keys don't trip the gate. Skip envvar honored only under CI so an agent in a local session cannot disable the check.
+
+**What changed**:
+- Tier 0 layer 3 complete. SHA-256 baseline of .git/hooks/*, .agentic/lib/hooks/*.py, .agentic/lib/integrity.py, .claude/hooks.json, .claude/settings.json[hooks subfield only], .claude/agents/*.md committed to .agentic/integrity.json. Pre-commit runs check_integrity FIRST (so a tampered later check still trips this one). ag integrity status/update commands; INTEGRITY_SKIP=1 honored only under CI=true. 13 unit tests, plain-script runnable. Gate hierarchy now: 1=git-layer, 2=filesystem RO, 3=hook integrity, 4=Claude hooks, ...
+
+**Next steps**:
+- Wave A R-003 last (ag merge local merge gate)
+
+**Blockers**: None
+

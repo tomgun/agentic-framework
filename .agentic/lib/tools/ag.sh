@@ -200,6 +200,7 @@ source "$COMMANDS_DIR/settings.sh"
 source "$COMMANDS_DIR/operations.sh"
 source "$COMMANDS_DIR/git-init.sh"
 source "$COMMANDS_DIR/contract.sh"
+source "$COMMANDS_DIR/integrity.sh"
 source "$COMMANDS_DIR/persona.sh"
 source "$COMMANDS_DIR/phase.sh"
 source "$COMMANDS_DIR/intel.sh"
@@ -265,6 +266,9 @@ case "${1:-help}" in
         ;;
     contract)
         shift; cmd_contract "$@"
+        ;;
+    integrity)
+        shift; cmd_integrity "$@"
         ;;
     persona)
         shift; cmd_persona "$@"

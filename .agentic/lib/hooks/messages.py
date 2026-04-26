@@ -169,6 +169,29 @@ JOURNAL_STALE = BlockReason(
     plan_ref='plan §"Durable history"',
 )
 
+INTEGRITY_TAMPERED = BlockReason(
+    code="integrity_tampered",
+    ac="AC0",
+    title="hook integrity baseline mismatch (possible tampering)",
+    next_steps=(
+        "Review the listed paths. If the changes are intentional and reviewed:",
+        "  ag integrity update     (regenerates baseline; audited via events.jsonl)",
+        "Otherwise: revert the modified hook/agent file to HEAD and re-stage.",
+    ),
+    verbose_detail=(
+        "Tier 0 R-004 baselines `.git/hooks/*`, `.agentic/lib/hooks/*.py`,\n"
+        "the integrity module itself, and `.claude/` hook config. The pre-commit\n"
+        "gate hashes them before any other check runs — so an agent that\n"
+        "modified the gate to disable a check would be caught here.\n\n"
+        "When the baseline mismatch is intentional (e.g., you legitimately\n"
+        "edited a hook), `ag integrity update` regenerates the baseline and\n"
+        "records an `integrity_baseline_updated` event in events.jsonl.\n\n"
+        "Honest limit: a determined human can `ag integrity update` to\n"
+        "launder a tamper. R-209 (HMAC signing) closes that path."
+    ),
+    plan_ref='plan §"Tier 0 honest-limit subsection" (R-004)',
+)
+
 SHIPPED_CONTRACT_NO_MIGRATION = BlockReason(
     code="shipped_contract_no_migration",
     ac="AC5",
@@ -277,6 +300,7 @@ RANGE_MIGRATIONS_MISSING = BlockReason(
 
 
 ALL_REASONS: tuple[BlockReason, ...] = (
+    INTEGRITY_TAMPERED,
     TESTS_FAILING,
     CONTRACT_CHECK_FAILED,
     PLAN_NOT_APPROVED,

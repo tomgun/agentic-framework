@@ -208,7 +208,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-004 · Hook integrity check
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"Tier 0 honest-limit subsection"
 **Goal:** SHA-256 baseline of hook scripts, agent definitions, settings.json hook entries; pre-commit verifies no tampering.
 
