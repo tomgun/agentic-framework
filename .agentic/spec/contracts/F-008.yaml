@@ -104,8 +104,9 @@ assertions:
   - id: AC-009
     text: >
       Skills-marketplace allowlist exists at .agentic/lib/data/skills-marketplace.yaml with
-      schema version 1. Every skill entry has a mandatory sha pin (no unpinned fetches).
-      Skills not listed in the allowlist cannot be installed via ag skills.
+      schema version 1. Every skill entry has a mandatory sha pin (no unpinned fetches,
+      no zero-sha placeholders past load). Skills not listed in the allowlist cannot be
+      installed via ag skills.
     type: structural
     verify: |
       test -f .agentic/lib/data/skills-marketplace.yaml &&
@@ -119,13 +120,21 @@ assertions:
               assert skill.get('sha'), f'{stack}/{skill.get(\"id\")}: missing sha pin'
       print('ok')
       "
+    tests:
+      - tests/test_skills_marketplace.sh::t_allowlist_loads
+      - tests/test_skills_marketplace.sh::t_missing_sha_rejected
+      - tests/test_skills_marketplace.sh::t_zero_sha_rejected_at_load
+      - tests/test_skills_marketplace.sh::t_malformed_yaml_rejected
 
   - id: AC-010
     text: >
       ag skills CLI is registered with subcommands suggest/install/sync/list/remove/update-pins/request.
-      Install refuses unmapped skills, refuses unpinned shas, verifies fetched sha256, and blocks
-      skills shipping scripts/ without explicit --accept-scripts. Fetches only from
-      raw.githubusercontent.com. Honors GITHUB_TOKEN, HTTPS_PROXY, NO_PROXY.
+      Install refuses unmapped skills, refuses unpinned/zero shas (rejected at load AND install for
+      defense in depth), and blocks skills shipping scripts/ without explicit --accept-scripts.
+      Integrity comes from commit-sha pinning (each fetch URL embeds a 40-char commit sha; raw host
+      serves the exact bytes for that commit). sha256 of fetched SKILL.md is recorded in .source.json
+      for tamper detection on subsequent `ag skills sync`. Fetches only from raw.githubusercontent.com.
+      Honors GITHUB_TOKEN, HTTPS_PROXY, NO_PROXY.
     type: structural
     verify: |
       test -f .agentic/lib/tools/commands/skills.sh &&
@@ -133,6 +142,14 @@ assertions:
       grep -qE '^\s*skills\)' .agentic/lib/tools/ag.sh &&
       grep -q 'raw.githubusercontent.com' .agentic/lib/tools/skills_marketplace.py &&
       grep -q 'accept-scripts\|accept_scripts' .agentic/lib/tools/skills_marketplace.py
+    tests:
+      - tests/test_skills_marketplace.sh::t_ag_skills_registered
+      - tests/test_skills_marketplace.sh::t_raw_host_enforced
+      - tests/test_skills_marketplace.sh::t_script_quarantine
+      - tests/test_skills_marketplace.sh::t_seed_sha_rejected_on_install
+      - tests/test_skills_marketplace.sh::t_request_targets_upstream_repo
+      - tests/test_skills_marketplace.sh::t_signal_path_traversal_rejected
+      - tests/test_skills_marketplace.sh::t_scoped_npm_wildcard_matches
 
   - id: AC-011
     text: >
@@ -144,6 +161,8 @@ assertions:
     verify: |
       grep -q 'local/extensions/skills' .agentic/lib/tools/generate-skills.sh &&
       grep -q 'local/extensions/skills' .agentic/lib/tools/generate-cursor-skills.sh
+    tests:
+      - tests/test_skills_marketplace.sh::t_extension_dir_paths_in_generators
 
 nfr_refs: []
 migrations:

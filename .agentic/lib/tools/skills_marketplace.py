@@ -18,10 +18,19 @@ Subcommands:
 Safety (AC-010):
   - Fetches only from raw.githubusercontent.com (HTTPS).
   - Refuses skills not listed in the allowlist.
-  - Refuses entries whose sha is missing or all-zero (seed marker).
-  - sha256 of fetched SKILL.md is recorded in .source.json; upstream
-    changes surface via `ag skills sync`.
+  - Refuses entries whose sha is missing or all-zero (seed marker) — at load
+    AND at install (defense in depth).
+  - Integrity comes from commit-sha pinning (each fetch URL embeds a 40-char
+    commit sha; raw.githubusercontent.com serves the exact bytes for that
+    commit). sha256 of fetched SKILL.md is also recorded in .source.json
+    for tamper detection on subsequent `ag skills sync`.
   - If a fetched skill ships scripts/, install aborts unless --accept-scripts.
+    NOTE: scripts/ detection is heuristic — we inspect the SKILL.md text for
+    Bash in `allowed-tools` frontmatter or scripts/*.sh references. A skill
+    repo could ship scripts/ that the SKILL.md never mentions; the generator
+    pipeline would then copy them through. This is an honest limitation.
+    Hardening path: enumerate skill subpaths via the GitHub trees API (sha-
+    pinned) before fetch. Tracked as a follow-up.
   - Honors GITHUB_TOKEN (for rate limit), HTTPS_PROXY, NO_PROXY.
 
 Precedence (AC-011, R4):
@@ -41,7 +50,8 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 
@@ -55,7 +65,6 @@ def _require_yaml():
         return yaml
     except ImportError:
         die("PyYAML is required for `ag skills` (install: `pip install pyyaml`).", code=2)
-    return None  # unreachable
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -110,17 +119,25 @@ class Allowlist:
         if not path.exists():
             die(f"Allowlist not found at {path}")
         yaml = _require_yaml()
-        data = yaml.safe_load(path.read_text()) or {}
+        try:
+            data = yaml.safe_load(path.read_text()) or {}
+        except yaml.YAMLError as e:
+            die(f"Allowlist {path}: YAML parse error: {e}")
         version = data.get("version")
         if version != 1:
             die(f"Allowlist {path}: expected version 1, got {version!r}")
         stacks = data.get("stacks") or {}
         # Validate shape + mandatory sha on every skill (AC-009)
+        # Reject zero-sha (seed marker) at load — ensures suggest/list/sync also
+        # surface the seed-state, not just install. install_skill() also rejects
+        # zero-sha for defense in depth.
         for name, body in stacks.items():
             for skill in body.get("skills") or []:
                 sha = skill.get("sha")
                 if not sha or not re.fullmatch(r"[0-9a-f]{40}", sha):
                     die(f"Allowlist: stack '{name}' skill '{skill.get('id')}' missing or invalid sha pin")
+                if sha == ZERO_SHA:
+                    die(f"Allowlist: stack '{name}' skill '{skill.get('id')}' has placeholder zero-sha; a maintainer must run `ag skills update-pins` and commit the resolved sha before this entry can be used.")
         return cls(version=version, stacks=stacks)
 
     def entries(self) -> Iterable[SkillEntry]:
@@ -156,6 +173,7 @@ def is_tty() -> bool:
 # ---------------------------------------------------------------------------
 # Stack detection (signals → matching stack keys)
 # ---------------------------------------------------------------------------
+@lru_cache(maxsize=1)
 def _read_package_json() -> dict:
     p = PROJECT_ROOT / "package.json"
     if not p.exists():
@@ -169,17 +187,40 @@ def _read_package_json() -> dict:
 def _pkg_json_path(jq_path: str, pkg: dict) -> bool:
     """Resolve e.g. 'dependencies.react' → pkg['dependencies']['react'] exists.
 
-    Supports a trailing glob (e.g. dependencies.@azure/.*) via regex on last segment.
+    Supports scoped npm packages: keys matching '@scope/name' are treated as a
+    single segment (the '/' is the separator inside the key, not a path step).
+    Supports a trailing glob on the last segment (e.g. 'dependencies.@azure/*'
+    matches any '@azure/<anything>' key).
     """
-    parts = jq_path.split(".")
+    # Tokenize: scoped npm names like @scope/name remain a single segment.
+    # Strategy: split on '.' but rejoin '@x/y' tokens that got separated.
+    raw_parts = jq_path.split(".")
+    parts: list[str] = []
+    i = 0
+    while i < len(raw_parts):
+        part = raw_parts[i]
+        # Handle '@scope/name' wildcards: '@azure/*' — the '*' may itself be a part
+        if part.startswith("@") and "/" not in part and i + 1 < len(raw_parts):
+            # Reassemble with following segment(s) until we have @scope/name
+            part = part + "." + raw_parts[i + 1]
+            i += 2
+        else:
+            i += 1
+        parts.append(part)
+
     cur: object = pkg
-    for i, part in enumerate(parts):
-        is_last = i == len(parts) - 1
+    for j, part in enumerate(parts):
+        is_last = j == len(parts) - 1
         if is_last and ("*" in part or part.endswith("/")):
             # wildcard match on keys
             if not isinstance(cur, dict):
                 return False
-            pattern = re.compile("^" + part.replace(".", r"\.").replace("*", ".*") + "$")
+            # Anchor: '^@azure/.*$' matches '@azure/identity', etc.
+            pattern_text = "^" + re.escape(part).replace(r"\*", ".*") + "$"
+            try:
+                pattern = re.compile(pattern_text)
+            except re.error:
+                return False
             return any(pattern.match(k) for k in cur.keys())
         if not isinstance(cur, dict) or part not in cur:
             return False
@@ -188,7 +229,11 @@ def _pkg_json_path(jq_path: str, pkg: dict) -> bool:
 
 
 def signal_matches(signal: str) -> bool:
-    """Evaluate one signal against the project. See allowlist header for grammar."""
+    """Evaluate one signal against the project. See allowlist header for grammar.
+
+    Bare-filename signals must be relative paths within PROJECT_ROOT — absolute
+    paths and `..` traversal are rejected.
+    """
     if signal.startswith("package.json:"):
         pkg = _read_package_json()
         if not pkg:
@@ -199,8 +244,11 @@ def signal_matches(signal: str) -> bool:
             return False
         pattern = re.compile(signal.split(":", 1)[1], re.IGNORECASE)
         return bool(pattern.search(STACK_MD.read_text()))
-    # bare filename signals — file presence
-    return (PROJECT_ROOT / signal).exists()
+    # bare filename signals — file presence within PROJECT_ROOT only
+    sig_path = Path(signal)
+    if sig_path.is_absolute() or ".." in sig_path.parts:
+        return False
+    return (PROJECT_ROOT / sig_path).exists()
 
 
 def detect_stacks(allow: Allowlist) -> list[str]:
@@ -213,10 +261,16 @@ def detect_stacks(allow: Allowlist) -> list[str]:
 
 
 def builtin_covers(stack: str) -> bool:
-    """R4 precedence: skip marketplace if built-in F-008 file exists for stack."""
-    # Map allowlist stack-key → built-in quality_knowledge filename
+    """R4 precedence: skip marketplace if built-in F-008 file exists for stack.
+
+    Map allowlist stack-key → built-in quality_knowledge filename. React-web
+    apps are covered by `web_fullstack` (Next.js + general web frontend
+    knowledge applies). React Native is `mobile_react_native`. Vanilla React
+    web should NOT be considered covered by the RN file.
+    """
     builtin_map = {
-        "react": "mobile_react_native",   # no direct react builtin; RN is closest
+        "react": "web_fullstack",         # React web → web_fullstack (Next.js, frontend patterns)
+        "react_native": "mobile_react_native",
         "python": "backend_python",
         "node": "backend_node",
         "nextjs": "web_fullstack",
@@ -250,8 +304,7 @@ def fetch(url: str) -> bytes:
     except urllib.error.HTTPError as e:
         die(f"fetch failed ({e.code}): {url}")
     except urllib.error.URLError as e:
-        die(f"network error: {e.reason} — {url}")
-    return b""  # unreachable
+        die(f"network error: {e.reason} - {url}")
 
 
 # ---------------------------------------------------------------------------
@@ -403,8 +456,8 @@ def cmd_install(args) -> int:
     if not args.yes and is_tty():
         print("Install the following skills?")
         for c in candidates:
-            print(f"  - {c.id} [{c.stack}] — {c.reason}")
-        print(f"    source: https://github.com/{c.owner_repo} @ {c.sha[:7]}")
+            print(f"  - {c.id} [{c.stack}] - {c.reason}")
+            print(f"    source: https://github.com/{c.owner_repo} @ {c.sha[:7]}")
         resp = input("Proceed? [y/N] ").strip().lower()
         if resp not in ("y", "yes"):
             print("Aborted.")
@@ -426,7 +479,7 @@ def cmd_sync(args) -> int:
 
     if args.dry_run:
         if to_add or to_remove:
-            print(f"🧩 Stack signals changed — {len(to_add)} skill(s) to add, {len(to_remove)} to remove. Run: ag skills sync")
+            print(f"Stack signals changed: {len(to_add)} skill(s) to add, {len(to_remove)} to remove. Run: ag skills sync")
         return 0 if not (to_add or to_remove) else 2  # 2 = diff present (hook signal)
 
     if not (to_add or to_remove):
@@ -478,6 +531,11 @@ def cmd_update_pins(args) -> int:
     Uses GitHub's refs API (not raw) to fetch the current HEAD sha of the
     default branch. Does NOT write changes; prints proposed edits so a
     maintainer can review and commit intentionally.
+
+    Limitation: HEAD sha is repo-wide, not subpath-aware. If a skill author
+    pushes commits that don't touch the skill's subpath, this still reports
+    a stale diff. Maintainers should verify the subpath actually changed
+    (e.g., `git log --oneline old..new -- <subpath>`) before bumping.
     """
     allow = Allowlist.load()
     seen = set()
@@ -508,21 +566,29 @@ def cmd_update_pins(args) -> int:
 
 
 def cmd_request(args) -> int:
-    """Open a templated GitHub issue to propose a new skill (R11)."""
+    """Open a templated GitHub issue to propose a new skill (R11).
+
+    Issue is filed against the framework upstream repo, NOT the user's
+    current repo. The default upstream is tomgun/agentic-framework; users
+    can override with --upstream-repo for forks.
+    """
     url = args.url
     stack_guess = args.stack or "unknown"
+    upstream = args.upstream_repo or "tomgun/agentic-framework"
     body = (
         f"**Proposed skill:** {url}\n"
         f"**Target stack:** {stack_guess}\n\n"
-        f"**Why it would help:**\n\n_…rationale here…_\n\n"
+        f"**Why it would help:**\n\n_...rationale here..._\n\n"
         f"**Source reviewed:** [ ] SKILL.md read  [ ] no executable scripts / scripts reviewed\n"
     )
     if not shutil.which("gh"):
         print("Skill request template (install `gh` to auto-open issue):\n")
         print(body)
+        print(f"\nFile against: {upstream}")
         return 0
     subprocess.run(
         ["gh", "issue", "create",
+         "--repo", upstream,
          "--title", f"Skills marketplace request: {url}",
          "--body", body,
          "--label", "skills-marketplace"],
@@ -563,6 +629,7 @@ def main(argv: list[str] | None = None) -> int:
     pq = sub.add_parser("request")
     pq.add_argument("url", help="GitHub repo URL of proposed skill")
     pq.add_argument("--stack", help="target stack key (e.g. react)")
+    pq.add_argument("--upstream-repo", help="GitHub repo to file the issue against (default: tomgun/agentic-framework)")
 
     args = p.parse_args(argv)
 

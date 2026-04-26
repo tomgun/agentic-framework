@@ -9,7 +9,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag verify F-XXXX` — run tests and record results
 - `ag done F-XXXX` — post-merge: doc gate, VERSION bump, state flush
 - `ag status` — see current work items
-- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase` | `ag persona`
+- `ag commit` | `ag done` | `ag todo` | `ag backlog` | `ag git-init` | `ag contract` | `ag phase` | `ag persona` | `ag skills`
 
 Decision routing: current state → OVERVIEW.md, work log with reasoning → JOURNAL.md (use `--decision` to mark choices), ADR for significant tradeoffs (formal), user preferences → `ag intel remember`.
 
@@ -27,6 +27,7 @@ Decision routing: current state → OVERVIEW.md, work log with reasoning → JOU
 - Proposing a choice: Before presenting a recommendation, write: `echo "Use Redis for caching" > .agentic/session/pending-decision.txt`. Framework detects "yes/ok" and advises capture.
 - "intelligence/patterns/quality checks" → Run `ag intel` subcommands (check, learn, remember, patterns, memory, decisions, review-session).
 - "quality check/quality profile/stack quality/quality validation/quality setup" → Run `ag quality setup` (generate profile from detected stack), `ag quality run` (run checks), `ag quality status` (show profile). Stack knowledge in `.agentic/lib/quality_knowledge/`.
+- "skills marketplace/install community skill/recommended skill/skill for stack" → Run `ag skills suggest` (matches against detected stack), `ag skills install --all` (interactive install with sha pinning + script quarantine), `ag skills sync` (reconcile installed vs current stack). Allowlist at `.agentic/lib/data/skills-marketplace.yaml`. Built-in F-008 quality_knowledge takes precedence (`--override-builtin` to bypass).
 - Before workflow phases: run `ag intel architecture` (planning), `ag intel spec F-XXXX` (specs), `ag intel implement F-XXXX` (coding), `ag intel test F-XXXX` (testing) for phase-aware quality guidance.
 - NEVER write code for multiple features outside of `ag auto` commands.
 - **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.

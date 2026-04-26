@@ -23,6 +23,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
 - `ag commit` | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag skills suggest|install|sync|list|remove|update-pins|request` — F-008 marketplace integration: install community quality skills from a curated allowlist with mandatory sha pinning, script quarantine, and Claude+Cursor fan-out
 - `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX`
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
