@@ -5747,3 +5747,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-26 20:19 - Removed fabricated CONTRIBUTIONS entries
+
+**Why**: Honest attribution: CONTRIBUTIONS.md is for actual user design inputs, not author framings dressed up as quotes.
+
+**What changed**:
+- User flagged R-005 + R-012 entries as misattributed framings, not actual user insights. Removed both sections cleanly; conversation + journal entries already capture real inputs (Wave A ordering, phase-based PR batching).
+
+**Next steps**:
+- Continue Wave A: R-004 hook integrity baseline
+
+**Blockers**: None
+

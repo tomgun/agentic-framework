@@ -3328,38 +3328,6 @@ Initial proposal included 8 behavioral protocols ("answer honestly - could this 
 
 ---
 
-### R-005 — Filesystem Read-Only Protection for Shipped Contracts (v0.83.0)
-
-**User insight 1 — "Hardening before polish"**: Tomas chose Wave A (R-005 + R-012 + R-004 + R-003) over Wave B (UX widgets) for sprint 2, with the framing that *doing UX widgets before hardening leaves a leaky wall behind a polished facade*. The ordering principle: every honest-limit you document is a wall left to build. Hardening costs less when you do it before you have users counting on the polish.
-
-**User insight 2 — "Two walls, not one"**: The R-005 design pairs filesystem `chmod 444` with the existing pre-commit gate's shipped-contract-migration check. Either layer alone is bypassable: the chmod is undone by `chmod u+w`, the gate is undone by `--no-verify`. Together they form an "agent must be deliberate, twice" invariant — accidental or LLM-pattern-following mutation is blocked by the filesystem, intentional bypass is recorded by the gate's audit trail. **The principle: structural enforcement isn't single-layer; it's belt-and-suspenders where each layer is honest about its own limit.**
-
-**User insight 3 — "Sanctioned path, not lockdown"**: Rather than freezing shipped contracts entirely, R-005 introduces `ag contract migrate F-XXX --reason "<text>"` as the sanctioned mutation path. Tomas framed this as *the only way through is the way that records the audit trail*. The chmod cycle (444 → 644 → mutate → 444) is internal to the command; agents see one ergonomic call instead of a permission puzzle. **The principle: friction belongs at the bypass, not the happy path.**
-
-**Why it matters**: Shipped contracts are the framework's contract-with-itself. Before R-005, an agent could quietly mutate them via `Edit`/`Write` — pre-commit caught the diff, but only at commit time, after the agent had already convinced itself the change was fine. R-005 moves the block to the moment the agent tries to write, with a clear pointer to the migration command. The error message *is* the documentation.
-
-**Design direction**: Every Tier 0 honest-limit in the enforcement hierarchy gets a paired non-git layer. R-004 (hook integrity) closes the hook-tampering limit next; together with R-005 the only deliberate-action bypass remaining is `git commit --no-verify`, which the gate already audits via push-time replay.
-
----
-
-### R-012 — Structured Gate Error Messages with Next-Step Catalog (v0.83.0)
-
-**User insight 1 — "Friction belongs at the bypass, not the failure"**: Tomas pushed for the gate to fail *informatively*, not just block. The principle: the agent shouldn't have to read source code to find the next command. Every blocked check carries 1–3 concrete `ag` invocations that resolve it. Bypass remains audited (`--skip-gate "<reason>"`); the helpful UX belongs at the failure path.
-
-**User insight 2 — "The error message *is* the documentation"**: When R-005 introduced the EACCES path on shipped contracts, the refusal hint pointed directly at `ag contract migrate F-XXX --reason "..."` — which is the exact command needed to resolve it. R-012 generalizes that pattern across every gate failure. **Documentation that lives only in design docs is documentation no one reads when they're stuck. Documentation that prints itself at the moment of failure is documentation that converts into action.**
-
-**User insight 3 — "One PR per phase, not one per item"**: When asked why R-005 and R-012 should be separate PRs, Tomas pushed back: sprint 1 was a single merged PR ("Merge sprint 1 — Tier 0 git-layer enforcement + observability spine") covering 4 items. The natural batching is sprint/wave, not individual R-XXX items. **The principle: PR boundaries should match cognitive boundaries (a coherent shipped capability), not bureaucratic boundaries (one ticket = one PR).** Wave A is "Tier 0 hardening cluster" — a single coherent narrative, hence a single PR.
-
-**Why it matters**: Sprint 1 shipped working gates (R-001/R-002), but their UX was minimal — bare BLOCKED messages with whatever next-steps each `check_*` function had inlined. R-012 extracts the message catalog into `messages.py` so:
-- Every block reason is grep-able (one place to refine wording)
-- The 1–3 next-steps invariant is enforced by the dataclass and validated by tests
-- `precommit_gate` and `prepush_gate` share strings instead of drifting
-- A `--verbose` flag layers in expanded explanations + plan refs without bloating the default output
-
-**Design direction**: The catalog is the source of truth; the gates are thin. Adding a new check means adding a new `BlockReason` to `messages.py` and a `from_reason(...)` call in the gate — no inline next-step strings allowed. Tests enforce that every `from_reason(messages.X)` reference resolves, so the catalog stays in sync with the gates.
-
----
-
 **Framework Repository**: https://github.com/tomgun/agentic-framework
 **Current Version**: v0.73.0
 **License**: Dual-license (GPL-3.0 for framework, proprietary OK for products)
