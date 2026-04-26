@@ -5672,3 +5672,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: PyYAML missing in dev container surfaces a real ag contract check failure — environmental, not introduced by R-001
 
+
+### Session: 2026-04-26 17:05 - R-002 Tier 0 pre-push gate
+
+**Why**: Pre-commit catches per-commit shape; pre-push catches range shape (rebases, amends, force-pushes that would land bad state on shared remote); composing both is v5's defense-in-depth at the git layer
+
+**Decision**: Migration check across full pushed range reuses precommit_gate's line-based YAML helpers via lazy import — DRY without coupling the modules into each other
+
+**What changed**:
+- Shipped prepush_gate.py with 5 hardcoded checks (full integration tests, ag contract coverage threshold parsed from output, drift.sh --docs in formal+, range-walk migration check across <remote>..<local>, ag-push breadcrumb), 22 tests passing without pytest/pyyaml deps. Wired ag push --skip-gate <reason>; emits push_attempt event regardless of outcome (AC7) plus gate_blocked / gate_skipped / contract_check / test_run as in R-001. Pre-push shim installed at .git/hooks/pre-push.
+
+**Next steps**:
+- R-008 Textual TUI next (sequential per user direction)
+
+**Blockers**: Same as R-001 — PyYAML missing in dev container makes ag contract coverage degrade to 0% which would block; tests stub the output so unit tests pass
+

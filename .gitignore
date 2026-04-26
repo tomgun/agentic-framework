@@ -61,6 +61,7 @@ tests/llm/.test-state
 .agentic/session/.plan-review-skipped
 .agentic/session/.spec-first-skipped
 .agentic/session/.gate-invoked-via-ag
+.agentic/session/.push-invoked-via-ag
 .agentic/session/.plan-approved
 .agentic/session/progress/
 .agentic/session/parallel-logs/

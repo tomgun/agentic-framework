@@ -101,7 +101,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-002 · `prepush_gate.py` — pre-push integration suite + drift checks
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"Tier 0 — Always-on external enforcement"
 **Goal:** Second-wall enforcement at git push. Runs full e2e suite + doc-freshness drift + contract coverage analysis.
 
