@@ -580,7 +580,7 @@ Please research current best practices for [environment]:
 
 Use **AskUserQuestion** in 2 calls. Call 2 is **dynamic** — adapt options based on Call 1 answers.
 
-**Call 1 — Project identity** (4 questions, user will often pick "Other" for free-text):
+**Call 1 — Project identity** (3 questions, user will often pick "Other" for free-text):
 ```json
 {
   "questions": [
@@ -591,19 +591,11 @@ Use **AskUserQuestion** in 2 calls. Call 2 is **dynamic** — adapt options base
       "options": [
         {"label": "Web app", "description": "Browser-based application"},
         {"label": "Mobile app", "description": "iOS/Android native or hybrid"},
+        {"label": "Desktop app", "description": "Electron, Tauri, native"},
         {"label": "CLI tool", "description": "Command-line utility"},
-        {"label": "Game", "description": "Interactive game or simulation"}
-      ]
-    },
-    {
-      "question": "Primary platform?",
-      "header": "Platform",
-      "multiSelect": false,
-      "options": [
-        {"label": "Web", "description": "Browser-based"},
-        {"label": "Mobile", "description": "iOS/Android"},
-        {"label": "Desktop", "description": "Electron, Tauri, native"},
-        {"label": "CLI", "description": "Terminal application"}
+        {"label": "API / service", "description": "Backend service, no UI"},
+        {"label": "Game", "description": "Interactive game or simulation"},
+        {"label": "Other", "description": "Describe in free text"}
       ]
     },
     {
@@ -631,6 +623,8 @@ Use **AskUserQuestion** in 2 calls. Call 2 is **dynamic** — adapt options base
   ]
 }
 ```
+
+**Platform follow-up** (only if needed): If the user picks "Game" or "Other", ask a follow-up for target platform (web, mobile, desktop) since the product type alone doesn't determine it. For all other options the platform is implied by the product type — map directly to STACK.md `Primary platform:`.
 
 **Call 2 — Constraints & testing** (DYNAMIC — build based on Call 1 answers):
 
@@ -680,6 +674,15 @@ Example for a TypeScript web app:
         {"label": "Cypress", "description": "Mature, large community"},
         {"label": "None", "description": "Skip E2E for now"}
       ]
+    },
+    {
+      "question": "Development approach?",
+      "header": "Dev mode",
+      "multiSelect": false,
+      "options": [
+        {"label": "Acceptance-driven (default)", "description": "Implement feature, then tests verify acceptance criteria"},
+        {"label": "TDD", "description": "Write failing tests first, then implement (red-green-refactor)"}
+      ]
     }
   ]
 }
@@ -709,10 +712,23 @@ Example for a Python CLI tool (no E2E question):
         {"label": "unittest", "description": "Built-in, no dependencies"},
         {"label": "hypothesis", "description": "Property-based testing"}
       ]
+    },
+    {
+      "question": "Development approach?",
+      "header": "Dev mode",
+      "multiSelect": false,
+      "options": [
+        {"label": "Acceptance-driven (default)", "description": "Implement feature, then tests verify acceptance criteria"},
+        {"label": "TDD", "description": "Write failing tests first, then implement (red-green-refactor)"}
+      ]
     }
   ]
 }
 ```
+
+**Development approach** — write to STACK.md based on the answer:
+- Acceptance-driven → `development_mode: standard`
+- TDD → `development_mode: tdd`
 
 After collecting answers, proceed with the detailed steps below:
 - **License**: See Step 2a
@@ -866,7 +882,8 @@ Ask the user:
 "How do you want to work with AI agents?
 
 a) Single agent (default) - One agent handles everything
-   Simple, no coordination overhead
+   Simple, no coordination overhead. Can add multi-agent later with:
+   bash .agentic/lib/tools/setup-agent.sh pipeline
    Good for: Most projects, getting started
 
 b) Specialized agents - Different agents for research, testing, coding, review
@@ -879,11 +896,7 @@ c) Parallel features - Multiple agents on different features simultaneously
    Requires: AGENTS.json coordination
    Good for: Large projects, team development
 
-d) Not sure - Start simple, enable later
-   You can always add multi-agent support with:
-   bash .agentic/lib/tools/setup-agent.sh pipeline
-
-Type a/b/c/d:"
+Type a/b/c:"
 ```
 
 **If (b) Specialized agents chosen:**
@@ -900,7 +913,7 @@ Type a/b/c/d:"
    git worktree add ../project-F0042 -b feature/F-0042
    ```
 
-**If (a) or (d) chosen:**
+**If (a) Single agent chosen:**
 - No additional setup needed
 - Multi-agent can be enabled later
 

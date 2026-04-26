@@ -101,6 +101,69 @@ assertions:
         2>/dev/null | grep -v 'quality_knowledge\|quality_profiles\|anatomy\.yaml\|CHANGELOG\|journal/' | wc -l)
       test "$count" -le 8
 
+  - id: AC-009
+    text: >
+      Skills-marketplace allowlist exists at .agentic/lib/data/skills-marketplace.yaml with
+      schema version 1. Every skill entry has a mandatory sha pin (no unpinned fetches,
+      no zero-sha placeholders past load). Skills not listed in the allowlist cannot be
+      installed via ag skills.
+    type: structural
+    verify: |
+      test -f .agentic/lib/data/skills-marketplace.yaml &&
+      python3 -c "
+      import sys, yaml
+      with open('.agentic/lib/data/skills-marketplace.yaml') as f:
+          data = yaml.safe_load(f)
+      assert data.get('version') == 1, 'missing/wrong version'
+      for stack, body in (data.get('stacks') or {}).items():
+          for skill in (body.get('skills') or []):
+              assert skill.get('sha'), f'{stack}/{skill.get(\"id\")}: missing sha pin'
+      print('ok')
+      "
+    tests:
+      - tests/test_skills_marketplace.sh::t_allowlist_loads
+      - tests/test_skills_marketplace.sh::t_missing_sha_rejected
+      - tests/test_skills_marketplace.sh::t_zero_sha_rejected_at_load
+      - tests/test_skills_marketplace.sh::t_malformed_yaml_rejected
+
+  - id: AC-010
+    text: >
+      ag skills CLI is registered with subcommands suggest/install/sync/list/remove/update-pins/request.
+      Install refuses unmapped skills, refuses unpinned/zero shas (rejected at load AND install for
+      defense in depth), and blocks skills shipping scripts/ without explicit --accept-scripts.
+      Integrity comes from commit-sha pinning (each fetch URL embeds a 40-char commit sha; raw host
+      serves the exact bytes for that commit). sha256 of fetched SKILL.md is recorded in .source.json
+      for tamper detection on subsequent `ag skills sync`. Fetches only from raw.githubusercontent.com.
+      Honors GITHUB_TOKEN, HTTPS_PROXY, NO_PROXY.
+    type: structural
+    verify: |
+      test -f .agentic/lib/tools/commands/skills.sh &&
+      test -f .agentic/lib/tools/skills_marketplace.py &&
+      grep -qE '^\s*skills\)' .agentic/lib/tools/ag.sh &&
+      grep -q 'raw.githubusercontent.com' .agentic/lib/tools/skills_marketplace.py &&
+      grep -q 'accept-scripts\|accept_scripts' .agentic/lib/tools/skills_marketplace.py
+    tests:
+      - tests/test_skills_marketplace.sh::t_ag_skills_registered
+      - tests/test_skills_marketplace.sh::t_raw_host_enforced
+      - tests/test_skills_marketplace.sh::t_script_quarantine
+      - tests/test_skills_marketplace.sh::t_seed_sha_rejected_on_install
+      - tests/test_skills_marketplace.sh::t_request_targets_upstream_repo
+      - tests/test_skills_marketplace.sh::t_signal_path_traversal_rejected
+      - tests/test_skills_marketplace.sh::t_scoped_npm_wildcard_matches
+
+  - id: AC-011
+    text: >
+      Marketplace skills land in .agentic/local/extensions/skills/marketplace-<slug>/ with a
+      .source.json recording id, repo, sha, sha256. generate-skills.sh propagates them to
+      .claude/skills/ (existing extension pipeline) and generate-cursor-skills.sh propagates
+      them to .cursor/skills/ (extended to read the extensions dir).
+    type: structural
+    verify: |
+      grep -q 'local/extensions/skills' .agentic/lib/tools/generate-skills.sh &&
+      grep -q 'local/extensions/skills' .agentic/lib/tools/generate-cursor-skills.sh
+    tests:
+      - tests/test_skills_marketplace.sh::t_extension_dir_paths_in_generators
+
 nfr_refs: []
 migrations:
   - id: M-001
@@ -115,3 +178,19 @@ migrations:
       - "Created .agentic/lib/quality_knowledge/ (21 files)"
       - "Created quality_profile_generator.py + ag quality CLI"
       - "Wired enforcement into ag commit, gate.py, scaffold.sh"
+
+  - id: M-002
+    date: "2026-04-13"
+    trigger: expansion
+    reason: >
+      Added skills.sh marketplace integration (PR-A of three-phase rollout): stack-matched
+      community skills installable from a curated allowlist, with mandatory sha pinning,
+      script quarantine, and agent-agnostic fan-out to Claude + Cursor skill dirs. PR-B
+      (ag init integration) and PR-C (stack-change hook + instruction-file sync across
+      Claude/Cursor/Copilot/Codex + LLM tests) follow in backlog positions 13-14.
+    changes:
+      - "Added AC-009 (allowlist with mandatory sha), AC-010 (CLI + safety), AC-011 (extension-dir fan-out)"
+      - "Created .agentic/lib/data/skills-marketplace.yaml"
+      - "Created .agentic/lib/tools/skills_marketplace.py"
+      - "Created .agentic/lib/tools/commands/skills.sh + registered ag skills"
+      - "Extended generate-cursor-skills.sh to read .agentic/local/extensions/skills/"

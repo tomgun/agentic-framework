@@ -203,6 +203,7 @@ source "$COMMANDS_DIR/phase.sh"
 source "$COMMANDS_DIR/intel.sh"
 source "$COMMANDS_DIR/debug.sh"
 source "$COMMANDS_DIR/quality.sh"
+source "$COMMANDS_DIR/skills.sh"
 
 # Self-healing: ensure pre-commit hooks are installed on every ag invocation
 # Addresses D2 (Deterministic Enforcement) — hooks must survive git config resets
@@ -296,6 +297,10 @@ case "${1:-help}" in
     quality)
         shift
         cmd_quality "$@"
+        ;;
+    skills)
+        shift
+        cmd_skills "$@"
         ;;
     qa)
         shift

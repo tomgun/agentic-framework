@@ -76,5 +76,17 @@
     "description": "T-0087: AC check-off timing \u2014 verify in feature branch pre-merge, not post-merge (F-002)",
     "added_at": "2026-04-10T13:26:14Z",
     "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "F-008 PR-B: skills.sh marketplace - ag init integration (interactive prompt, non-interactive fallback, --no-skills flag)",
+    "added_at": "2026-04-13T19:05:42Z",
+    "added_by": "agent"
+  },
+  {
+    "type": "task",
+    "description": "F-008 PR-C: skills.sh marketplace - STACK.md change hook + instruction-file sync across Claude/Cursor/Copilot/Codex + LLM test variants",
+    "added_at": "2026-04-13T19:05:47Z",
+    "added_by": "agent"
   }
 ]

@@ -5612,3 +5612,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-13 19:13 - F-008 PR-A: skills.sh marketplace integration scaffold
+
+**Why**: F-008 today ships 7 built-in stack quality files. Community stacks outside that set get nothing. skills.sh provides ~91k community skills but no safe install path into the framework.
+
+**Decision**: Curated allowlist + confirm prompt (supply-chain gate), GitHub raw fetch only (no npx/arbitrary JS), mandatory sha pins, script quarantine, extension-dir landing zone. Three-PR phasing — engine first, init integration second, change-detection hook third.
+
+**What changed**:
+- Added ag skills CLI (suggest/install/sync/list/remove/update-pins/request) with curated allowlist at .agentic/lib/data/skills-marketplace.yaml, Python engine at skills_marketplace.py, bash dispatcher, Cursor generator extension. AC-009/010/011 + M-002 added to F-008 contract.
+
+**Next steps**:
+- PR-B: ag init integration (backlog pos 13). PR-C: STACK.md PostToolUse hook + cross-agent instruction sync + LLM tests (backlog pos 14).
+
+**Blockers**: Real sha pins needed before first real install — current entries are seed placeholders (all-zero shas); ag skills install refuses seed pins explicitly.
+
