@@ -279,7 +279,7 @@ case "${1:-help}" in
         cmd_feedback "$@"
         ;;
     commit)
-        cmd_commit
+        shift; cmd_commit "$@"
         ;;
     done)
         shift; cmd_done "$@"

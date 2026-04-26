@@ -5657,3 +5657,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-26 16:51 - R-001 Tier 0 pre-commit gate (v5 redesign)
+
+**Why**: Months of failed single-agent enforcement; v5 inverts to Tier 0 git-layer enforcement that fires regardless of which agent runs in the session
+
+**Decision**: Stack R-001 branch on R-007 rather than ff-main locally — keeps both branches reviewable; merge to main is a separate user decision
+
+**What changed**:
+- Shipped precommit_gate.py with 6 hardcoded checks (tests, contracts, plan-approved sentinel, JOURNAL freshness, shipped-contract migrations, ag-commit breadcrumb), 31 tests passing without pytest/pyyaml deps. Wired ag commit --skip-gate <reason> for sanctioned audited bypasses; emits gate_blocked / gate_skipped / contract_check / test_run events to events.jsonl. Pre-commit shim installed at .git/hooks/pre-commit; activation in .agentic/hooks/ deferred to R-015 hooks register.
+
+**Next steps**:
+- R-002 prepush gate then R-008 TUI in parallel; eventually R-015 wires this gate into core.hooksPath active path
+
+**Blockers**: PyYAML missing in dev container surfaces a real ag contract check failure — environmental, not introduced by R-001
+

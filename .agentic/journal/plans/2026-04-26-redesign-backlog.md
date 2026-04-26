@@ -37,7 +37,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ## Phase 0 — Tier 0 hardening + observability spine + UX additions (4–5.5 weeks)
 
 ### R-007 · JSONL event spine schema + writer
-**Status:** in_progress · **Effort:** 2d · **Deps:** —
+**Status:** shipped · **Effort:** 2d · **Deps:** —
 **Plan ref:** plan §"Observability layer" + §"Canonical event streams"
 **Goal:** Define the canonical JSONL schemas for `events.jsonl`, `delegation.jsonl`, `token-ledger.jsonl`; implement an append-only writer used by all subsequent hooks/CLIs.
 
@@ -66,7 +66,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-001 · `precommit_gate.py` — hardcoded-blocking pre-commit gate
-**Status:** planned · **Effort:** 3d · **Deps:** R-007
+**Status:** shipped · **Effort:** 3d · **Deps:** R-007
 **Plan ref:** plan §"Tier 0 — Always-on external enforcement" + §"Quality + verification capabilities" §7
 **Goal:** Tier 0 pre-commit Python gate. Fires at `git commit` (separate process from Claude Code), runs harness verification, blocks on contract/sentinel/journal failures. No advisory escapes.
 

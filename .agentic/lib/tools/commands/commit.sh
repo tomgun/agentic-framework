@@ -4,6 +4,29 @@
 # Depends on: SCRIPT_DIR, ROOT_DIR, PROFILE, color codes, paths.sh, settings.sh
 
 cmd_commit() {
+    # Sanctioned Tier 0 bypass (R-001 AC7): `ag commit --skip-gate "<reason>"`
+    # Sets AGENT_SKIP_GATE so precommit_gate.py records a `gate_skipped` event
+    # and returns 0, then forwards remaining args to `git commit`. Use sparingly.
+    if [[ "${1:-}" == "--skip-gate" ]]; then
+        local reason="${2:-}"
+        if [[ -z "$reason" ]]; then
+            echo -e "${RED}ag commit --skip-gate requires a reason.${NC}"
+            echo "  Usage: ag commit --skip-gate \"<reason>\" [git-commit-args...]"
+            return 1
+        fi
+        shift 2
+        export AGENT_SKIP_GATE=1
+        export AGENT_SKIP_GATE_REASON="$reason"
+        # Breadcrumb for AC6 — tells the gate this was sanctioned, not raw git.
+        mkdir -p "$ROOT_DIR/.agentic/session"
+        printf '%s\n' "$reason" > "$ROOT_DIR/.agentic/session/.gate-invoked-via-ag"
+        # If no further args, drop into editor mode like raw `git commit`.
+        if [[ $# -eq 0 ]]; then
+            exec git commit
+        fi
+        exec git commit "$@"
+    fi
+
     # Gate: git must be active (F-0250)
     local git_mode
     git_mode=$(get_setting "git_mode" "active")
@@ -13,6 +36,11 @@ cmd_commit() {
         echo ""
         return 0
     fi
+
+    # Breadcrumb so the Tier 0 gate (R-001 AC6) can distinguish sanctioned
+    # `ag commit` invocations from raw `git commit ...`.
+    mkdir -p "$ROOT_DIR/.agentic/session"
+    printf 'invoked-via-ag\n' > "$ROOT_DIR/.agentic/session/.gate-invoked-via-ag"
 
     echo -e "${BOLD}=== Pre-Commit Gates ===${NC}"
     echo ""
