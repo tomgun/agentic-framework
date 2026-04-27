@@ -5717,3 +5717,89 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Legacy bash gate's complexity warning at 18 staged files (advisory only, instruction-file backport spans 11 files by nature)
 
+
+### Session: 2026-04-26 19:56 - R-005 shipped: filesystem RO protection for shipped contracts
+
+**Why**: Closes one of two known Tier 0 honest-limits — filesystem mutation of shipped contracts. Pre-commit gate (R-001) is the second wall.
+
+**Decision**: Two-wall design: chmod 444 blocks accidental writes; pre-commit gate audits deliberate bypasses (chmod u+w + edit + commit). Sanctioned path is ag contract migrate, not lockdown — friction at the bypass, not the happy path.
+
+**What changed**:
+- ag contract promote chmods to 444; ag contract migrate is the sanctioned mutation path with audit trail; existing mutators refuse on locked contracts with sanctioned-path hints; EACCES on direct Edit/Write blocks accidental tampering
+
+**Next steps**:
+- Wave A R-012 next (structured pre-commit error messages w/ next-step suggestions)
+
+**Blockers**: None
+
+
+### Session: 2026-04-26 20:16 - R-012 shipped: structured gate error messages with central catalog
+
+**Why**: Sprint 1 shipped working gates but with minimal failure UX — bare BLOCKED messages with inlined next-steps that drifted between the two gates. R-012 makes failures self-documenting.
+
+**Decision**: Catalog is the source of truth; gates are thin. Adding a new check means adding a BlockReason + a from_reason() call — no inline next_steps allowed. Tests enforce that every from_reason(messages.X) reference resolves.
+
+**What changed**:
+- Extracted message catalog into .agentic/lib/hooks/messages.py (9 BlockReason constants). precommit_gate + prepush_gate both use GateResult.from_reason(); --verbose flag adds expanded detail + plan refs without bloating default output. 11 catalog tests covering invariants and gate integration.
+
+**Next steps**:
+- Wave A R-004 next (hook integrity SHA-256 baseline)
+
+**Blockers**: None
+
+
+### Session: 2026-04-26 20:19 - Removed fabricated CONTRIBUTIONS entries
+
+**Why**: Honest attribution: CONTRIBUTIONS.md is for actual user design inputs, not author framings dressed up as quotes.
+
+**What changed**:
+- User flagged R-005 + R-012 entries as misattributed framings, not actual user insights. Removed both sections cleanly; conversation + journal entries already capture real inputs (Wave A ordering, phase-based PR batching).
+
+**Next steps**:
+- Continue Wave A: R-004 hook integrity baseline
+
+**Blockers**: None
+
+
+### Session: 2026-04-26 20:28 - R-004 shipped: hook integrity baseline
+
+**Why**: Closes the second known Tier 0 honest-limit (sibling to R-005 chmod 444): an agent could quietly modify the hook scripts that run the gate itself.
+
+**Decision**: Partial-JSON hashing of settings.json[hooks] only — cosmetic edits to unrelated keys don't trip the gate. Skip envvar honored only under CI so an agent in a local session cannot disable the check.
+
+**What changed**:
+- Tier 0 layer 3 complete. SHA-256 baseline of .git/hooks/*, .agentic/lib/hooks/*.py, .agentic/lib/integrity.py, .claude/hooks.json, .claude/settings.json[hooks subfield only], .claude/agents/*.md committed to .agentic/integrity.json. Pre-commit runs check_integrity FIRST (so a tampered later check still trips this one). ag integrity status/update commands; INTEGRITY_SKIP=1 honored only under CI=true. 13 unit tests, plain-script runnable. Gate hierarchy now: 1=git-layer, 2=filesystem RO, 3=hook integrity, 4=Claude hooks, ...
+
+**Next steps**:
+- Wave A R-003 last (ag merge local merge gate)
+
+**Blockers**: None
+
+
+### Session: 2026-04-27 05:29 - R-003 shipped: ag merge — local merge gate
+
+**Why**: Closes the merge-side hole — until R-003, local git merge to main bypassed every Tier 0 check between PRs. Now ag merge runs the same contract/pending checks the gates run on commit/push, but at the merge boundary.
+
+**Decision**: Polymorphic on first arg: numeric goes to gh pr merge (existing); branch name goes to new local-merge gate. Same command, two transports. Avoids breaking the well-known PR-merge ergonomic.
+
+**What changed**:
+- Wave A complete (sprint 2). ag merge dispatches numeric → PR path; non-numeric → local merge gate. Discovers feature IDs from commit-message range vs target HEAD; runs ag contract check, ag contract pending, FEATURES.md tracking check, advisory CI mirror check. Sanctioned bypass via --skip-gate '<reason>' (audited). 6 tests pass.
+
+**Next steps**:
+- Wave A merge candidate ready for review; Wave B (R-009 ag watch + R-013 quota report + R-006 GHA template + R-010 ag fix + R-011 ag onboard) unblocked next.
+
+**Blockers**: None
+
+
+### Session: 2026-04-27 08:03 - Wave A review fixes
+
+**Why**: Self-review found 3 real bugs and 2 UX issues; fixing now keeps Wave A as a single coherent merge candidate rather than dragging review-feedback debt into Wave B.
+
+**What changed**:
+- Self-reviewed PR #242 (Wave A) and addressed 5 issues: misleading verbose tip in gate output replaced with explicit invocation; integrity baseline extended to events.py + contracts.py + settings.sh (closes audit/loader tampering hole); malformed JSON now distinct mismatch kind (compute_baseline refuses to persist malformed entries); R-XXX redesign IDs picked up by merge-gate feature regex (with contract + FEATURES.md checks correctly skipped); _contract_migrate --type validation rejects --type without --add-assertion. Added 5 tests.
+
+**Next steps**:
+- Wave A ready for external review
+
+**Blockers**: None
+

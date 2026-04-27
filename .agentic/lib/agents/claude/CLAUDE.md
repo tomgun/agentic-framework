@@ -22,11 +22,12 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag status` — see current work items and next steps
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
-- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` (PR via gh) | `ag merge <branch> [--skip-gate "<reason>"]` (local merge gate; R-003) | `ag flush` | `ag backlog` | `ag todo`
 - `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper that drops a breadcrumb so the pre-push gate (R-002) records intent
 - `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008). Requires `pip install textual`.
 - `ag skills suggest|install|sync|list|remove|update-pins|request` — F-008 marketplace integration: install community quality skills from a curated allowlist with mandatory sha pinning, script quarantine, and Claude+Cursor fan-out
-- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX`
+- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX` | `ag contract migrate F-XXXX --reason "..." [--set K=V | --add-assertion "..."]` (sanctioned mutation path for shipped/read-only contracts; R-005)
+- `ag integrity status` | `ag integrity update` — hook + agent + .claude config baseline (R-004); pre-commit verifies before any other check
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
@@ -79,11 +80,13 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 
 Framework enforcement uses multiple layers. When adding new gates or enforcement, prefer higher layers:
 1. **Tier 0 git-layer gates** (v5; `precommit_gate.py` / `prepush_gate.py`) — fire in a separate process from any agent session. Pre-commit blocks per-commit (tests, contracts, plan-approved sentinel, JOURNAL freshness, shipped-contract migrations). Pre-push blocks range-shaped (full integration tests, coverage threshold, doc drift, range migrations). Sanctioned bypass: `ag commit --skip-gate "<reason>"` / `ag push --skip-gate "<reason>"` — both audited to events.jsonl. *Honest limit:* pre-commit cannot itself observe `git commit --no-verify` (the flag short-circuits hooks); pre-push catches the same range on push regardless.
-2. **Claude hooks** (real-time, during session) — PreToolUse blocks/warns before action, PostToolUse tracks after, Stop.sh validates at session end, UserPromptSubmit nudges per-prompt. In-session enforcement layer.
-3. **Skills** (just-in-time guidance) — loaded at workflow trigger points via `.claude/skills/`
-4. **`ag` commands** (workflow gates) — `ag done`, `ag implement`, `ag commit` validate preconditions
-5. **Pre-commit hooks (legacy bash)** — `pre-commit-check.sh` 16-check defense-in-depth; will be retired in R-301
-6. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
+2. **Filesystem read-only protection** (R-005; shipped contracts only) — `ag contract promote` chmods `lifecycle: shipped` contracts to `444`, so direct `Edit`/`Write`/`$EDITOR` writes fail with EACCES. The sanctioned mutation path is `ag contract migrate F-XXX --reason "<text>" [--set K=V | --add-assertion "<text>"]`, which records an auditable migration entry, applies the change, and re-locks the file. *Honest limit:* a deliberate `chmod u+w` bypasses this layer; the Tier 0 pre-commit gate's shipped-contract-migration check is the second wall.
+3. **Hook integrity baseline** (R-004) — `.agentic/integrity.json` carries SHA-256 hashes of `.git/hooks/pre-{commit,push}`, `.agentic/lib/hooks/*.py`, `.agentic/lib/integrity.py`, `.claude/hooks.json`, `.claude/settings.json[hooks]`, and `.claude/agents/*.md`. Pre-commit verifies the baseline first (before any other check), so an agent that tampered with a later check still trips this one. `ag integrity update` regenerates the baseline (audited via events.jsonl `integrity_baseline_updated`); `INTEGRITY_SKIP=1` is honored only under `CI=true`. *Honest limit:* a determined human can `ag integrity update` to launder a tamper; HMAC signing (R-209) closes that path.
+4. **Claude hooks** (real-time, during session) — PreToolUse blocks/warns before action, PostToolUse tracks after, Stop.sh validates at session end, UserPromptSubmit nudges per-prompt. In-session enforcement layer.
+5. **Skills** (just-in-time guidance) — loaded at workflow trigger points via `.claude/skills/`
+6. **`ag` commands** (workflow gates) — `ag done`, `ag implement`, `ag commit` validate preconditions
+7. **Pre-commit hooks (legacy bash)** — `pre-commit-check.sh` 16-check defense-in-depth; will be retired in R-301
+8. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
 
 ## Design Tracking
 

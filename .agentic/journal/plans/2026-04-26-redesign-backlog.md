@@ -185,7 +185,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-003 · `ag merge` — local merge gate
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"Tier 0 — Always-on external enforcement" → "Local primitives"
 **Goal:** Standard merge path with deterministic checks before allowing local merge to main. User can configure `git config alias.merge ag-merge` for hard enforcement.
 
@@ -208,7 +208,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-004 · Hook integrity check
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"Tier 0 honest-limit subsection"
 **Goal:** SHA-256 baseline of hook scripts, agent definitions, settings.json hook entries; pre-commit verifies no tampering.
 
@@ -236,7 +236,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-005 · Filesystem read-only protection for shipped contracts
-**Status:** planned · **Effort:** 1d · **Deps:** —
+**Status:** shipped · **Effort:** 1d · **Deps:** —
 **Plan ref:** plan §"Tier 0 — Local primitives"
 **Goal:** Set `chmod 444` on `spec/contracts/*.yaml` files where `lifecycle: shipped` and `protection: contract`. Crude but agent-cannot-bypass-without-deliberate-chmod.
 
@@ -329,7 +329,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-012 · Pre-commit error messages with concrete next-step suggestions
-**Status:** planned · **Effort:** 1d · **Deps:** R-001
+**Status:** shipped · **Effort:** 1d · **Deps:** R-001
 **Plan ref:** plan §"UX additions for Phase 0"
 **Goal:** Replace bare "BLOCKED" messages with structured guidance ("here's what to do next").
 

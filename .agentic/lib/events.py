@@ -74,6 +74,7 @@ EVENT_TYPES: tuple[str, ...] = (
     "integrity_baseline_updated",
     "intel_invoked",
     "quota_degraded",
+    "contract_migration",
 )
 
 DELEGATION_VERDICTS: tuple[str, ...] = (
