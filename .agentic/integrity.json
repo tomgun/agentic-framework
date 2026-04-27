@@ -5,7 +5,7 @@
     ".agentic/lib/contracts.py": "ffc7c48e17f0aa055b8ef02b93bbfd8df0ce4c47712c6fb58fabe497e42e55c1",
     ".agentic/lib/events.py": "e6843dcbb2df5f3896039b8be95a19a39986c754d8835571d88c300272d009f9",
     ".agentic/lib/hooks/messages.py": "4554ec1a8890942c64cbf7645aca1a4d9ddd2d7db52291ee23c95e76f9c999b8",
-    ".agentic/lib/hooks/precommit_gate.py": "f19a8e918a90d382a71cc3d38400142484ad8ddf0c918a63a32cf2fc60de7ca7",
+    ".agentic/lib/hooks/precommit_gate.py": "3ceae9667c5474aa216867e006f2f01ae2785c463bbcb872cb079e775a1edd3b",
     ".agentic/lib/hooks/prepush_gate.py": "d376199d6a22aa9fe4061d2128965d7863d6f432bfdecf9b9df53506ee31c57c",
     ".agentic/lib/integrity.py": "8c2912890f0b439e47b7d1f536d8b6219d8aff11852f373dfd610209e6b0892a",
     ".agentic/lib/settings.sh": "241cabc83eaf599d741e99da01cff29855e1c641eaf4bef948c0951d1f8fc51f",

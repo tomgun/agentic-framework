@@ -5818,3 +5818,108 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-27 09:31 - R-009 ag watch shipped
+
+**Why**: SSH sessions need a lightweight observability frontend; TUI too heavy
+
+**Decision**: Skip colorama dep; ANSI codes work natively on supported terminals
+
+**What changed**:
+- Color-coded events.jsonl tail; stdlib + ANSI; filter/since/once flags; 34 tests pass
+
+**Next steps**:
+- R-013 quota report next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:35 - R-013 quota report shipped
+
+**Why**: Pro/Max quota awareness needed before Tier 2/3 work to avoid burnout
+
+**Decision**: Window-based rate (not instantaneous) for projection — more stable and conservative
+
+**What changed**:
+- ag intel report --quota; rolling 5h window; per-tier+per-model breakdown; alerts at 70/85/95%; linear projection; --json output; 22 tests pass
+
+**Next steps**:
+- R-006 GHA template next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:38 - R-006 GHA template shipped
+
+**Why**: Multi-contributor repos and compliance need GitHub-side enforcement; local hooks aren't shared across clones
+
+**Decision**: Belt-and-suspenders only — Tier 0 already strong; mirror catches gaps, doesn't replace
+
+**What changed**:
+- agentic-gate.yml runs precommit+prepush in CI mirror; uploads logs+verification.json; PR comment on failure only; docs/CI_MIRROR.md; cmd_init surfaces template
+
+**Next steps**:
+- R-010 ag fix next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:42 - R-010 ag fix shipped
+
+**Why**: Hotfixes need a fast path that doesn't bypass safety — only ceremony
+
+**Decision**: Skip spec+plan only; tests/migrations/integrity stay required
+
+**What changed**:
+- ag fix "<msg>"; AGENT_FIX_MODE=1 skips check_contracts and check_plan_approved; preserves test/journal/integrity/migration; emits hotfix_commit event on success; [hotfix] footer; 9 tests
+
+**Next steps**:
+- R-011 ag onboard next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:46 - R-011 ag onboard shipped
+
+**Why**: Multi-contributor projects need a fast cold-start path; current state isn't self-explanatory
+
+**Decision**: Generate-from-current-state, not hand-curated; People section is hand-edited stub
+
+**What changed**:
+- ag onboard generates .agentic/ONBOARDING.md from STACK/FEATURES/STATUS/ADR/journal; --force overwrite; -o output; 5-min walkthrough; precommit gate references it; 12 tests
+
+**Next steps**:
+- Instruction file sync next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:49 - Wave B instruction sync
+
+**Why**: Memory-seed and instruction files are how features reach agents in user projects
+
+**Decision**: Same one-liner pattern in every instruction file (consistent with Wave A)
+
+**What changed**:
+- Updated CLAUDE.md (template+root), .cursorrules, copilot, codex, cursor template, memory-seed.md with R-006/R-009/R-010/R-011/R-013; flipped redesign-backlog statuses to shipped; STATUS.md current focus updated
+
+**Next steps**:
+- PR creation
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 13:25 - Wave B review fixes
+
+**Why**: Self-review found medium issue (projection denominator) + 5 minor/trivial; user asked to fix all
+
+**Decision**: Active-span denominator with 60s floor — closer to 'current rate' intuition while protecting against tiny-N nonsense projections
+
+**What changed**:
+- Issue 1: quota projection uses min(window, now-earliest_record_ts) with 60s floor — bursty workloads now project sooner. Issue 2: print_blocked takes project_root (no subprocess on failure path). Issue 3: onboard restores strict mode before python heredoc + checks file written. Issue 4: 7 new bash dispatcher smoke tests for fix.sh + watch.sh. Issue 5: drop unused jsonschema from CI mirror. Issue 6: soften R-110 reference in 70% advice.
+
+**Next steps**:
+- Push to PR #243
+
+**Blockers**: —
+
