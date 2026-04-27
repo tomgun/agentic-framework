@@ -5803,3 +5803,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-27 09:22 - Sprint 2 / Wave A merged (PR #242 → 676985cb)
+
+**Why**: Sprint 2 closed the two Tier 0 honest-limits documented post-sprint-1 (filesystem mutation of shipped contracts; hook tampering) and made gate failures self-documenting via the central message catalog. R-003 closed the merge-side hole. The hardening-before-polish ordering means Wave B's UX widgets land on a sealed base.
+
+**Decision**: Squash-merge over fast-forward — sprint-1 precedent (single 'Merge sprint 1' commit). The 6 individual commits collapsed into 676985cb. Branch deleted on remote.
+
+**What changed**:
+- Tier 0 hardening cluster shipped. R-005 (chmod 444 on shipped contracts), R-012 (structured gate error catalog + --verbose), R-004 (hook integrity SHA-256 baseline w/ events.py + contracts.py + settings.sh covered), R-003 (ag merge local merge gate). Plus self-review fixes (5 issues addressed in fix(review) commit before merge). Enforcement hierarchy now 8 layers; 50 deterministic tests + 846 validate_framework ACs all green on main.
+
+**Next steps**:
+- Wave B unblocked: R-009 ag watch (2d), R-013 ag intel report --quota (2d), R-006 GHA template (1d), R-010 ag fix --skip-contract (2d), R-011 ag onboard (3d).
+
+**Blockers**: None
+
