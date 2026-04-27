@@ -22,7 +22,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag status` — see current work items and next steps
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
-- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` (PR via gh) | `ag merge <branch> [--skip-gate "<reason>"]` (local merge gate; R-003) | `ag flush` | `ag backlog` | `ag todo`
 - `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper that drops a breadcrumb so the pre-push gate (R-002) records intent
 - `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008). Requires `pip install textual`.
 - `ag skills suggest|install|sync|list|remove|update-pins|request` — F-008 marketplace integration: install community quality skills from a curated allowlist with mandatory sha pinning, script quarantine, and Claude+Cursor fan-out

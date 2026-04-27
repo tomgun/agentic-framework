@@ -185,7 +185,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-003 · `ag merge` — local merge gate
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"Tier 0 — Always-on external enforcement" → "Local primitives"
 **Goal:** Standard merge path with deterministic checks before allowing local merge to main. User can configure `git config alias.merge ag-merge` for hard enforcement.
 

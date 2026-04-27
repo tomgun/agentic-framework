@@ -5775,3 +5775,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-27 05:29 - R-003 shipped: ag merge — local merge gate
+
+**Why**: Closes the merge-side hole — until R-003, local git merge to main bypassed every Tier 0 check between PRs. Now ag merge runs the same contract/pending checks the gates run on commit/push, but at the merge boundary.
+
+**Decision**: Polymorphic on first arg: numeric goes to gh pr merge (existing); branch name goes to new local-merge gate. Same command, two transports. Avoids breaking the well-known PR-merge ergonomic.
+
+**What changed**:
+- Wave A complete (sprint 2). ag merge dispatches numeric → PR path; non-numeric → local merge gate. Discovers feature IDs from commit-message range vs target HEAD; runs ag contract check, ag contract pending, FEATURES.md tracking check, advisory CI mirror check. Sanctioned bypass via --skip-gate '<reason>' (audited). 6 tests pass.
+
+**Next steps**:
+- Wave A merge candidate ready for review; Wave B (R-009 ag watch + R-013 quota report + R-006 GHA template + R-010 ag fix + R-011 ag onboard) unblocked next.
+
+**Blockers**: None
+

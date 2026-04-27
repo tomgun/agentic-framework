@@ -27,7 +27,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag status` — see current work items and next steps
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
-- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` (PR via gh) | `ag merge <branch> [--skip-gate "<reason>"]` (local merge gate; R-003) | `ag flush` | `ag backlog` | `ag todo`
 - `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper (R-002) so the pre-push gate records intent
 - `ag tui` — Textual mission-control dashboard (R-008) live-tailing JSONL streams; needs `pip install textual`
 - `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX` | `ag contract migrate F-XXXX --reason "..." [--set K=V | --add-assertion "..."]` (sanctioned mutation path for shipped/read-only contracts; R-005)

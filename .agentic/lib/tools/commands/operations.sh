@@ -254,17 +254,25 @@ cmd_merge() {
         return 0
     fi
 
-    local pr_number="${1:-}"
-    local feature_id="${2:-}"
+    local first_arg="${1:-}"
 
-    if [ -z "$pr_number" ]; then
-        echo -e "${RED}Usage: ag merge <pr-number> [F-XXXX]${NC}"
-        echo "  Merges a PR and runs ag done for the feature."
-        echo ""
-        echo "  If F-XXXX is not provided, attempts to extract from PR title."
-        echo "  Example: ag merge 148 F-0222"
+    if [ -z "$first_arg" ]; then
+        echo -e "${RED}Usage:${NC}"
+        echo "  ag merge <pr-number> [F-XXXX]      Merge a GitHub PR via gh; runs ag done after"
+        echo "  ag merge <branch> [--skip-gate \"<reason>\"]"
+        echo "                                     Local merge gate (R-003) → git merge --no-ff <branch>"
         exit 1
     fi
+
+    # R-003 dispatch: numeric → existing PR-merge path; non-numeric → local merge gate.
+    if ! [[ "$first_arg" =~ ^[0-9]+$ ]]; then
+        shift
+        _merge_local "$first_arg" "$@"
+        return $?
+    fi
+
+    local pr_number="$first_arg"
+    local feature_id="${2:-}"
 
     echo -e "${BOLD}=== Merge PR #$pr_number ===${NC}"
     echo ""
