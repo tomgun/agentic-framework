@@ -5938,3 +5938,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 16:39 - No-autorecord rule applies to user projects too
+
+**Why**: User asked whether the rule applies to production projects — yes; multi-contributor projects benefit from the same logic since auto-memory is per-user/per-machine and invisible to teammates
+
+**Decision**: Template carries shared concerns (dogfooding); root extends with framework-specific destinations only (FRAMEWORK_DEVELOPMENT, PRINCIPLES). Rule is not duplicated across layers.
+
+**What changed**:
+- Hoisted the no-autorecord rule from framework-dev wrapper into the canonical template (.agentic/lib/agents/claude/CLAUDE.md) so user projects receive it. Propagated the same one-liner into .cursorrules + cursor template, copilot-instructions + template, codex template, and memory-seed.md. Root CLAUDE.md no longer duplicates the rule — points at template instead, with a note that 'project' reads as 'framework' for framework dev.
+
+**Next steps**:
+- —
+
+**Blockers**: —
+

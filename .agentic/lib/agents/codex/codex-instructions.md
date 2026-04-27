@@ -64,6 +64,7 @@ STOP! Trigger Words (match on intent, not just exact words):
 - Multi-session safety: never run destructive git ops when other sessions may be active.
 - NEVER write code for multiple features outside of `ag auto` commands. Batch work → `ag auto crunch`.
 - No feature inflation: improvements/enforcement/hardening of existing features are deliverables on those features, not new F-XXXX.
+- Don't autorecord project things to your assistant's auto-memory. Project corrections / decisions / conventions belong in repo files (instruction files, skills, JOURNAL.md, ADRs) where every contributor sees them. Auto-memory is single-machine, single-user, invisible to teammates.
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
