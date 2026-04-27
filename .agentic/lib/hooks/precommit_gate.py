@@ -188,6 +188,11 @@ class GateContext:
     staged_files: list[str]
     session_id: str
     is_formal_like: bool
+    # R-010: when True, the commit was started via `ag fix` and the gate skips
+    # spec/contract-existence and plan-approval checks. Test/journal/integrity/
+    # shipped-contract-migration checks still run.
+    fix_mode: bool = False
+    fix_reason: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -271,6 +276,7 @@ def _build_context(root: Path) -> GateContext:
     profile = _read_setting(root, "profile", "discovery").strip().lower()
     plan_review_raw = _read_setting(root, "plan_review_enabled", "no").strip().lower()
     pch = _read_setting(root, "pre_commit_hook", "fast").strip().lower()
+    fix_mode = os.environ.get("AGENT_FIX_MODE") == "1"
     return GateContext(
         root=root,
         profile=profile,
@@ -282,6 +288,8 @@ def _build_context(root: Path) -> GateContext:
         or os.environ.get("CLAUDE_SESSION_ID")
         or f"precommit-{uuid.uuid4().hex[:12]}",
         is_formal_like=_is_formal_like(profile),
+        fix_mode=fix_mode,
+        fix_reason=os.environ.get("AGENT_FIX_REASON", "") if fix_mode else "",
     )
 
 
@@ -455,6 +463,11 @@ def check_tests(ctx: GateContext) -> GateResult:
 
 def check_contracts(ctx: GateContext) -> GateResult:
     """AC2: `ag contract check`. Structural assertions verified by the harness."""
+    if ctx.fix_mode:
+        # R-010: hotfix mode skips spec-existence/contract-completeness checks.
+        # `check_shipped_contract_migrations` still runs and blocks shipped-
+        # contract changes without a migration entry.
+        return GateResult(ac="AC2", failed=False, title="hotfix mode; contracts skipped")
     ag_sh = ctx.root / ".agentic" / "lib" / "tools" / "ag.sh"
     if not ag_sh.exists():
         return GateResult(ac="AC2", failed=False, title="contracts (ag.sh missing; skipped)")
@@ -491,6 +504,9 @@ def check_contracts(ctx: GateContext) -> GateResult:
 
 def check_plan_approved(ctx: GateContext) -> GateResult:
     """AC3: `.plan-approved` sentinel must exist when plan_review_enabled."""
+    if ctx.fix_mode:
+        # R-010: hotfixes are by definition emergency commits without a plan.
+        return GateResult(ac="AC3", failed=False, title="hotfix mode; plan check skipped")
     if not ctx.plan_review_enabled:
         return GateResult(ac="AC3", failed=False, title="plan review disabled; skipped")
     if not _has_code_changes(ctx.staged_files):
@@ -840,10 +856,21 @@ def run_gate(ctx: GateContext, *, verbose: bool = False) -> int:
                 "gate": "precommit",
                 "failures": [{"ac": r.ac, "title": r.title} for r in failures],
                 "staged_file_count": len(ctx.staged_files),
+                "fix_mode": ctx.fix_mode,
             },
         )
         return 2
     print_passed(results)
+    if ctx.fix_mode:
+        # R-010: every passing hotfix commit emits a hotfix_commit event.
+        _emit_event(
+            type="hotfix_commit",
+            session_id=ctx.session_id,
+            payload={
+                "reason": ctx.fix_reason,
+                "staged_file_count": len(ctx.staged_files),
+            },
+        )
     return 0
 
 

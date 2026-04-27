@@ -191,6 +191,7 @@ source "$COMMANDS_DIR/commit.sh"
 source "$COMMANDS_DIR/push.sh"
 source "$COMMANDS_DIR/tui.sh"
 source "$COMMANDS_DIR/watch.sh"
+source "$COMMANDS_DIR/fix.sh"
 source "$COMMANDS_DIR/done.sh"
 source "$COMMANDS_DIR/kickoff.sh"
 source "$COMMANDS_DIR/auto.sh"
@@ -297,6 +298,9 @@ case "${1:-help}" in
         ;;
     watch)
         shift; cmd_watch "$@"
+        ;;
+    fix)
+        shift; cmd_fix "$@"
         ;;
     done)
         shift; cmd_done "$@"

@@ -5863,3 +5863,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 09:42 - R-010 ag fix shipped
+
+**Why**: Hotfixes need a fast path that doesn't bypass safety — only ceremony
+
+**Decision**: Skip spec+plan only; tests/migrations/integrity stay required
+
+**What changed**:
+- ag fix "<msg>"; AGENT_FIX_MODE=1 skips check_contracts and check_plan_approved; preserves test/journal/integrity/migration; emits hotfix_commit event on success; [hotfix] footer; 9 tests
+
+**Next steps**:
+- R-011 ag onboard next
+
+**Blockers**: —
+
