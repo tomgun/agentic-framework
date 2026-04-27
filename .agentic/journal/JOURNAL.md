@@ -5923,3 +5923,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 16:22 - Wave B merged
+
+**Why**: Wave B closed the lightweight observability + new-contributor + emergency-path UX gaps so Phase 0 has a coherent surface
+
+**Decision**: Bumped to 0.84.0 (minor) consistent with Wave A's 0.81→0.82→0.83 cadence
+
+**What changed**:
+- PR #243 merged as 22b4877b (squash). Self-review fixes landed before merge. 136 tests + 846 ACs green at merge time. VERSION bumped 0.83.0 → 0.84.0.
+
+**Next steps**:
+- Phase 0 wrap: R-014 / R-015 / R-016. Then Phase 1 (R-101+).
+
+**Blockers**: —
+

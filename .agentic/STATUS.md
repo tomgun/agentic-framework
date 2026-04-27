@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Wave B merged: ag watch, intel report --quota, GHA template, ag fix, ag onboard. Next: Phase 1 (R-101+) (Updated: 2026-04-27 09:47 UTC)
+- Wave B merged (22b4877b). Phase 0 feature-complete except R-014 (TUI quota ring), R-015 (ag hooks register), R-016 (bypass test battery). Phase 1 (R-101+) unblocked. (Updated: 2026-04-27 16:22 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
