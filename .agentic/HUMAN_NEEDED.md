@@ -121,6 +121,15 @@ _No active items_
 
 
 
+
+### HN-0088: Sprint 2 / Wave B PR ready
+- **Type**: review-pr
+- **Added**: 2026-04-27
+- **Context**: PR #243 — UX + observability cluster (R-009 ag watch, R-013 quota report, R-006 GHA template, R-010 ag fix, R-011 ag onboard). 6 commits, 92 new tests + 846 framework ACs all green. https://github.com/tomgun/agentic-framework/pull/243
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0087: Review PR #242 — Sprint 2 / Wave A · Tier 0 hardening cluster
