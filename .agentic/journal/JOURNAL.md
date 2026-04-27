@@ -5924,17 +5924,17 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 **Blockers**: —
 
 
-### Session: 2026-04-27 16:22 - Wave B merged
+### Session: 2026-04-27 16:25 - Wave B — UX + observability cluster
 
-**Why**: Wave B closed the lightweight observability + new-contributor + emergency-path UX gaps so Phase 0 has a coherent surface
+**Why**: Tier 0 enforcement is real but not visible enough — Wave B closes the lightweight observability + new-contributor + emergency-path gaps so contributors can see what the gate is doing, what tokens are doing, and have an audited fast-path for genuine emergencies
 
-**Decision**: Bumped to 0.84.0 (minor) consistent with Wave A's 0.81→0.82→0.83 cadence
+**Decision**: Stdlib-only for new analysis modules (zero new runtime deps); CI mirror is belt-and-suspenders opt-in (not required); hotfix mode skips ceremony but not safety; quota uses active-span not full-window for projection denominator
 
 **What changed**:
-- PR #243 merged as 22b4877b (squash). Self-review fixes landed before merge. 136 tests + 846 ACs green at merge time. VERSION bumped 0.83.0 → 0.84.0.
+- Framework gained four user-facing commands (ag watch for SSH-friendly events.jsonl tail; ag intel report --quota for Pro/Max usage; ag fix for emergency commits with audited skip; ag onboard for new-contributor playbook) plus an opt-in GitHub Actions CI mirror. Quality bar moved: hotfix mode skips spec/plan but explicitly keeps tests + migrations + integrity (skip-narrowly, not skip-everything). Quota projection uses active-span (max(window_start, earliest_record_ts)) with a 60s floor — corrects a bursty-vs-steady misjudgement found in self-review. Pre-commit gate's failure path no longer shells out to git rev-parse for a value GateContext already holds. Onboard now fails loud on substitution errors instead of silently writing empty ONBOARDING.md.
 
 **Next steps**:
-- Phase 0 wrap: R-014 / R-015 / R-016. Then Phase 1 (R-101+).
+- Phase 0 wrap (R-014 TUI quota ring, R-015 ag hooks register, R-016 bypass test battery) before Phase 1 opens
 
 **Blockers**: —
 

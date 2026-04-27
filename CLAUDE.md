@@ -62,7 +62,7 @@ Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `
 - Never fabricate APIs, data, or behavior. If uncertain, ask.
 - NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 - No feature inflation: improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new capability ID.
-- Behavioral corrections belong in instruction files: When a correction applies to this project, update CLAUDE.md or the relevant skill file — don't write a memory as a substitute.
+- **Do not autorecord framework things to Claude auto-memory** (`~/.claude/projects/.../memory/`). That system is reserved for cross-project / per-user / per-machine context the user manages directly. Anything framework-relevant — corrections, design decisions, behavior rules, journal-entry conventions, doc patterns — belongs in repo files (CLAUDE.md, FRAMEWORK_DEVELOPMENT.md, `.agentic/lib/PRINCIPLES.md`, the relevant skill in `.claude/skills/`, JOURNAL.md, ADRs), where every contributor and every machine sees it. Auto-memory is gitignored, single-machine, invisible to other contributors — useless for framework dev.
 
 ## After Plan Mode Exits (when `plan_review_enabled: yes`)
 
