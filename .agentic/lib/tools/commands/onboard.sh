@@ -152,6 +152,11 @@ EOF
     fi
 
     # ----- Substitute via python (handles multi-line values safely) ---------
+    # Restore strict shell options BEFORE the python heredoc so a substitution
+    # error fails loud instead of silently claiming success below.
+    case "$_saved_opts" in *e*) set -e ;; esac
+    case "$_saved_opts" in *o*) set -o pipefail ;; esac
+
     PYTHONIOENCODING=utf-8 \
     PROJECT_NAME="$project_name" \
     GENERATED_AT="$generated_at" \
@@ -182,12 +187,16 @@ with open(out_path, "w", encoding="utf-8") as fh:
     fh.write(body)
 PYEOF
 
+    # Verify the file was actually written. Catches the case where the python
+    # heredoc raises before write (template missing a marker, permission fail).
+    if [[ ! -s "$out_path" ]]; then
+        echo -e "${RED}✗${NC} Substitution failed — $out_path is empty or missing." >&2
+        return 1
+    fi
+
     echo -e "${GREEN}✓${NC} Wrote $out_path"
     echo ""
     echo "Next: skim it, edit the ${BOLD}People / channels${NC} section, and commit."
     echo "  ${DIM}ag onboard --force${NC} to regenerate later."
-
-    # Restore caller's shell options.
-    case "$_saved_opts" in *e*) set -e ;; esac
-    case "$_saved_opts" in *o*) set -o pipefail ;; esac
+    # Strict mode was already restored before the python heredoc above.
 }

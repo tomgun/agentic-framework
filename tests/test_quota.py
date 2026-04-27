@@ -287,19 +287,28 @@ def test_no_advice_when_below_threshold(tmp_path: Path):
 
 
 def test_projection_extrapolates_linearly(tmp_path: Path):
-    """600k tokens over a 5h window → ~33 tok/s → ~3.3h to hit 1M ceiling."""
+    """600k tokens with an earliest record 2h ago → rate uses 2h, not 5h."""
     p = tmp_path / "tl.jsonl"
+    # Two records: one 2h ago (sets the earliest_record_ts), one 60s ago.
     _write_ledger(
         p,
         [
+            {
+                "ts": _ts(2 * 3600),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 200_000,
+                "tokens_out": 100_000,
+            },
             {
                 "ts": _ts(60),
                 "session_id": "s",
                 "model": "sonnet",
                 "tier": "tier2",
-                "tokens_in": 300_000,
-                "tokens_out": 300_000,
-            }
+                "tokens_in": 200_000,
+                "tokens_out": 100_000,
+            },
         ],
     )
     rep = quota.compute_quota(
@@ -307,9 +316,90 @@ def test_projection_extrapolates_linearly(tmp_path: Path):
     )
     assert rep.projected_exhaustion is not None
     delta = (rep.projected_exhaustion - _NOW).total_seconds()
-    # Rate = 600k / 18000s = 33.3 tok/s. Remaining 400k / 33.3 ≈ 12000s.
-    assert 0 < delta < 24 * 3600
-    # Sanity: should be in the order of hours, not minutes
+    # 600k tokens over ~2h → 83.3 tok/s. Remaining 400k / 83.3 ≈ 4800s = 80m.
+    # Verify it's in the right order of magnitude (1–3 hours).
+    assert 60 * 60 < delta < 4 * 3600
+
+
+def test_projection_active_span_shorter_than_window(tmp_path: Path):
+    """600k burned in the last 2 minutes should project FAR sooner than
+    the same 600k spread evenly over a 2h active span."""
+    p = tmp_path / "tl_bursty.jsonl"
+    # All 600k in the last 2 minutes (one record sets active_span=floor of 60s)
+    _write_ledger(
+        p,
+        [
+            {
+                "ts": _ts(120),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 300_000,
+                "tokens_out": 300_000,
+            },
+        ],
+    )
+    rep_bursty = quota.compute_quota(
+        token_ledger_path=p, ceiling_tokens=1_000_000, now=_NOW
+    )
+    bursty_delta = (rep_bursty.projected_exhaustion - _NOW).total_seconds()
+
+    # Steady scenario: same 600k but with an early record at 2h ago
+    p2 = tmp_path / "tl_steady.jsonl"
+    _write_ledger(
+        p2,
+        [
+            {
+                "ts": _ts(2 * 3600),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            },
+            {
+                "ts": _ts(120),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 300_000,
+                "tokens_out": 299_800,
+            },
+        ],
+    )
+    rep_steady = quota.compute_quota(
+        token_ledger_path=p2, ceiling_tokens=1_000_000, now=_NOW
+    )
+    steady_delta = (rep_steady.projected_exhaustion - _NOW).total_seconds()
+
+    # Bursty projection must be visibly shorter than the steady one
+    assert bursty_delta < steady_delta
+    # Bursty must be conservative — under an hour
+    assert bursty_delta < 3600
+
+
+def test_projection_floors_at_one_minute(tmp_path: Path):
+    """A single record 5s ago shouldn't yield 'exhausted in seconds' nonsense."""
+    p = tmp_path / "tl.jsonl"
+    _write_ledger(
+        p,
+        [
+            {
+                "ts": _ts(5),  # would yield active_span = 5s without the floor
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            },
+        ],
+    )
+    rep = quota.compute_quota(
+        token_ledger_path=p, ceiling_tokens=1_000_000, now=_NOW
+    )
+    delta = (rep.projected_exhaustion - _NOW).total_seconds()
+    # 200 tokens / 60s floor = 3.3 tok/s; remaining ≈ 999800 / 3.3 ≈ 83h.
+    # Floor must protect us from a tiny-N projection.
     assert delta > 60 * 60
 
 

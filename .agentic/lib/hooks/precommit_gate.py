@@ -782,7 +782,12 @@ def _color(s: str, code: str) -> str:
     return f"{code}{s}{_RESET}"
 
 
-def print_blocked(failures: list[GateResult], *, verbose: bool = False) -> None:
+def print_blocked(
+    failures: list[GateResult],
+    *,
+    verbose: bool = False,
+    project_root: Optional[Path] = None,
+) -> None:
     """Structured BLOCKED output (R-001 AC8 + R-012). Each failure gets a
     title, detail, concrete next-step commands, and — when `verbose=True` —
     expanded explanations + plan refs from `messages.py`.
@@ -790,6 +795,10 @@ def print_blocked(failures: list[GateResult], *, verbose: bool = False) -> None:
     The catalog (`messages.BlockReason`) carries the verbose extras; the
     runtime detail (test output tail, file list, etc.) carries the failure-
     specific facts. We render both.
+
+    `project_root` is threaded in from `GateContext` to avoid a subprocess
+    `git rev-parse` re-resolution on the failure path. When omitted (e.g.,
+    legacy direct callers), falls back to `_project_root()`.
     """
     sys.stderr.write(_color("\n━━━ pre-commit gate BLOCKED ━━━\n", _RED + _BOLD))
     sys.stderr.write(f"{len(failures)} check(s) failed:\n\n")
@@ -820,7 +829,8 @@ def print_blocked(failures: list[GateResult], *, verbose: bool = False) -> None:
         ))
     # R-011: surface the onboarding playbook when available so first-time
     # contributors hitting an unfamiliar gate know where to start.
-    onboarding = _project_root() / ".agentic" / "ONBOARDING.md"
+    root = project_root if project_root is not None else _project_root()
+    onboarding = root / ".agentic" / "ONBOARDING.md"
     if onboarding.exists():
         sys.stderr.write(_color(
             "New here? See .agentic/ONBOARDING.md (R-011) for context.\n",
@@ -856,7 +866,7 @@ def run_gate(ctx: GateContext, *, verbose: bool = False) -> int:
     results = [check(ctx) for check in _CHECKS]
     failures = [r for r in results if r.failed]
     if failures:
-        print_blocked(failures, verbose=verbose)
+        print_blocked(failures, verbose=verbose, project_root=ctx.root)
         _emit_event(
             type="gate_blocked",
             session_id=ctx.session_id,

@@ -136,16 +136,30 @@ def _compute_alert(pct: Optional[float]) -> Optional[str]:
 def _project_exhaustion(
     *,
     tokens_in_window: int,
+    earliest_record_ts: Optional[datetime],
     window_start: datetime,
     now: datetime,
     ceiling: int,
 ) -> Optional[datetime]:
-    """Linear extrapolation: at current rate, when does usage hit ceiling?"""
+    """Linear extrapolation: at current rate, when does usage hit ceiling?
+
+    The denominator is the **active** time spent burning tokens, capped by the
+    window length. Specifically: ``elapsed = now - max(window_start, earliest_record_ts)``.
+    A user who burned 600k tokens in the last 5 minutes gets a far shorter
+    projection than someone who burned the same amount evenly across 5 hours,
+    which matches subjective intuition. When the active span is shorter than
+    one minute we floor at 60s to avoid divide-by-zero-ish projections that
+    would look like "exhaustion in 3 seconds" from a single record.
+    """
     if ceiling <= 0 or tokens_in_window <= 0:
         return None
-    elapsed = (now - window_start).total_seconds()
-    if elapsed <= 0:
-        return None
+    if earliest_record_ts is None:
+        active_start = window_start
+    else:
+        active_start = max(window_start, earliest_record_ts)
+    elapsed = (now - active_start).total_seconds()
+    if elapsed < 60:
+        elapsed = 60.0
     rate_tokens_per_sec = tokens_in_window / elapsed
     if rate_tokens_per_sec <= 0:
         return None
@@ -172,8 +186,9 @@ def _build_advice(*, alert: Optional[str], by_tier: dict[str, int]) -> list[str]
         )
     if alert == "70%" and by_tier.get("tier2", 0) > 0:
         notes.append(
-            "70% threshold reached — auto-degradation (R-110) will downgrade "
-            "Tier 2 critics from Sonnet → Haiku when implemented."
+            "70% threshold reached — Tier 2 critic invocations are the largest "
+            "single contributor; consider switching the critic model to Haiku "
+            "(or skipping critic on low-risk diffs) until the window resets."
         )
     return notes
 
@@ -201,11 +216,14 @@ def compute_quota(
     by_tier: dict[str, int] = {}
     by_model: dict[str, int] = {}
     record_count = 0
+    earliest_ts: Optional[datetime] = None
 
     for rec in _iter_records(token_ledger_path):
         ts = _parse_ts(rec)
         if ts is None or ts < window_start or ts > now:
             continue
+        if earliest_ts is None or ts < earliest_ts:
+            earliest_ts = ts
         record_count += 1
         ti = _coerce_int(rec.get("tokens_in"))
         to = _coerce_int(rec.get("tokens_out"))
@@ -236,6 +254,7 @@ def compute_quota(
     projection = (
         _project_exhaustion(
             tokens_in_window=tokens_total,
+            earliest_record_ts=earliest_ts,
             window_start=window_start,
             now=now,
             ceiling=ceiling_tokens,

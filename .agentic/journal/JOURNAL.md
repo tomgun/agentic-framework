@@ -5908,3 +5908,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 13:25 - Wave B review fixes
+
+**Why**: Self-review found medium issue (projection denominator) + 5 minor/trivial; user asked to fix all
+
+**Decision**: Active-span denominator with 60s floor — closer to 'current rate' intuition while protecting against tiny-N nonsense projections
+
+**What changed**:
+- Issue 1: quota projection uses min(window, now-earliest_record_ts) with 60s floor — bursty workloads now project sooner. Issue 2: print_blocked takes project_root (no subprocess on failure path). Issue 3: onboard restores strict mode before python heredoc + checks file written. Issue 4: 7 new bash dispatcher smoke tests for fix.sh + watch.sh. Issue 5: drop unused jsonschema from CI mirror. Issue 6: soften R-110 reference in 70% advice.
+
+**Next steps**:
+- Push to PR #243
+
+**Blockers**: —
+
