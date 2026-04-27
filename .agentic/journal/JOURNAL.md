@@ -5833,3 +5833,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 09:35 - R-013 quota report shipped
+
+**Why**: Pro/Max quota awareness needed before Tier 2/3 work to avoid burnout
+
+**Decision**: Window-based rate (not instantaneous) for projection — more stable and conservative
+
+**What changed**:
+- ag intel report --quota; rolling 5h window; per-tier+per-model breakdown; alerts at 70/85/95%; linear projection; --json output; 22 tests pass
+
+**Next steps**:
+- R-006 GHA template next
+
+**Blockers**: —
+

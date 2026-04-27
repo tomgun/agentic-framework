@@ -67,6 +67,7 @@ cmd_intel() {
         spec)          _intel_spec "$@" ;;
         implement)     _intel_implement "$@" ;;
         test)          _intel_test "$@" ;;
+        report)        _intel_report "$@" ;;
         help|--help|-h) _intel_help ;;
         *)
             echo -e "${RED}Unknown intel subcommand: $subcmd${NC}"
@@ -108,6 +109,72 @@ _intel_help() {
     echo ""
     echo "  ${BOLD}Metrics${NC}"
     echo "  stats [--session]         Show token metrics (session + lifetime)"
+    echo "  report --quota            Pro/Max quota usage in last 5h window (R-013)"
+}
+
+# ---------------------------------------------------------------------------
+# `ag intel report` — JSONL-backed reports (R-013 + future R-101/R-209/R-407).
+# ---------------------------------------------------------------------------
+_intel_report() {
+    local kind=""
+    local extra=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --quota)
+                kind="quota"
+                shift
+                ;;
+            --json|--no-color)
+                extra+=("$1"); shift
+                ;;
+            --window-seconds|--ceiling-tokens|--token-ledger|--journal-dir)
+                extra+=("$1" "${2:-}"); shift 2
+                ;;
+            -h|--help)
+                echo -e "${BOLD}ag intel report${NC} — JSONL-backed reports"
+                echo ""
+                echo "  --quota              Pro/Max quota usage report (5h trailing window)"
+                echo "  --window-seconds N   Override window (default 18000 = 5h)"
+                echo "  --ceiling-tokens N   Override quota ceiling (default: STACK.md)"
+                echo "  --json               Emit JSON instead of human-readable text"
+                echo "  --no-color           Disable ANSI colors"
+                return 0
+                ;;
+            *)
+                echo -e "${RED}Unknown report flag: $1${NC}"
+                return 1
+                ;;
+        esac
+    done
+
+    if [[ "$kind" != "quota" ]]; then
+        echo -e "${RED}ag intel report requires --quota (more report types coming).${NC}"
+        return 2
+    fi
+
+    # Resolve ceiling from STACK.md when not overridden on the CLI.
+    local ceiling_arg=()
+    local has_ceiling=0
+    for arg in "${extra[@]}"; do
+        if [[ "$arg" == "--ceiling-tokens" ]]; then
+            has_ceiling=1
+            break
+        fi
+    done
+    if [[ "$has_ceiling" -eq 0 ]]; then
+        local stack_ceiling
+        stack_ceiling=$(get_setting "quota_pro_max_window_tokens" "")
+        if [[ -n "$stack_ceiling" ]]; then
+            ceiling_arg=(--ceiling-tokens "$stack_ceiling")
+        fi
+    fi
+
+    local journal_dir="$ROOT_DIR/.agentic/journal"
+    PYTHONPATH="$ROOT_DIR/.agentic/lib${PYTHONPATH:+:$PYTHONPATH}" \
+        python3 -m quota \
+        --journal-dir "$journal_dir" \
+        "${ceiling_arg[@]}" \
+        "${extra[@]}"
 }
 
 # ---------------------------------------------------------------------------
