@@ -24,7 +24,11 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag next` — show what to do next
 - `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` (PR via gh) | `ag merge <branch> [--skip-gate "<reason>"]` (local merge gate; R-003) | `ag flush` | `ag backlog` | `ag todo`
 - `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper that drops a breadcrumb so the pre-push gate (R-002) records intent
+- `ag fix "<reason>"` — hotfix-mode commit (R-010): skips spec-existence + plan-approval, keeps tests/journal/migrations/integrity; emits `hotfix_commit` event; `[hotfix]` footer
 - `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008). Requires `pip install textual`.
+- `ag watch [--filter k=v] [--since 1h] [--from-start] [--once]` — color-coded stream of events.jsonl for SSH (R-009); stdlib only
+- `ag intel report --quota` — Pro/Max session quota usage in last 5h window: per-tier/per-model breakdown, threshold alerts at 70/85/95%, projected exhaustion (R-013)
+- `ag onboard` — generate `.agentic/ONBOARDING.md` for new contributors from STACK/FEATURES/STATUS/journal/ADR (R-011)
 - `ag skills suggest|install|sync|list|remove|update-pins|request` — F-008 marketplace integration: install community quality skills from a curated allowlist with mandatory sha pinning, script quarantine, and Claude+Cursor fan-out
 - `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX` | `ag contract migrate F-XXXX --reason "..." [--set K=V | --add-assertion "..."]` (sanctioned mutation path for shipped/read-only contracts; R-005)
 - `ag integrity status` | `ag integrity update` — hook + agent + .claude config baseline (R-004); pre-commit verifies before any other check

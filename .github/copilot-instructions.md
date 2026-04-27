@@ -18,6 +18,10 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
 - `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper (R-002 pre-push gate records via breadcrumb)
 - `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008; needs `pip install textual`)
+- `ag watch [--filter k=v] [--since 1h] [--from-start] [--once]` — color-coded events.jsonl tail for SSH (R-009); stdlib only
+- `ag fix "<reason>"` — hotfix-mode commit (R-010): skips spec-existence + plan-approval, keeps tests/journal/migrations/integrity
+- `ag intel report --quota` — Pro/Max session usage in last 5h: per-tier/per-model breakdown, alerts at 70/85/95% (R-013)
+- `ag onboard` — generate `.agentic/ONBOARDING.md` for new contributors (R-011)
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 
 Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `journal.md`, `verification.json`.

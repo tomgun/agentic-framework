@@ -5893,3 +5893,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 09:49 - Wave B instruction sync
+
+**Why**: Memory-seed and instruction files are how features reach agents in user projects
+
+**Decision**: Same one-liner pattern in every instruction file (consistent with Wave A)
+
+**What changed**:
+- Updated CLAUDE.md (template+root), .cursorrules, copilot, codex, cursor template, memory-seed.md with R-006/R-009/R-010/R-011/R-013; flipped redesign-backlog statuses to shipped; STATUS.md current focus updated
+
+**Next steps**:
+- PR creation
+
+**Blockers**: —
+

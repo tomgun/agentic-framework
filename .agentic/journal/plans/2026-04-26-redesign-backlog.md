@@ -163,7 +163,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-009 · `ag watch` — lightweight terminal event tail
-**Status:** planned · **Effort:** 2d · **Deps:** R-007
+**Status:** shipped · **Effort:** 2d · **Deps:** R-007
 **Plan ref:** plan §"Observability layer" → frontends table
 **Goal:** Color-coded `tail -f` style stream of events.jsonl for SSH sessions where Textual TUI is too heavy.
 
@@ -259,7 +259,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-006 · GitHub Actions YAML template (optional CI mirror)
-**Status:** planned · **Effort:** 1d · **Deps:** R-001, R-002
+**Status:** shipped · **Effort:** 1d · **Deps:** R-001, R-002
 **Plan ref:** plan §"Tier 0 — Remote primitives (optional)"
 **Goal:** Drop-in `.github/workflows/agentic-gate.yml` template that runs the same Tier 0 checks on PR-merge for users with GitHub remotes.
 
@@ -284,7 +284,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-010 · `ag fix --skip-contract` — hotfix mode
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"UX additions for Phase 0"
 **Goal:** Lightweight commit path for hotfixes. Tier 0 still requires test, but skips full spec/contract requirement; audited.
 
@@ -308,7 +308,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-011 · `ag onboard` — new-contributor playbook
-**Status:** planned · **Effort:** 3d · **Deps:** —
+**Status:** shipped · **Effort:** 3d · **Deps:** —
 **Plan ref:** plan §"UX additions for Phase 0" + Theme J18
 **Goal:** Generates `.agentic/ONBOARDING.md` for a contributor joining an existing project. Different from `ag init` (new project).
 
@@ -351,7 +351,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-013 · `ag intel report --quota` — Pro/Max session quota usage
-**Status:** planned · **Effort:** 2d · **Deps:** R-007
+**Status:** shipped · **Effort:** 2d · **Deps:** R-007
 **Plan ref:** plan §"Quota awareness (subscription model)"
 **Goal:** Display estimated quota usage in current 5h rolling window. Reads token-ledger.jsonl.
 
