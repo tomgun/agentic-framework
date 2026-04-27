@@ -120,12 +120,12 @@ _No active items_
 
 
 
-### HN-0087: Review PR #242 — R-005 filesystem read-only protection
+### HN-0087: Review PR #242 — Sprint 2 / Wave A · Tier 0 hardening cluster
 - **Type**: review
-- **Added**: 2026-04-26
-- **Context**: https://github.com/tomgun/agentic-framework/pull/242 · sprint 2 / Wave A item 1 of 4 · 14 tests (11 unit + 3 e2e skipped without PyYAML in container) · validate_framework 846/846 · two-wall design (chmod 444 + pre-commit gate); honest limit deliberate chmod u+w
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Added**: 2026-04-26 (last updated 2026-04-27 to reflect full Wave A scope)
+- **Context**: https://github.com/tomgun/agentic-framework/pull/242 · ships R-005 + R-012 + R-004 + R-003 in one PR (Wave A complete) · 6 commits including `fix(review)` for self-review feedback (verbose-tip, baseline coverage, malformed-JSON kind, R-XXX support, --type validation) · 50 tests pass in this container (16 + 11 + 8 + 15 + plus validate_framework 846/846); 3 e2e skipped without PyYAML
+- **Why human needed**: External review before merge. Self-review already addressed
+- **Impact**: Blocking: Wave B (R-009, R-013, R-006, R-010, R-011) — held until Wave A merges
 
 
 ## Resolved
