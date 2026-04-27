@@ -5878,3 +5878,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 09:46 - R-011 ag onboard shipped
+
+**Why**: Multi-contributor projects need a fast cold-start path; current state isn't self-explanatory
+
+**Decision**: Generate-from-current-state, not hand-curated; People section is hand-edited stub
+
+**What changed**:
+- ag onboard generates .agentic/ONBOARDING.md from STACK/FEATURES/STATUS/ADR/journal; --force overwrite; -o output; 5-min walkthrough; precommit gate references it; 12 tests
+
+**Next steps**:
+- Instruction file sync next
+
+**Blockers**: —
+

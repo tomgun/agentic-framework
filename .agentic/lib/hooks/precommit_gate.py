@@ -818,6 +818,14 @@ def print_blocked(failures: list[GateResult], *, verbose: bool = False) -> None:
             "  python3 .agentic/lib/hooks/precommit_gate.py --verbose\n",
             _YELLOW,
         ))
+    # R-011: surface the onboarding playbook when available so first-time
+    # contributors hitting an unfamiliar gate know where to start.
+    onboarding = _project_root() / ".agentic" / "ONBOARDING.md"
+    if onboarding.exists():
+        sys.stderr.write(_color(
+            "New here? See .agentic/ONBOARDING.md (R-011) for context.\n",
+            _YELLOW,
+        ))
     sys.stderr.write("\n")
 
 
