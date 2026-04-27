@@ -58,10 +58,18 @@ BASELINE_FILENAME = ".agentic/integrity.json"
 """Where the baseline JSON lives, relative to project root."""
 
 # Paths that, if they exist, are hashed in full.
+#
+# The audit-writer (events.py) and the contract-loader (contracts.py) are
+# baselined too: tampering with them defeats the gates without tripping
+# integrity. settings.sh is included for the same reason — it parses the
+# `pre_commit_hook` setting that gates can read to disable themselves.
 _FULL_FILE_PATHS: tuple[str, ...] = (
     ".git/hooks/pre-commit",
     ".git/hooks/pre-push",
     ".agentic/lib/integrity.py",
+    ".agentic/lib/events.py",
+    ".agentic/lib/contracts.py",
+    ".agentic/lib/settings.sh",
     ".agentic/lib/hooks/precommit_gate.py",
     ".agentic/lib/hooks/prepush_gate.py",
     ".agentic/lib/hooks/messages.py",
@@ -91,8 +99,17 @@ class IntegrityMismatch:
     """Path relative to project root."""
 
     kind: str
-    """`"modified"` (hash differs), `"missing_in_tree"` (baselined but absent),
-    or `"missing_in_baseline"` (present but never baselined)."""
+    """One of:
+      `"modified"`             — file present, hash differs from baseline
+      `"missing_in_tree"`      — baselined path not found on disk
+      `"missing_in_baseline"`  — present on disk but never baselined
+      `"malformed"`            — partial-JSON target whose file no longer
+                                 parses (so the canonical subfield can't
+                                 be hashed). Treated as a mismatch even
+                                 though there's no `actual` hash to show
+                                 — silent-skip would let a deliberately
+                                 corrupted settings.json hide tampering.
+    """
 
     expected: Optional[str] = None
     """Hash recorded in baseline, when applicable."""
@@ -119,15 +136,34 @@ def _hash_file(path: Path) -> str:
     return h.hexdigest()
 
 
+# Sentinel returned by `_hash_partial_json` when the target file exists but
+# fails to parse as JSON. Distinct from `None` (key absent — silent skip)
+# so the verifier can flag a deliberately-corrupted file as `malformed`
+# rather than `missing_in_tree`.
+_MALFORMED_SENTINEL = "<malformed>"
+
+
 def _hash_partial_json(path: Path, key: str) -> Optional[str]:
-    """SHA-256 of a single JSON subfield in canonical form. Returns None
-    when the file or the field is missing — the caller treats that as
-    "skip this baselined target", not as a mismatch."""
+    """SHA-256 of a single JSON subfield in canonical form. Returns:
+      * a hex digest               — success
+      * `_MALFORMED_SENTINEL`      — the file exists but isn't valid JSON
+                                     (treated as a mismatch by `verify_all`,
+                                     so deliberate corruption can't hide
+                                     hooks-subfield tampering)
+      * `None`                     — the key is genuinely absent; caller
+                                     skips this baselined target silently.
+    """
     try:
-        data = json.loads(path.read_text())
-    except (OSError, ValueError):
+        text = path.read_text()
+    except OSError:
         return None
-    if not isinstance(data, dict) or key not in data:
+    try:
+        data = json.loads(text)
+    except ValueError:
+        return _MALFORMED_SENTINEL
+    if not isinstance(data, dict):
+        return _MALFORMED_SENTINEL
+    if key not in data:
         return None
     canonical = json.dumps(data[key], sort_keys=True, separators=(",", ":"))
     return _sha256_bytes(canonical.encode("utf-8"))
@@ -159,14 +195,28 @@ def _enumerate_targets(root: Path) -> Iterable[tuple[str, Optional[str]]]:
             yield f"{rel}[{key}]", h
 
 
-def compute_baseline(root: Path) -> dict[str, str]:
-    """Compute the current baseline as `{path_or_path[key]: sha256}`.
-    Stable across runs as long as files don't change; sorted by path
-    for stable JSON serialization."""
+def _current_state(root: Path) -> dict[str, str]:
+    """Internal: every existing target with its hash *or* the malformed
+    sentinel for partial-JSON targets that no longer parse. Used by
+    `verify_all` so it can flag malformation as a mismatch, but NOT by
+    `compute_baseline`, which only persists valid hashes."""
     out = {}
     for path, h in _enumerate_targets(root):
         out[path] = h
     return dict(sorted(out.items()))
+
+
+def compute_baseline(root: Path) -> dict[str, str]:
+    """Compute the baseline as `{path_or_path[key]: sha256}` for persistence.
+    Sorted by path for stable JSON serialization. Drops malformed entries
+    so a corrupted `.claude/settings.json` doesn't get baselined as 'fine'
+    — fix the file, then re-run `ag integrity update`."""
+    out = {
+        path: h
+        for path, h in _current_state(root).items()
+        if h != _MALFORMED_SENTINEL
+    }
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -270,15 +320,24 @@ def _verify_strict(root: Path, *, skip_attempted: bool = False) -> VerifyResult:
         # actionable but not blocking on first run.
         return VerifyResult(mismatches=[], baseline_present=False)
 
-    current = compute_baseline(root)
+    # Use the raw current state (includes malformed sentinels) so we can
+    # distinguish a malformed file from a missing one. compute_baseline()
+    # drops sentinels, which is correct for persistence but wrong for
+    # verification.
+    current = _current_state(root)
     mismatches: list[IntegrityMismatch] = []
 
-    # Modified or missing-in-tree.
+    # Modified or missing-in-tree (or malformed — a partial-JSON target
+    # whose file no longer parses, signalled via _MALFORMED_SENTINEL).
     for path, expected in baseline.items():
         actual = current.get(path)
         if actual is None:
             mismatches.append(IntegrityMismatch(
                 path=path, kind="missing_in_tree", expected=expected
+            ))
+        elif actual == _MALFORMED_SENTINEL:
+            mismatches.append(IntegrityMismatch(
+                path=path, kind="malformed", expected=expected, actual=None,
             ))
         elif actual != expected:
             mismatches.append(IntegrityMismatch(
@@ -287,11 +346,15 @@ def _verify_strict(root: Path, *, skip_attempted: bool = False) -> VerifyResult:
 
     # New files appearing in baselined globs that the baseline doesn't know
     # about — surface them; the agent should `ag integrity update` to bless
-    # them or remove them.
+    # them or remove them. A never-baselined-but-malformed target is reported
+    # as `malformed` rather than `missing_in_baseline` for clarity.
     for path, actual in current.items():
         if path not in baseline:
+            kind = "malformed" if actual == _MALFORMED_SENTINEL else "missing_in_baseline"
             mismatches.append(IntegrityMismatch(
-                path=path, kind="missing_in_baseline", actual=actual,
+                path=path,
+                kind=kind,
+                actual=None if actual == _MALFORMED_SENTINEL else actual,
             ))
 
     return VerifyResult(

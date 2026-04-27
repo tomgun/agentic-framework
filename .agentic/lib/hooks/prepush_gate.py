@@ -647,7 +647,11 @@ def print_blocked(failures: list[GateResult], *, verbose: bool = False) -> None:
     sys.stderr.write(_color("To bypass with audit (use sparingly):\n", _YELLOW))
     sys.stderr.write("  ag push --skip-gate \"<reason>\"\n")
     if not verbose:
-        sys.stderr.write(_color("Tip: pass --verbose for expanded explanations and plan refs.\n", _YELLOW))
+        sys.stderr.write(_color(
+            "Tip: re-run with explicit invocation for expanded detail + plan refs:\n"
+            "  python3 .agentic/lib/hooks/prepush_gate.py --verbose\n",
+            _YELLOW,
+        ))
     sys.stderr.write("\n")
 
 

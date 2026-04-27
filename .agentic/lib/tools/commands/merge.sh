@@ -16,16 +16,30 @@
 
 # ---- Helpers --------------------------------------------------------------
 
-# Discover feature/dev/epic IDs mentioned in commit messages on the source
-# branch but not on the merge target. Returns deduped IDs on stdout.
+# Discover feature/dev/epic/redesign IDs mentioned in commit messages on the
+# source branch but not on the merge target. Returns deduped IDs on stdout.
+#
+# We pick up two grammars:
+#   * `(F|DEV|E|NFR)-NNN[.M]`  — framework feature IDs (FEATURES.md / contracts)
+#   * `R-NNN`                  — redesign-backlog items (no contract; lighter
+#                                checks via _merge_id_is_redesign).
 _merge_discover_features() {
     local branch="$1"
     local target="${2:-HEAD}"
     local base
     base=$(git merge-base "$target" "$branch" 2>/dev/null) || return 0
     git log --format=%B "$base..$branch" 2>/dev/null \
-        | grep -oE "$FEATURE_ID_ERE" \
+        | grep -oE "(${FEATURE_ID_ERE}|NFR-[0-9]{3,}|R-[0-9]{3,})" \
         | sort -u
+}
+
+# True if the ID belongs to the redesign backlog (R-NNN). Redesign items
+# don't have contract YAMLs and don't appear in FEATURES.md — they live in
+# `.agentic/journal/plans/2026-04-26-redesign-backlog.md`. The gate skips
+# the contract + FEATURES.md tracking checks for these and runs only the
+# pending-input + advisory CI checks.
+_merge_id_is_redesign() {
+    [[ "$1" =~ ^R-[0-9]{3,}$ ]]
 }
 
 # Echo PASS/FAIL line + accumulate failures into the named array variable.
@@ -112,8 +126,15 @@ _merge_local_gate() {
     local -a failed=()
 
     # AC1.b — `ag contract check F-XXX` for each detected feature.
+    # R-XXX (redesign-backlog) items have no contracts; skip them here and
+    # surface that explicitly so the report doesn't look "vacuously passing".
     if [[ -n "$features" ]]; then
+        local redesign_ids=""
         for fid in $features; do
+            if _merge_id_is_redesign "$fid"; then
+                redesign_ids="$redesign_ids $fid"
+                continue
+            fi
             if bash "$ROOT_DIR/.agentic/lib/tools/ag.sh" contract check "$fid" >/dev/null 2>&1; then
                 _merge_record failed ok "contract check: $fid"
             else
@@ -121,6 +142,10 @@ _merge_local_gate() {
                     "Run: ag contract check $fid    (see failing assertions)"
             fi
         done
+        if [[ -n "$redesign_ids" ]]; then
+            echo -e "  ${YELLOW}!${NC} contract check skipped for redesign items:$redesign_ids"
+            echo "      (R-XXX items live in the redesign backlog, not spec/contracts/)"
+        fi
     fi
 
     # AC1.c — `ag contract pending` reports nothing for the detected features.
@@ -145,22 +170,32 @@ _merge_local_gate() {
     # so the expected state is "in_progress" or "ready" — *not* "shipped"
     # (which would mean the merge already happened). We block only on the
     # missing-from-FEATURES.md case, which signals a feature that was never
-    # tracked.
+    # tracked. R-XXX items live in the redesign backlog and are excluded
+    # from this check.
     if [[ -n "$features" ]] && [[ -f "$ROOT_DIR/.agentic/spec/FEATURES.md" ]]; then
-        local untracked=""
+        local trackable_ids=""
         for fid in $features; do
-            # Strip dotted children for the FEATURES.md lookup (parent owns the row).
-            local parent="${fid%%.*}"
-            if ! grep -qE "(^|[^A-Za-z0-9])${parent}([^A-Za-z0-9]|$)" \
-                  "$ROOT_DIR/.agentic/spec/FEATURES.md"; then
-                untracked="$untracked $fid"
+            if _merge_id_is_redesign "$fid"; then
+                continue
             fi
+            trackable_ids="$trackable_ids $fid"
         done
-        if [[ -z "$untracked" ]]; then
-            _merge_record failed ok "all features tracked in FEATURES.md"
-        else
-            _merge_record failed fail "untracked in FEATURES.md:$untracked" \
-                "Run: bash .agentic/lib/tools/feature.sh cap add ..."
+        if [[ -n "$trackable_ids" ]]; then
+            local untracked=""
+            for fid in $trackable_ids; do
+                # Strip dotted children for the FEATURES.md lookup (parent owns the row).
+                local parent="${fid%%.*}"
+                if ! grep -qE "(^|[^A-Za-z0-9])${parent}([^A-Za-z0-9]|$)" \
+                      "$ROOT_DIR/.agentic/spec/FEATURES.md"; then
+                    untracked="$untracked $fid"
+                fi
+            done
+            if [[ -z "$untracked" ]]; then
+                _merge_record failed ok "all features tracked in FEATURES.md"
+            else
+                _merge_record failed fail "untracked in FEATURES.md:$untracked" \
+                    "Run: bash .agentic/lib/tools/feature.sh cap add ..."
+            fi
         fi
     fi
 

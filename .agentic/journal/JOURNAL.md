@@ -5790,3 +5790,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-27 08:03 - Wave A review fixes
+
+**Why**: Self-review found 3 real bugs and 2 UX issues; fixing now keeps Wave A as a single coherent merge candidate rather than dragging review-feedback debt into Wave B.
+
+**What changed**:
+- Self-reviewed PR #242 (Wave A) and addressed 5 issues: misleading verbose tip in gate output replaced with explicit invocation; integrity baseline extended to events.py + contracts.py + settings.sh (closes audit/loader tampering hole); malformed JSON now distinct mismatch kind (compute_baseline refuses to persist malformed entries); R-XXX redesign IDs picked up by merge-gate feature regex (with contract + FEATURES.md checks correctly skipped); _contract_migrate --type validation rejects --type without --add-assertion. Added 5 tests.
+
+**Next steps**:
+- Wave A ready for external review
+
+**Blockers**: None
+

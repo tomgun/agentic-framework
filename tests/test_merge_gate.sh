@@ -173,6 +173,39 @@ else
 fi
 cleanup_repo
 
+# ── R-XXX redesign items: discovered, but contract + FEATURES.md skipped ───
+
+test_case "R-XXX: discovered by feature regex"
+setup_repo
+git checkout --quiet -b feat/R-100
+echo "rx" > rx.txt; git add rx.txt; git commit --quiet -m "feat(R-100): redesign item"
+git checkout --quiet main
+source_merge_helpers
+features=$(_merge_discover_features feat/R-100 main | tr '\n' ' ')
+if [[ "$features" == *"R-100"* ]]; then
+    pass
+else
+    fail "expected R-100 in features, got: $features"
+fi
+cleanup_repo
+
+test_case "R-XXX: gate passes (no contract / no FEATURES.md tracking required)"
+setup_repo
+git checkout --quiet -b feat/R-100
+echo "rx" > rx.txt; git add rx.txt; git commit --quiet -m "feat(R-100): redesign item"
+git checkout --quiet main
+out=$(ag_sandbox merge feat/R-100 2>&1); rc=$?
+# R-100 is not in FEATURES.md, has no contract. The gate should NOT block on
+# either — it should print "skipped for redesign items" and proceed.
+if [[ $rc -eq 0 ]] \
+    && echo "$out" | grep -q "contract check skipped for redesign items: R-100" \
+    && ! echo "$out" | grep -q "untracked in FEATURES.md"; then
+    pass
+else
+    fail "rc=$rc; expected pass with redesign-skip message, got ${out:0:240}"
+fi
+cleanup_repo
+
 # ── AC4: --skip-gate "<reason>" bypasses gate and proceeds to git merge ────
 
 test_case "AC4: --skip-gate \"<reason>\" bypasses gate and merges"

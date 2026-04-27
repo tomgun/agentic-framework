@@ -977,7 +977,9 @@ _contract_migrate() {
     local trigger="implementation_discovery"
     local set_kv=""
     local add_assertion_text=""
-    local add_assertion_type="behavioral"
+    # Empty default so we can detect "user passed --type" vs "default";
+    # resolved to "behavioral" below once we confirm --add-assertion was set.
+    local add_assertion_type=""
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -989,6 +991,16 @@ _contract_migrate() {
             *) shift ;;
         esac
     done
+
+    # --type only makes sense with --add-assertion; refuse silent ignore.
+    if [[ -n "$add_assertion_type" ]] && [[ -z "$add_assertion_text" ]]; then
+        echo -e "${RED}--type requires --add-assertion${NC}" >&2
+        echo "  --type sets the new assertion's type field (structural|behavioral)." >&2
+        echo "  Pass it together with --add-assertion \"<text>\"." >&2
+        return 1
+    fi
+    # Default the type when --add-assertion is given without --type.
+    [[ -z "$add_assertion_type" ]] && add_assertion_type="behavioral"
 
     if [[ -z "$feature_id" ]] || [[ -z "$reason" ]]; then
         echo -e "${RED}Usage: ag contract migrate F-XXXX --reason \"<text>\" \\${NC}"

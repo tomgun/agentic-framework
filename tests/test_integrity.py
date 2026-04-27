@@ -307,6 +307,53 @@ def test_skip_envvar_ignored_locally():
 # ---------------------------------------------------------------------------
 
 
+def test_malformed_partial_json_after_baseline_is_flagged_as_malformed():
+    """A baselined `.claude/settings.json` that gets corrupted to invalid
+    JSON must surface as kind='malformed', not silently drop. Closes the
+    review issue #3 hole."""
+    root = _make_fixture(with_settings_json=True)
+    try:
+        integrity.update_baseline(root)
+        # Corrupt the file to invalid JSON.
+        (root / ".claude" / "settings.json").write_text("{not valid json")
+        result = integrity.verify_all(root)
+        malformed = [m for m in result.mismatches if m.kind == "malformed"]
+        assert any(m.path == ".claude/settings.json[hooks]" for m in malformed), \
+            f"expected malformed mismatch; got {[(m.path, m.kind) for m in result.mismatches]}"
+    finally:
+        _cleanup(root)
+
+
+def test_compute_baseline_does_not_persist_malformed_entries():
+    """If the file is already malformed at baseline-time, the persisted
+    baseline must not contain it (otherwise re-running verify would say
+    'fine' on a corrupted file). Caller should fix the JSON before
+    `ag integrity update`."""
+    root = _make_fixture(with_settings_json=True)
+    try:
+        # Corrupt the file BEFORE baselining.
+        (root / ".claude" / "settings.json").write_text("{garbage}")
+        baseline = integrity.compute_baseline(root)
+        assert ".claude/settings.json[hooks]" not in baseline, \
+            f"malformed entry leaked into baseline: {list(baseline)}"
+    finally:
+        _cleanup(root)
+
+
+def test_baseline_covers_audit_and_loader_modules():
+    """Review issue #2: events.py + contracts.py + settings.sh must be
+    baselined — tampering with them defeats enforcement without tripping
+    integrity. We verify against the live framework lib, not a fixture."""
+    project_root = REPO_ROOT
+    baseline = integrity.compute_baseline(project_root)
+    for must_have in (
+        ".agentic/lib/events.py",
+        ".agentic/lib/contracts.py",
+        ".agentic/lib/settings.sh",
+    ):
+        assert must_have in baseline, f"baseline missing required path: {must_have}"
+
+
 def test_first_run_no_baseline_returns_baseline_present_false():
     root = _make_fixture()
     try:
@@ -350,6 +397,9 @@ if __name__ == "__main__":
         test_verify_all_clean_when_unchanged,
         test_skip_envvar_honored_under_ci,
         test_skip_envvar_ignored_locally,
+        test_malformed_partial_json_after_baseline_is_flagged_as_malformed,
+        test_compute_baseline_does_not_persist_malformed_entries,
+        test_baseline_covers_audit_and_loader_modules,
         test_first_run_no_baseline_returns_baseline_present_false,
         test_catalog_has_integrity_tampered,
     ]

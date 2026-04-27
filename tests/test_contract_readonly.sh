@@ -208,6 +208,18 @@ out=$(_contract_migrate F-99905 2>&1); rc=$?
 if [[ $rc -ne 0 ]] && echo "$out" | grep -q "Usage:"; then pass; else fail "rc=$rc out=${out:0:120}"; fi
 drop_unit_dir
 
+test_case "ag contract migrate: --type without --add-assertion is rejected"
+make_unit_dir
+# Review issue #7: --type used to be silently ignored if --add-assertion was
+# absent. Now it errors out so the user knows their flag had no effect.
+out=$(_contract_migrate F-99905 --reason "test" --type behavioral 2>&1); rc=$?
+if [[ $rc -ne 0 ]] && echo "$out" | grep -q "type requires --add-assertion"; then
+    pass
+else
+    fail "rc=$rc out=${out:0:160}"
+fi
+drop_unit_dir
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Group 2: End-to-end integration via `ag contract` (requires PyYAML)
 # ─────────────────────────────────────────────────────────────────────────────
