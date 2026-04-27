@@ -847,6 +847,11 @@ cmd_init() {
     echo ""
     echo -e "Init playbook: ${BLUE}.agentic/init/init_playbook.md${NC}"
     echo -e "Init questions: ${BLUE}.agentic/init/init_questions.md${NC}"
+    echo ""
+    echo -e "${BOLD}Optional: CI mirror (R-006)${NC}"
+    echo -e "  cp .agentic/lib/init/templates/.github/workflows/agentic-gate.yml \\"
+    echo -e "     .github/workflows/agentic-gate.yml"
+    echo -e "  ${DIM}# runs Tier 0 gates on every push/PR — see docs/CI_MIRROR.md${NC}"
 }
 
 

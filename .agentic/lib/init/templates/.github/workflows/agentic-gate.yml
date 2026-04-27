@@ -1,0 +1,162 @@
+# agentic-gate.yml — optional CI mirror of the local Tier 0 gates (R-006).
+#
+# Drop-in workflow that runs the same `precommit_gate.py` and `prepush_gate.py`
+# checks GitHub-side. This is belt-and-suspenders enforcement for repos with a
+# GitHub remote: agents can't bypass the local gate without ALSO disabling the
+# CI gate, which leaves an obvious paper trail.
+#
+# To enable: copy this file to `.github/workflows/agentic-gate.yml` in your
+# repository and commit. See `docs/CI_MIRROR.md` for setup notes and limitations.
+
+name: Agentic Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Minimum needed for the post-comment step on PRs. Fork PRs only get read perms
+# (GitHub's default), so the comment step gracefully no-ops there.
+permissions:
+  contents: read
+  pull-requests: write
+
+# Cancel a previous run on the same ref when a newer push lands.
+concurrency:
+  group: agentic-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Tier 0 gates (CI mirror)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout (full history for range checks)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install runtime deps
+        run: |
+          python -m pip install --upgrade pip
+          # PyYAML powers contract parsing; jsonschema is optional but lets the
+          # CI mirror match local enforcement strictness when present.
+          pip install pyyaml jsonschema
+
+      - name: Run pre-commit gate
+        id: precommit
+        env:
+          CI: "true"
+          AGENTIC_CI_MIRROR: "1"
+        run: |
+          set +e
+          python3 .agentic/lib/hooks/precommit_gate.py --ci-mode --verbose 2>&1 \
+            | tee precommit-gate.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+        continue-on-error: true
+
+      - name: Run pre-push gate (full integration suite + drift)
+        id: prepush
+        env:
+          CI: "true"
+          AGENTIC_CI_MIRROR: "1"
+        run: |
+          set +e
+          python3 .agentic/lib/hooks/prepush_gate.py --ci-mode --verbose 2>&1 \
+            | tee prepush-gate.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+        continue-on-error: true
+
+      - name: Upload gate logs and verification artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentic-gate-${{ github.run_id }}
+          path: |
+            precommit-gate.log
+            prepush-gate.log
+            .agentic/work/**/verification.json
+            .agentic/journal/events.jsonl
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Compose summary
+        if: always()
+        id: summary
+        run: |
+          PRE_RC="${{ steps.precommit.outputs.exit_code }}"
+          PUSH_RC="${{ steps.prepush.outputs.exit_code }}"
+          {
+            echo "## Agentic Gate"
+            echo ""
+            echo "| Gate | Exit |"
+            echo "|---|---|"
+            echo "| pre-commit | $PRE_RC |"
+            echo "| pre-push   | $PUSH_RC |"
+            echo ""
+            if [ "$PRE_RC" != "0" ] || [ "$PUSH_RC" != "0" ]; then
+              echo "<details><summary>pre-commit gate output</summary>"
+              echo ""
+              echo '```'
+              tail -200 precommit-gate.log 2>/dev/null || echo "(no log)"
+              echo '```'
+              echo "</details>"
+              echo ""
+              echo "<details><summary>pre-push gate output</summary>"
+              echo ""
+              echo '```'
+              tail -200 prepush-gate.log 2>/dev/null || echo "(no log)"
+              echo '```'
+              echo "</details>"
+            else
+              echo "_All Tier 0 gates passed._"
+            fi
+          } > summary.md
+          {
+            echo "summary<<__EOF__"
+            cat summary.md
+            echo "__EOF__"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Append summary to job output
+        if: always()
+        run: cat summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      # Comment on PRs only when at least one gate failed (success: silent, AC-4).
+      - name: Comment on PR (failure only)
+        if: |
+          always()
+          && github.event_name == 'pull_request'
+          && (steps.precommit.outputs.exit_code != '0' || steps.prepush.outputs.exit_code != '0')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('summary.md', 'utf8');
+            const marker = '<!-- agentic-gate-marker -->';
+            const tagged = `${marker}\n${body}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const existing = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const prior = existing.data.find(c => c.body && c.body.includes(marker));
+            if (prior) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: prior.id, body: tagged });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body: tagged });
+            }
+
+      - name: Fail if any gate failed
+        if: always()
+        run: |
+          if [ "${{ steps.precommit.outputs.exit_code }}" != "0" ] \
+             || [ "${{ steps.prepush.outputs.exit_code }}" != "0" ]; then
+            echo "One or more agentic gates failed — see summary above."
+            exit 1
+          fi

@@ -5848,3 +5848,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-27 09:38 - R-006 GHA template shipped
+
+**Why**: Multi-contributor repos and compliance need GitHub-side enforcement; local hooks aren't shared across clones
+
+**Decision**: Belt-and-suspenders only — Tier 0 already strong; mirror catches gaps, doesn't replace
+
+**What changed**:
+- agentic-gate.yml runs precommit+prepush in CI mirror; uploads logs+verification.json; PR comment on failure only; docs/CI_MIRROR.md; cmd_init surfaces template
+
+**Next steps**:
+- R-010 ag fix next
+
+**Blockers**: —
+
