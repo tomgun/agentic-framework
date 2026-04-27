@@ -5818,3 +5818,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-27 09:31 - R-009 ag watch shipped
+
+**Why**: SSH sessions need a lightweight observability frontend; TUI too heavy
+
+**Decision**: Skip colorama dep; ANSI codes work natively on supported terminals
+
+**What changed**:
+- Color-coded events.jsonl tail; stdlib + ANSI; filter/since/once flags; 34 tests pass
+
+**Next steps**:
+- R-013 quota report next
+
+**Blockers**: —
+
