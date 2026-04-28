@@ -7,6 +7,14 @@ strings that both the Textual widget and the unit tests consume. Tests
 inspect substrings (percentages, ring chars, color tags); the Textual
 Static widget renders the markup as colored text.
 
+Format change (R-014, breaking for any external scrapers):
+  Pre-R-014:  `tokens=125,000 (42%)`              — bare ASCII text
+  Post-R-014: `tokens=125,000 [bold yellow]◑ 42%[/]` — Rich markup with
+              colored ring char. The percentage is still present (no
+              parens); downstream tooling that grepped `\\(N%\\)` should
+              switch to `\\b\\d+%`. Nothing in-tree did so this is a
+              no-op for the framework itself.
+
 R-014 additions:
   * `_ring_segment(pct)` — Unicode quarter-circle progression (○◔◐◕●).
   * `_color_for_pct(pct)` — alert-level color: green<70, yellow<85,
@@ -14,8 +22,11 @@ R-014 additions:
     text in `[name]…[/]` markup.
   * `header_lines` emits the colored ring next to the percentage when a
     quota window is configured.
-  * The Textual `HeaderPanel` widget sets a tooltip with by-tier breakdown
-    pulled from `snap.header.by_tier`.
+  * `HeaderPanel.update_from(snap)` rewrites the header text (cheap;
+    called every 0.5s from app.py's `_refresh`).
+  * `HeaderPanel.update_tooltip_from(snap)` rewrites the by-tier tooltip
+    (sorted dict + per-tier % math; called every 30s from
+    `_refresh_quota_only` so we don't redo this work on every text tick).
 """
 from __future__ import annotations
 
@@ -132,7 +143,14 @@ def make_panel():
         DEFAULT_CSS = "HeaderPanel { dock: top; height: 1; padding: 0 1; background: $primary-darken-2; color: $text; }"
 
         def update_from(self, snap: "DashboardSnapshot") -> None:
+            """Rewrite the header text. Cheap; safe to call on every tick.
+            Tooltip is updated separately via `update_tooltip_from`."""
             self.update("\n".join(header_lines(snap)))
+
+        def update_tooltip_from(self, snap: "DashboardSnapshot") -> None:
+            """Rewrite the by-tier tooltip. Slightly heavier — sorts the
+            tier dict and computes per-tier percentages — so app.py only
+            calls this on the 30s quota tick rather than every 0.5s."""
             self.tooltip = by_tier_tooltip(snap)
 
     return HeaderPanel("")

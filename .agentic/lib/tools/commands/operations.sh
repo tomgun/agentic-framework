@@ -699,10 +699,15 @@ cmd_init() {
         echo "  \"Let's review and update the project initialization\""
         echo ""
         # R-015 AC6 — even on the already-initialized fast path, ensure Tier 0
-        # hook shims are in place. Idempotent: a no-op when shims already match.
+        # hook shims are in place. Stay quiet when shims already match so a
+        # user running `ag init` "just to check" doesn't see surprise hook
+        # activity; only print the header + invoke register when there's
+        # actual work to do.
         if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-            echo -e "${BOLD}Tier 0 hooks (R-015):${NC}"
-            cmd_hooks register || true
+            if ! _hooks_already_registered; then
+                echo -e "${BOLD}Tier 0 hooks (R-015):${NC}"
+                cmd_hooks register || true
+            fi
         fi
         return 0
     fi
@@ -740,11 +745,14 @@ cmd_init() {
     echo -e "  ${DIM}# runs Tier 0 gates on every push/PR — see docs/CI_MIRROR.md${NC}"
 
     # R-015 AC6 — register Tier 0 git-hook shims automatically when ag init
-    # runs in a git repo. Idempotent: a no-op when shims already match.
+    # runs in a git repo. Stay quiet when shims already match so re-runs of
+    # `ag init` don't dump hook activity the user didn't ask for.
     if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-        echo ""
-        echo -e "${BOLD}Tier 0 hooks (R-015):${NC}"
-        cmd_hooks register || true
+        if ! _hooks_already_registered; then
+            echo ""
+            echo -e "${BOLD}Tier 0 hooks (R-015):${NC}"
+            cmd_hooks register || true
+        fi
     fi
 }
 

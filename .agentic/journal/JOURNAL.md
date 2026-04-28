@@ -6071,3 +6071,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 13:00 - PR #246 review fixes — addressed all 11 issues
+
+**Why**: External review of PR #246 surfaced 11 actionable issues (4 R-014, 7 R-015) covering modal latency, falsy-coalesce, tooltip cadence, format-change doc, AC1 deviation, idiom, race window, atomicity, init UX, baseline semantics, test fragility. Each addressed in place; tests extended; no behavioural regressions.
+
+**Decision**: _hooks_dir always returns .git/hooks/ (matches AC1 literally; install/F-0300 remains the dedicated transport for core.hooksPath workflows). Modal trigger moved to fast tick — same snapshot data, lower latency, no extra cost. Header panel split into text vs tooltip update methods (cheap text rebuild stays at 0.5s; tooltip per-tier sort/% math at 30s). Atomic shim writes use sibling temp + mv to preserve prior state on crash mid-write.
+
+**What changed**:
+- R-014: modal trigger moved from 30s to 0.5s tick (catches 95% rising edge promptly); HeaderPanel split into update_from (text, every 0.5s) + update_tooltip_from (heavier by-tier math, every 30s); 0.0 falsy-coalesce replaced with explicit None check; format-change docstring added with regex migration hint. R-015: dropped core.hooksPath redirect from _hooks_dir (AC1 literal); replaced diff -q <(cat) with diff -q -; backup-dir now timestamp+pid+seq; atomic shim writes via temp+mv; cmd_init silent on no-op via new _hooks_already_registered helper; explicit design-choice comment block on unregister + integrity update; AC3 test parses JSON structurally; new AC6b test covers the silent path.
+
+**Next steps**:
+- PR review pass complete. Ready for re-review + merge.
+
+**Blockers**: —
+

@@ -115,10 +115,12 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             tail.start(on_record=lambda rec: state.apply_record(rec))
             # Full panel refresh — events arrive at human-perceivable cadence.
             self.set_interval(0.5, self._refresh)
-            # Quota burn-down ring updates on a slower cadence per AC6 — the
-            # token-ledger doesn't change shape often enough to warrant the
-            # same 0.5s rebuild as the events panel.
+            # Quota tick handles the tooltip rebuild + health resync. Token
+            # ledger doesn't change shape often, so 30s is plenty. set_interval
+            # doesn't fire immediately on register, so seed once now so the
+            # tooltip isn't empty until the first 30s tick.
             self.set_interval(30.0, self._refresh_quota_only)
+            self._refresh_quota_only()
 
         def on_unmount(self) -> None:  # type: ignore[override]
             tail.stop()
@@ -129,16 +131,22 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
                       self._drilldown, self._health):
                 if w is not None:
                     w.update_from(snap)
+            # Modal trigger lives on the fast tick so the rising edge to 95%
+            # is caught within ~0.5s rather than waiting up to 30s for the
+            # quota refresh — the underlying snapshot data is already fresh
+            # via the streams tail.
+            self._maybe_show_quota_modal(snap)
 
         def _refresh_quota_only(self) -> None:
-            """Quota-specific tick — updates only header + health (where the
-            quota signals appear). R-014 layers the burn-down ring on top
-            of this hook."""
+            """Quota-specific 30s tick — refreshes the by-tier tooltip on the
+            header (more expensive than the line text) and lets the health
+            panel resync. The modal trigger runs on the 0.5s `_refresh`
+            tick (see `_maybe_show_quota_modal`)."""
             snap = state.snapshot()
-            for w in (self._header, self._health):
-                if w is not None:
-                    w.update_from(snap)
-            self._maybe_show_quota_modal(snap)
+            if self._header is not None:
+                self._header.update_tooltip_from(snap)
+            if self._health is not None:
+                self._health.update_from(snap)
 
         def _maybe_show_quota_modal(self, snap) -> None:
             """Push the 95% modal on rising edge. Reset acknowledgement when
@@ -148,7 +156,11 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
                 self._quota_modal_acknowledged = False
             if should_show_modal(self._prev_quota_alert, cur,
                                  self._quota_modal_acknowledged):
-                pct = snap.header.quota_pct or 95.0
+                # Default fallback: the alert is "95%" so quota_pct must be
+                # >= 95.0; this branch only runs in pathological races where
+                # the snapshot lost it. Use an explicit None check so a
+                # legitimate 0.0 reading wouldn't fall back to 95.
+                pct = snap.header.quota_pct if snap.header.quota_pct is not None else 95.0
                 self.push_screen(
                     self._QuotaAlertScreen(pct=pct),
                     self._handle_quota_modal_choice,

@@ -115,9 +115,17 @@ setup_repo
 ag_sandbox hooks register >/dev/null 2>&1
 ok=1
 [[ -f "$SANDBOX/.agentic/integrity.json" ]] || ok=0
-# Pre-commit hook must appear in the baseline after register.
-grep -q "pre-commit" "$SANDBOX/.agentic/integrity.json" 2>/dev/null || ok=0
-if [[ $ok -eq 1 ]]; then pass; else fail "integrity.json missing or doesn't include hook"; fi
+# Structural assertion: parse the JSON and verify both hook paths are
+# registered as keys under "files". Avoids matching the literal string
+# "pre-commit" elsewhere in the doc.
+python3 - "$SANDBOX/.agentic/integrity.json" >/dev/null 2>&1 <<'PYEOF' || ok=0
+import json, sys
+data = json.load(open(sys.argv[1]))
+files = data.get("files", {})
+assert ".git/hooks/pre-commit" in files, "pre-commit not in baseline"
+assert ".git/hooks/pre-push" in files, "pre-push not in baseline"
+PYEOF
+if [[ $ok -eq 1 ]]; then pass; else fail "integrity.json missing or doesn't include hook entries"; fi
 cleanup_repo
 
 # ── AC4: re-running register is idempotent (no second backup) ───────────────
@@ -184,6 +192,24 @@ grep -q "Tier 0 hooks (R-015)" /tmp/r015-init.txt || ok=0
 if [[ $ok -eq 1 ]]; then pass; else fail "init output tail: $(tail -10 /tmp/r015-init.txt)"; fi
 cleanup_repo
 rm -f /tmp/r015-init.txt
+
+# ── AC6b: ag init stays silent on the hook section when shims already match ─
+
+test_case "AC6b: ag init does NOT print the Tier 0 hooks section when shims already match"
+setup_repo
+# First init writes the shims.
+ag_sandbox init > /tmp/r015-init1.txt 2>&1
+# Second init: shims already canonical → cmd_init must skip the header
+# entirely (UX fix per PR review #7).
+ag_sandbox init > /tmp/r015-init2.txt 2>&1
+ok=1
+[[ -x "$SANDBOX/.git/hooks/pre-commit" ]] || ok=0
+# The second run must NOT mention the Tier 0 hooks section header.
+if grep -q "Tier 0 hooks (R-015)" /tmp/r015-init2.txt; then ok=0; fi
+# But it MUST still exit cleanly (i.e. cmd_init still ran to completion).
+if [[ $ok -eq 1 ]]; then pass; else fail "second-init output: $(cat /tmp/r015-init2.txt)"; fi
+cleanup_repo
+rm -f /tmp/r015-init1.txt /tmp/r015-init2.txt
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 

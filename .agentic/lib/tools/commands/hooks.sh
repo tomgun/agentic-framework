@@ -32,20 +32,11 @@ _hooks_require_git_repo() {
 }
 
 _hooks_dir() {
-    # Honour core.hooksPath if it points somewhere; otherwise default to
-    # .git/hooks (Git's standard fallback). R-015 writes to the resolved
-    # directory so register works under either configuration.
-    local custom
-    custom="$(git config core.hooksPath 2>/dev/null || true)"
-    if [ -n "$custom" ]; then
-        # core.hooksPath may be relative to repo root; canonicalise.
-        case "$custom" in
-            /*) printf '%s\n' "$custom" ;;
-            *)  printf '%s/%s\n' "$ROOT_DIR" "$custom" ;;
-        esac
-    else
-        printf '%s/.git/hooks\n' "$ROOT_DIR"
-    fi
+    # R-015 AC1 mandates `.git/hooks/pre-commit` and `.git/hooks/pre-push`
+    # literally. Always resolves to .git/hooks/ — projects that want the
+    # `core.hooksPath` redirection use `ag hooks install` (F-0300)
+    # instead, which is the dedicated transport for that workflow.
+    printf '%s/.git/hooks\n' "$ROOT_DIR"
 }
 
 _hooks_shim_pre_commit() {
@@ -53,10 +44,6 @@ _hooks_shim_pre_commit() {
 #!/usr/bin/env bash
 # Tier 0 pre-commit gate (R-001) — fires regardless of which agent runs in
 # any session. The gate logic lives in Python; this shim is just a launcher.
-#
-# Note: when `core.hooksPath` is set (e.g., to .agentic/hooks/), git uses that
-# path INSTEAD of .git/hooks/. The same Python gate is invoked by the active
-# dispatcher in either location.
 set -e
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 exec python3 "$ROOT/.agentic/lib/hooks/precommit_gate.py" "$@"
@@ -69,9 +56,6 @@ _hooks_shim_pre_push() {
 # Tier 0 pre-push gate (R-002) — second-wall enforcement when the local
 # range is about to leave the repo. Runs in a separate process from the
 # agent session, so the agent does not control invocation.
-#
-# Note: when `core.hooksPath` redirects to .agentic/hooks/, the same Python
-# gate is invoked by the active dispatcher there. R-015 wires both paths.
 set -e
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 exec python3 "$ROOT/.agentic/lib/hooks/prepush_gate.py" "$@"
@@ -79,15 +63,52 @@ EOF
 }
 
 # Compare a target file's contents against the shim text on stdin.
-# Returns 0 when they match (idempotent path), 1 otherwise.
+# Returns 0 when they match (idempotent path), 1 otherwise. `diff -q -`
+# tells diff to read its first input from stdin directly — the canonical
+# bash idiom (avoids `<(cat)` process-substitution gymnastics).
 _hooks_shim_matches() {
     local target="$1"
     [ -f "$target" ] || return 1
-    diff -q <(cat) "$target" >/dev/null 2>&1
+    diff -q - "$target" >/dev/null 2>&1
 }
 
+# Returns 0 iff both Tier 0 shims already match the canonical text. Used
+# by callers (e.g. cmd_init) that want to silently skip register when the
+# repo is already armed.
+_hooks_already_registered() {
+    local hooks_dir
+    hooks_dir="$(_hooks_dir)"
+    _hooks_shim_pre_commit | _hooks_shim_matches "$hooks_dir/pre-commit" || return 1
+    _hooks_shim_pre_push   | _hooks_shim_matches "$hooks_dir/pre-push"   || return 1
+    return 0
+}
+
+# Timestamp + PID + monotonic counter — guarantees uniqueness even if two
+# `register` calls fire within the same second under the same shell.
 _hooks_backup_dir() {
-    printf '%s/.git/hooks/.backup-%s\n' "$ROOT_DIR" "$(date -u +%Y%m%d-%H%M%S)"
+    local seq=${_HOOKS_BACKUP_SEQ:-0}
+    _HOOKS_BACKUP_SEQ=$((seq + 1))
+    printf '%s/.git/hooks/.backup-%s-%s-%s\n' \
+        "$ROOT_DIR" \
+        "$(date -u +%Y%m%d-%H%M%S)" \
+        "$$" \
+        "$_HOOKS_BACKUP_SEQ"
+}
+
+# Atomic write: stage to a sibling temp file, then mv into place. A crash
+# mid-write leaves the prior shim (or no file) intact rather than a
+# truncated-and-empty one.
+_hooks_write_shim_atomic() {
+    local target="$1"
+    local tmp
+    tmp="${target}.tmp.$$"
+    if cat > "$tmp"; then
+        chmod +x "$tmp"
+        mv -f "$tmp" "$target"
+    else
+        rm -f "$tmp"
+        return 1
+    fi
 }
 
 # ---------------------------------------------------------------------------
@@ -129,10 +150,8 @@ _hooks_register() {
         fi
     done
 
-    _hooks_shim_pre_commit > "$pc"
-    chmod +x "$pc"
-    _hooks_shim_pre_push   > "$pp"
-    chmod +x "$pp"
+    _hooks_shim_pre_commit | _hooks_write_shim_atomic "$pc"
+    _hooks_shim_pre_push   | _hooks_write_shim_atomic "$pp"
 
     echo -e "${GREEN}✓ Registered Tier 0 hook shims:${NC}"
     echo -e "  • ${pc#$ROOT_DIR/}"
@@ -184,7 +203,15 @@ _hooks_unregister() {
         echo -e "${YELLOW}⚠ No backup found.${NC} $removed shim(s) removed; nothing to restore."
     fi
 
-    # Refresh integrity so the absence/restore is reflected in the baseline.
+    # Design choice: the integrity baseline tracks **current ground truth**,
+    # not the canonical Tier 0 state. After unregister the baseline will
+    # reflect whatever was restored (third-party Husky hook, empty file,
+    # absence). R-004's job is "detect changes from the recorded state",
+    # so re-registering is the supported way to return to a known-good
+    # signature — not "unregister leaves Tier 0 baseline frozen". Keeping
+    # baseline == filesystem keeps the two layers in sync; agents that
+    # tamper post-unregister still trip the integrity check on their
+    # next commit.
     cmd_integrity update >/dev/null 2>&1 || true
 }
 
