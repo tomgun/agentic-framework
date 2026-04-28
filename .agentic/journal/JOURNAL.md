@@ -6086,3 +6086,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 13:32 - Phase 0 manual smokes deferred to post-V5
+
+**Why**: User asked to document the smoke procedures for later. The two manual checks couldn't run in the merge-time container (need pip install textual + a fresh sandbox); deferring is acceptable since deterministic tests + 846 ACs cover the structural correctness.
+
+**What changed**:
+- Captured both manual verifications (R-014 Textual ring/modal, R-015 ag hooks register against fresh project) in tests/smoke/phase-0-manual-smoke.md with expected-behaviour tables. T-0098 added with trigger condition + background + related links per the TODO-context rule.
+
+**Next steps**:
+- Squash-merge PR #246 when ready; smokes will run after the full V5 refactoring is shipped
+
+**Blockers**: —
+

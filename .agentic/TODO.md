@@ -91,6 +91,13 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0064: ag preview command — stack-specific hook triggering preview deployment (Vercel/Netlify/etc), returns URL. Quality profile extension, not core.
 - **Added**: 2026-03-13
 
+### T-0098: Run Phase 0 manual smokes for R-014 + R-015
+- **Added**: 2026-04-28
+- **Trigger**: After V5 ground-up refactoring is complete (Phase 0..4 all shipped).
+- **Procedure**: `tests/smoke/phase-0-manual-smoke.md` — captures both smokes with expected-behaviour tables. Commands valid in v0.84.3; adapt to the surface as it stands when the trigger fires.
+- **Background**: PR #246 closed Phase 0 with deterministic tests + 846 framework ACs all green. The two manual smokes (Textual ring rendering + 95% modal; `ag hooks register` against a fresh project) were deferred at merge time because they need `pip install textual` and a sandbox, which the merge-time agent container couldn't provide.
+- **Related**: `.agentic/journal/plans/2026-04-26-redesign-backlog.md` (R-014 + R-015 "Verify" sections), `.agentic/lib/tui/panels/quota_alert.py`, `.agentic/lib/tools/commands/hooks.sh`.
+
 ---
 
 ## Promoted to Backlog
