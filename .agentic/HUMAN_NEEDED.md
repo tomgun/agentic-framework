@@ -116,12 +116,12 @@ _No active items_
 
 
 
-### HN-0089: PR #246: R-014 TUI quota burn-down ring + 95% modal alert
+### HN-0089: PR #246: R-014 + R-015 (Phase 0 closeout — TUI quota ring + ag hooks register)
 - **Type**: review
 - **Added**: 2026-04-28
-- **Context**: https://github.com/tomgun/agentic-framework/pull/246 — Phase 0 closeout cluster. Adds colored ring + by-tier tooltip + 95% modal to ag tui. 35 TUI tests + 846 ACs green. Manual TUI smoke pending (no Textual in container).
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
+- **Context**: https://github.com/tomgun/agentic-framework/pull/246 — Bundles last two redesign-backlog items. R-014: colored ring + by-tier tooltip + 95% modal in ag tui. R-015: ag hooks register/unregister + auto-install on ag init. 35 TUI tests + 7 hooks tests + 846 ACs all green. Manual TUI + manual hooks smoke pending.
+- **Why human needed**: Code review + manual smoke. Phase 0 is feature-complete after this merges.
+- **Impact**: Blocking Phase 1 R-101 (Token Ledger visible).
 
 
 ## Resolved
