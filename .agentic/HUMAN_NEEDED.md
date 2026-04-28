@@ -111,18 +111,16 @@ _No active items_
 
 
 
-### HN-0086: PR #241: V5 architectural-decision contributions backfill
-- **Type**: pr_review
-- **Added**: 2026-04-26
-- **Context**: https://github.com/tomgun/agentic-framework/pull/241 — backfills 20 user insights across 5 threads (real-world failures, M.A. audit, Claude arch PDF, transform-vs-greenfield, iterative pushback). Docs-only on .agentic/CONTRIBUTIONS.md + journal/status state files.
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
 
 
 
 
 ## Resolved
+
+### HN-0086: PR #241: V5 architectural-decision contributions backfill
+- **Resolved**: 2026-04-28
+- **Outcome**: Merged as c694c84c — conflicts resolved (STATUS.md + JOURNAL.md), squash-merged
+
 
 ### HN-0088: Sprint 2 / Wave B PR ready
 - **Resolved**: 2026-04-27

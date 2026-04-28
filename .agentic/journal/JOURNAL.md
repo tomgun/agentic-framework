@@ -6028,3 +6028,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-28 09:03 - PR #241 merged — V5 contributions backfilled
+
+**Why**: PR was open since 2026-04-26 with conflicts after Wave A/B merges; user asked to merge before starting R-014/R-015
+
+**What changed**:
+- Resolved STATUS.md + JOURNAL.md conflicts (kept main's current-state line; chronologically inserted PR's 19:31 entry before main's 19:56+ entries). Squash-merged as c694c84c. CONTRIBUTIONS.md gained the V5 ARCHITECTURAL DECISION section (5 threads, 20 insights from real-world failures, M.A. audit, Claude arch PDF, transform-vs-greenfield, iterative pushback).
+
+**Next steps**:
+- Begin R-014 (TUI quota burn-down ring) per Phase 0 closeout plan
+
+**Blockers**: —
+
