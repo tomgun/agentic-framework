@@ -6114,3 +6114,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 15:32 - R-101 plan APPROVED
+
+**Why**: Original R-101 backlog spec said reads token-ledger.jsonl (Deps: R-007). Reality: events.append_token_ledger() exists in R-007 ship but no production code calls it; the JSONL doesn't exist. Phase 1 voluntary-use test fails for a report showing zeros; per no-feature-inflation rule, hardening goes on R-101 not a new R.
+
+**Decision**: Expand R-101 scope from read-only (2d) to emission+read+TUI (5d). Defer rename of .agentic/journal/token-ledger.jsonl to disambiguate from F-041's .agentic/session/token-ledger.json — that cascades through R-007/R-013/R-014 and is its own R-NNN.
+
+**What changed**:
+- Converged after 3 rounds of dialectical review. Round 1 found 3 HIGH + 5 MEDIUM (fictional AGENTS.json contract, undocumented stdin contract, weak verification gates, cache_creation accounting drift, Ctrl+C data leak, etc.). Round 2 found 1 new HIGH (false 'stale stub' claim about live F-041 file at .agentic/session/token-ledger.json that Stop.sh:80-104 actively writes) + 1 MEDIUM + 3 LOW. Round 3 found 0 HIGH + 0 MEDIUM + 3 LOW (all implementation-time cleanups). Architecture (Stop-hook emitter + watermark + read-side projection + TUI fold-in) survived intact across all rounds. Plan: 5d, 5 commits, includes emission to close the spec gap that R-101 originally assumed away.
+
+**Next steps**:
+- Implementation: feat/R-101-token-ledger-visible branch; commit boundaries documented in plan; G1-G5 verification gates
+
+**Blockers**: None
+
