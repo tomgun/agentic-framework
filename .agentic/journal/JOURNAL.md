@@ -5953,3 +5953,33 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 04:50 - R-016 plan v6 APPROVED
+
+**Why**: Original R-016 attack list lifted verbatim from sibling close-out-hardening doc that proposed surfaces (.close-out-pending sentinel, PreToolUse path-deny, content classification, state_enforcement levels) Phase 0 (R-001..R-015) didn't ship — only 2/12 attacks cleanly mapped
+
+**Decision**: Preserve 12-test budget; realign composition to Phase 0 surfaces; six rounds of dialectical review until convergence in round 6 (zero new architectural bugs)
+
+**What changed**:
+- Phase 0 verification battery plan converged after six rounds of dialectical review. Composition: 12 attack-vectors × 3 profiles = 36-cell pass/fail matrix targeting Phase 0 Tier 0 surfaces (R-001..R-010). Test budget preserved from original; attack-vector list realigned to actual surfaces. Manifest-driven pass criteria (known-fails.yaml) ensures FAILs are linked deterministically. Six rounds surfaced 13 architectural bugs total; round 6 found zero new bugs and converged. One pre-existing R-001/R-004 limitation documented as out-of-scope (unbaselined .agentic/hooks/* shim).
+
+**Next steps**:
+- Begin Day-1 implementation — battery.sh scaffold helpers + run_battery.sh orchestrator skeleton
+
+**Blockers**: None
+
+
+### Session: 2026-04-28 06:31 - R-016 battery implementation complete (Day 1-5)
+
+**Why**: Plan-approved sentinel was missing pre-commit; framework profile is autonomous_formal so AC3 enforces; sentinel touched after dialectical review v6 marked plan APPROVED. Commit 1 went through gate cleanly (validate_framework.sh: 846 PASS); commit 2 needed fresh JOURNAL after HEAD advanced.
+
+**Decision**: Two-commit split: implementation (19 files) + state integration (3 files) — cohesive groups; matches recent sprint-style commit pattern in the repo
+
+**What changed**:
+- All 12 B-tests + 6 seeders + scaffold + orchestrator + day1_stub implemented. Final dry-run: 36-cell matrix, 34 PASS + 2 SKIP-by-design + 0 FAIL. Commit b91943cb captures the work. Pre-existing framework bug surfaced and worked around: ag contract list f-string mangled by bash interpolation in contract.sh:405 — needs separate followup, not R-016 scope. STACK.md location bug fixed during day1_stub run (write to root, not .agentic/). Pyyaml runtime dep documented in README.
+
+**Next steps**:
+- Stage commit 2 (backlog status + run_tests.sh opt-in integration); review; merge along with sibling journal-skill commits per branch-mixing decision
+
+**Blockers**: None
+
