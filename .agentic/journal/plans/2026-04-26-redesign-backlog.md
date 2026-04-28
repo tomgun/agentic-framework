@@ -414,7 +414,8 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-016 · Phase 0 verification — bypass test battery (B01–B12)
-**Status:** planned · **Effort:** 5d · **Deps:** R-001, R-002, R-003, R-004, R-005, R-010
+**Status:** in_progress · **Effort:** 5.5d · **Deps:** R-001, R-002, R-003, R-004, R-005, R-010
+**Plan:** `.agentic/journal/plans/2026-04-27-R-016-revised-ac-plan.md` (APPROVED v6 after 6 rounds of dialectical review; attack-vector list realigned to actual Phase 0 surfaces — original B01-B12 had 7/12 referencing sibling-doc surfaces Phase 0 didn't ship).
 **Plan ref:** plan §"Verification approach" + sibling-doc bypass tests
 **Goal:** Adversarial test suite proving Tier 0 catches each documented bypass attempt. Cross-profile (discovery, formal, autonomous_formal).
 

@@ -62,7 +62,7 @@ Write artifacts to `.agentic/work/F-XXXX/`: `plan.md`, `spec.md`, `review.md`, `
 - Never fabricate APIs, data, or behavior. If uncertain, ask.
 - NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 - No feature inflation: improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new capability ID.
-- Behavioral corrections belong in instruction files: When a correction applies to this project, update CLAUDE.md or the relevant skill file — don't write a memory as a substitute.
+- (No-autorecord rule lives in the template at `.agentic/lib/agents/claude/CLAUDE.md` — it applies to framework dev too, just substitute "framework" for "project" when reading. FRAMEWORK_DEVELOPMENT.md and `.agentic/lib/PRINCIPLES.md` are the framework-dev-specific destinations to add to the template's list.)
 
 ## After Plan Mode Exits (when `plan_review_enabled: yes`)
 
@@ -135,4 +135,4 @@ Breaking changes: Provide upgrade path in `upgrade.sh`.
 Test in scratch project before committing framework changes.
 Worktree: Use `git worktree` on feature branches when another agent may be working on main.
 Instruction files are part of the feature: new `ag` commands/gates/workflows MUST update all instruction files (CLAUDE.md templates, cursorrules, copilot, codex, memory-seed, relevant skills, DEVELOPER_GUIDE, HOW_IT_WORKS).
-Behavioral corrections go in instruction files: When a correction applies to this project, update the CLAUDE.md template (`.agentic/lib/agents/claude/CLAUDE.md`) or the relevant skill file — don't write a memory as a substitute.
+Behavioral corrections go in instruction files: When a correction applies to this project, update the CLAUDE.md template (`.agentic/lib/agents/claude/CLAUDE.md`) or the relevant skill file — never the auto-memory system, which is single-machine and invisible to teammates. (See the no-autorecord rule in the template's Core Rules.)
