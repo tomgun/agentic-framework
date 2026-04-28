@@ -1,0 +1,18 @@
+# R-016 known FAIL manifest.
+#
+# The orchestrator (run_battery.sh) reads this file when computing pass criteria.
+# A FAIL cell in the matrix is acceptable IFF it appears here with a non-empty
+# `reason` and at least one of `journal_ref:` or `r_nnn:`.
+#
+# Schema:
+#   known_fails:
+#     - test: B01..B12
+#       profile: discovery | formal | autonomous_formal
+#       reason: "1-line description of the Phase 0 gap"
+#       journal_ref: ".agentic/journal/JOURNAL.md#YYYY-MM-DD-..."   # OR
+#       r_nnn: "R-NNN"                                              # at least one
+#
+# Sanctioned writer: post-Phase-0 review only. Individual B-tests and the
+# orchestrator do NOT append here.
+
+known_fails: []
