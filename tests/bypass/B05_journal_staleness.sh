@@ -58,11 +58,12 @@ profile="${1:-discovery}"
         formal|autonomous_formal)
             if [[ $rc -eq 0 ]]; then
                 echo "FAIL|commit succeeded — AC4 did not fire under formal+|$code_path"
-            elif echo "$out" | grep -qiE "AC4|journal.*stale|stale.*journal|JOURNAL"; then
-                echo "PASS|commit blocked by AC4 (journal stale)|$code_path"
+            elif bypass_assert_gate_blocked_by_ac "AC4" "precommit"; then
+                # Review fix #1: structured event assertion (gate_blocked.payload.failures has AC4).
+                echo "PASS|commit blocked by AC4 (gate_blocked event with AC4)|$code_path"
             else
                 ev=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-                echo "FAIL|blocked but not by AC4; output: $ev|$code_path"
+                echo "FAIL|blocked but not by AC4; no AC4 in gate_blocked event; output: $ev|$code_path"
             fi
             ;;
     esac

@@ -5983,3 +5983,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-28 07:27 - R-016 review-driven hardening
+
+**Why**: Review identified that stderr-text matching was fragile against messages.py wording changes; seeder failures masked root causes; per-cell python3 -c was unnecessary subprocess overhead; AGENT_FIX_MODE leak risk; signal-kill /tmp accumulation; ANSI escapes ignored NO_COLOR
+
+**Decision**: Pivot B-test pass criterion from prose-grep to structured gate_blocked event payload.failures — survives messages.py drift; assertion is now content-addressed by AC ID, not text
+
+**What changed**:
+- PR #244 self-review found 3 high + 3 medium fragility issues. v6 implementation hardened: B-tests now assert blocking via gate_blocked event payload.failures (AC-ID match) instead of grepping stderr prose; seeders bubble explicit SEED_FAIL context; env hygiene catches AGENT_FIX_MODE leaks; cleanup trap covers INT/TERM/HUP signals; results JSON batched into single python pass at end of run; NO_COLOR + non-tty respected for emitted output. Final verification: 36/36 cells unchanged (34 PASS + 2 SKIP-by-design + 0 FAIL).
+
+**Next steps**:
+- Push fixup commit; PR ready for human review/merge
+
+**Blockers**: None
+

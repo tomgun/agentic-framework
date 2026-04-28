@@ -56,10 +56,11 @@ profile="${1:-discovery}"
 
     if [[ $rc -eq 0 ]]; then
         echo "FAIL|hook tampering not detected — AC0 did not block|$code_path"
-    elif echo "$out" | grep -qiE "AC0|integrity|tamper"; then
-        echo "PASS|AC0 caught hook tampering (integrity baseline mismatch)|$code_path"
+    elif bypass_assert_gate_blocked_by_ac "AC0" "precommit"; then
+        # Review fix #1: structured event assertion.
+        echo "PASS|AC0 caught hook tampering (gate_blocked event with AC0; integrity baseline mismatch)|$code_path"
     else
         ev=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-        echo "FAIL|blocked but not by AC0; output: $ev|$code_path"
+        echo "FAIL|blocked but not by AC0; no AC0 in gate_blocked event; output: $ev|$code_path"
     fi
 )

@@ -36,16 +36,17 @@ SKIPPED_CHECKS=()
 
 emit() {
     # Indent + emit; first arg is verdict (PASS/FAIL/SKIP), rest is message.
+    # Uses battery.sh's BATTERY_* color vars which respect NO_COLOR + non-tty
+    # (review fix #7).
     local verdict="$1"; shift
-    local color reset
+    local color
     case "$verdict" in
-        PASS) color="\033[32m" ;;
-        FAIL) color="\033[31m" ;;
-        SKIP) color="\033[33m" ;;
+        PASS) color="$BATTERY_GREEN" ;;
+        FAIL) color="$BATTERY_RED" ;;
+        SKIP) color="$BATTERY_YELLOW" ;;
         *) color="" ;;
     esac
-    reset="\033[0m"
-    printf "    %b%s%b %s\n" "$color" "$verdict" "$reset" "$*"
+    printf "    %s%s%s %s\n" "$color" "$verdict" "$BATTERY_RESET" "$*"
 }
 
 run_profile() {

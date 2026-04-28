@@ -42,10 +42,11 @@ profile="${1:-discovery}"
 
     if [[ $rc -eq 0 ]]; then
         echo "FAIL|fix mode bypassed AC1 — R-010 contract violated|$code_path"
-    elif echo "$out" | grep -qiE "AC1|tests fail|test failed|tests failing"; then
-        echo "PASS|AC1 fires under fix mode (R-010 preserves tests gate)|$code_path"
+    elif bypass_assert_gate_blocked_by_ac "AC1" "precommit"; then
+        # Review fix #1: structured event assertion.
+        echo "PASS|AC1 fires under fix mode (gate_blocked event with AC1; R-010 preserves tests gate)|$code_path"
     else
         ev=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-        echo "FAIL|blocked but not by AC1; output: $ev|$code_path"
+        echo "FAIL|blocked but not by AC1; no AC1 in gate_blocked event; output: $ev|$code_path"
     fi
 )

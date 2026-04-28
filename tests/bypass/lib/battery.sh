@@ -31,17 +31,34 @@ FRAMEWORK_ROOT="$(cd "$TESTS_DIR/.." && pwd)"
 # shellcheck source=../../infrastructure/lib/helpers.sh
 source "$FRAMEWORK_ROOT/tests/infrastructure/lib/helpers.sh"
 
+# ─── Color handling (review fix #7: respect NO_COLOR + non-tty) ───
+
+if [[ -n "${NO_COLOR:-}" ]] || [[ ! -t 2 ]]; then
+    BATTERY_RED=""
+    BATTERY_GREEN=""
+    BATTERY_YELLOW=""
+    BATTERY_RESET=""
+else
+    BATTERY_RED=$'\033[31m'
+    BATTERY_GREEN=$'\033[32m'
+    BATTERY_YELLOW=$'\033[33m'
+    BATTERY_RESET=$'\033[0m'
+fi
+
 # ─── Env hygiene (round-2 finding; round-4 fix v6.1 prerequisite) ───
 #
 # INTEGRITY_SKIP=1 + CI=true silences integrity check (precommit_gate.py:341
-# via integrity.py:33-37). If contaminated, all B10/B11 cells silently pass.
-# Fail loud at battery start rather than producing a misleading matrix.
+# via integrity.py:33-37). AGENT_SKIP_GATE=1 silences both gates. AGENT_FIX_MODE=1
+# silences AC2/AC3 in pre-commit. Any leak from a prior B-test would corrupt
+# the matrix. Fail loud at battery start rather than producing a misleading
+# matrix (review fix #3).
 
 assert_env_hygiene() {
     local violations=()
     [[ "${INTEGRITY_SKIP:-}" == "1" ]] && violations+=("INTEGRITY_SKIP=1 is set")
     [[ "${CI:-}" == "true" ]] && violations+=("CI=true is set")
     [[ "${AGENT_SKIP_GATE:-}" == "1" ]] && violations+=("AGENT_SKIP_GATE=1 is set in caller env")
+    [[ "${AGENT_FIX_MODE:-}" == "1" ]] && violations+=("AGENT_FIX_MODE=1 is set in caller env (B09 leak risk)")
     if [[ ${#violations[@]} -gt 0 ]]; then
         echo "ERROR: env hygiene violated — these env vars would corrupt the matrix:" >&2
         printf '  - %s\n' "${violations[@]}" >&2
@@ -68,7 +85,10 @@ battery_cleanup() {
         fi
     done
 }
-trap battery_cleanup EXIT
+# Review fix #5: signal traps in addition to EXIT, so SIGTERM/SIGINT/SIGHUP
+# (CI timeout, user ctrl-C, terminal hangup) also clean up /tmp dirs.
+# battery_cleanup is idempotent so double-fire on EXIT-after-signal is harmless.
+trap battery_cleanup EXIT INT TERM HUP
 
 # ─── scaffold_project (load-bearing helper; round-1..round-5 corrections applied) ───
 #
@@ -262,8 +282,18 @@ EOF
     # None — without HEAD having the prior content, an attack edit looks like
     # a new file and the migration check skips.
     git add "$target"
-    AGENT_SKIP_GATE=1 AGENT_SKIP_GATE_REASON="seed shipped contract $feature_id" \
-        git commit -m "seed $feature_id" --quiet
+
+    # Review fix #2: capture commit output and bubble explicit failure context.
+    # If the gate misbehaves or the env is wrong, the calling B-test gets a
+    # named SEED_FAIL message instead of an opaque "b-test exited rc" fallback.
+    local seed_out seed_rc
+    seed_out=$(AGENT_SKIP_GATE=1 AGENT_SKIP_GATE_REASON="seed shipped contract $feature_id" \
+        git commit -m "seed $feature_id" --quiet 2>&1) && seed_rc=0 || seed_rc=$?
+    if [[ $seed_rc -ne 0 ]]; then
+        echo "SEED_FAIL: bypass_seed_shipped_contract($feature_id): commit returned $seed_rc" >&2
+        echo "$seed_out" | head -10 | sed 's/^/  /' >&2
+        return 1
+    fi
 
     # Match R-005's locked state. B07 verifies chmod=444 + EACCES; B06/B08/B12
     # then `chmod u+w` to perform the attack edit, knowing R-005 first wall is
@@ -355,8 +385,16 @@ EOF
 
     # Commit so the contract is reachable from HEAD; consistent with B06 pattern.
     git add "$target"
-    AGENT_SKIP_GATE=1 AGENT_SKIP_GATE_REASON="seed uncovered feature F-9001" \
-        git commit -m "seed F-9001" --quiet
+
+    # Review fix #2: explicit failure context (same pattern as bypass_seed_shipped_contract).
+    local seed_out seed_rc
+    seed_out=$(AGENT_SKIP_GATE=1 AGENT_SKIP_GATE_REASON="seed uncovered feature F-9001" \
+        git commit -m "seed F-9001" --quiet 2>&1) && seed_rc=0 || seed_rc=$?
+    if [[ $seed_rc -ne 0 ]]; then
+        echo "SEED_FAIL: bypass_seed_uncovered_feature: commit returned $seed_rc" >&2
+        echo "$seed_out" | head -10 | sed 's/^/  /' >&2
+        return 1
+    fi
 }
 
 bypass_seed_plan_approved() {
@@ -393,6 +431,53 @@ EOF
 }
 
 # ─── Assertion helpers ───
+
+bypass_assert_gate_blocked_by_ac() {
+    # Review fix #1: structured-event assertion replaces fragile stderr grep.
+    # Asserts events.jsonl contains a gate_blocked event whose payload.failures
+    # list has an entry with ac == <ac_id>. Optional <gate> filter restricts to
+    # "precommit" or "prepush" (both gates emit gate_blocked with the same
+    # payload schema; the gate field disambiguates). When messages.py rewords
+    # human-readable strings, this assertion still fires because it pivots on
+    # the structured AC ID, not the prose.
+    #
+    # Source of truth:
+    #   precommit_gate.py:870-879 — gate_blocked event with payload.gate="precommit"
+    #     and payload.failures=[{ac, title}]
+    #   prepush_gate.py:691-695 — gate_blocked event with payload.gate="prepush"
+    #     and same shape.
+    local ac_id="$1"
+    local gate="${2:-}"
+
+    local events=".agentic/journal/events.jsonl"
+    [[ -f "$events" ]] || return 1
+
+    python3 - "$ac_id" "$gate" "$events" <<'PY'
+import json, sys
+ac_id, gate_filter, path = sys.argv[1:4]
+try:
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                evt = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if evt.get("type") != "gate_blocked":
+                continue
+            payload = evt.get("payload") or {}
+            if gate_filter and payload.get("gate") != gate_filter:
+                continue
+            for fail in (payload.get("failures") or []):
+                if fail.get("ac") == ac_id:
+                    sys.exit(0)
+except FileNotFoundError:
+    pass
+sys.exit(1)
+PY
+}
 
 bypass_assert_event_present() {
     # Asserts events.jsonl contains at least one event of <type> with optional

@@ -77,8 +77,24 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
 RESULTS_FILE="$RESULTS_DIR/$TIMESTAMP.json"
 mkdir -p "$RESULTS_DIR"
 
-# Build the JSON incrementally as we go.
-declare -a CELL_JSON_LINES=()
+# Review fix #6: collect raw cell fields as TSV in a temp file rather than
+# spawning python3 per cell to JSON-encode. Final python pass at end reads
+# the TSV and builds the JSON matrix in one go. Saves ~36 subprocess
+# invocations per battery run.
+#
+# Constraint: cell field values must not contain literal tabs or newlines.
+# Test names (alphanumeric+underscore), profile labels (3 fixed strings),
+# outcome values (3 fixed strings), and code_path (controlled by us) are
+# tab-free by construction. Evidence is sanitized by individual B-tests
+# (head -3, tr \n ';', sed |/_/g — tab not in the substitution but tabs in
+# attack output are exotic; we normalize defensively below).
+CELLS_TMP=$(mktemp)
+
+# Tab/newline scrubber for evidence strings (defensive — keeps the TSV
+# parseable even if a B-test's stderr capture leaks a tab somehow).
+_scrub_tsv_field() {
+    printf '%s' "$1" | tr '\t\n\r' '   ' | head -c 500
+}
 
 run_cell() {
     local b_test="$1" profile="$2"
@@ -114,17 +130,14 @@ run_cell() {
     fi
     rm -f "$out_file"
 
-    # JSON-encode evidence + code_path safely.
-    local json_line
-    json_line=$(python3 -c '
-import json, sys
-b, profile, outcome, evidence, code_path = sys.argv[1:6]
-print(json.dumps({
-    "test": b, "profile": profile, "outcome": outcome,
-    "evidence": evidence, "code_path": code_path,
-}))
-' "$b_name" "$profile" "$outcome" "$evidence" "$code_path")
-    CELL_JSON_LINES+=("$json_line")
+    # Append cell as TSV. Evidence + code_path are scrubbed to keep TSV parseable.
+    printf '%s\t%s\t%s\t%s\t%s\n' \
+        "$b_name" \
+        "$profile" \
+        "$outcome" \
+        "$(_scrub_tsv_field "$evidence")" \
+        "$(_scrub_tsv_field "$code_path")" \
+        >> "$CELLS_TMP"
 }
 
 # ─── Main loop ───
@@ -141,14 +154,10 @@ for b_test in "${B_TESTS[@]}"; do
 done
 
 # ─── Aggregate + emit results JSON ───
-
-# Write per-cell JSON lines to a temp file so the python heredoc can read them
-# without bash-interpolation gymnastics that break on empty arrays.
-CELLS_TMP=$(mktemp)
-if [[ ${#CELL_JSON_LINES[@]} -gt 0 ]]; then
-    printf '%s\n' "${CELL_JSON_LINES[@]}" > "$CELLS_TMP"
-fi
-# else: leave $CELLS_TMP empty — the python reader handles zero-cell case
+#
+# CELLS_TMP was populated by run_cell as TSV (review fix #6 — single python pass
+# at end instead of one per cell). Each line is 5 tab-separated fields:
+#   test \t profile \t outcome \t evidence \t code_path
 
 python3 - "$RESULTS_FILE" "$BATTERY_DIR/known-fails.yaml" "$CELLS_TMP" <<'PY'
 import json, sys, datetime, pathlib
@@ -158,9 +167,19 @@ cells = []
 try:
     with open(cells_path) as f:
         for line in f:
-            line = line.strip()
-            if line:
-                cells.append(json.loads(line))
+            line = line.rstrip("\n")
+            if not line:
+                continue
+            parts = line.split("\t", 4)  # max 4 splits → 5 fields
+            if len(parts) != 5:
+                continue
+            cells.append({
+                "test":      parts[0],
+                "profile":   parts[1],
+                "outcome":   parts[2],
+                "evidence":  parts[3],
+                "code_path": parts[4],
+            })
 except FileNotFoundError:
     pass
 

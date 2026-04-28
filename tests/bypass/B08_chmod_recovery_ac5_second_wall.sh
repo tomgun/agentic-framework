@@ -46,10 +46,11 @@ profile="${1:-discovery}"
 
     if [[ $rc -eq 0 ]]; then
         echo "FAIL|R-005 bypassed AND AC5 missed — both walls breached|$code_path"
-    elif echo "$out" | grep -qiE "AC5|shipped.*contract|migration"; then
-        echo "PASS|AC5 caught the chmod-recovery attack (second wall holds)|$code_path"
+    elif bypass_assert_gate_blocked_by_ac "AC5" "precommit"; then
+        # Review fix #1: structured event assertion.
+        echo "PASS|AC5 caught the chmod-recovery attack (gate_blocked event with AC5; second wall holds)|$code_path"
     else
         ev=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-        echo "FAIL|blocked but not by AC5; output: $ev|$code_path"
+        echo "FAIL|blocked but not by AC5; no AC5 in gate_blocked event; output: $ev|$code_path"
     fi
 )

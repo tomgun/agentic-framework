@@ -66,10 +66,11 @@ profile="${1:-discovery}"
 
     if [[ $rc -eq 0 ]]; then
         echo "FAIL|push succeeded — range AC5 did not catch commit 3|$code_path"
-    elif echo "$out" | grep -qiE "AC5|migration|shipped.*contract|range"; then
-        echo "PASS|push blocked by pre-push range AC5 (commit 3 caught)|$code_path"
+    elif bypass_assert_gate_blocked_by_ac "AC5" "prepush"; then
+        # Review fix #1: structured event assertion (gate_blocked with payload.gate=prepush).
+        echo "PASS|push blocked by pre-push range AC5 (gate_blocked event with AC5; commit 3 caught)|$code_path"
     else
         ev=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-        echo "FAIL|blocked but not by range AC5; output: $ev|$code_path"
+        echo "FAIL|blocked but not by range AC5; no prepush AC5 in gate_blocked event; output: $ev|$code_path"
     fi
 )

@@ -54,17 +54,13 @@ profile="${1:-discovery}"
         exit 0
     fi
 
-    # Block happened. Verify it was AC1 specifically. The gate prints the
-    # blocking AC labels on stderr (precommit_gate.py:803-880 print_blocked).
-    # In addition, check_tests emits a test_run event with returncode != 0.
-    if echo "$out" | grep -qiE "AC1|tests fail|test failed|tests failing"; then
-        echo "PASS|commit blocked by AC1 (exit=$rc; tests-required fired)|$code_path"
-    elif bypass_assert_event_present "test_run" "precommit_gate"; then
-        # Fall back to events.jsonl — test_run event present means AC1 ran.
-        echo "PASS|commit blocked (exit=$rc); test_run event in events.jsonl|$code_path"
+    # Review fix #1: assert via structured gate_blocked event in events.jsonl
+    # (payload.failures contains {ac: AC1}) rather than grepping stderr prose.
+    # Survives messages.py wording changes; pivots on the AC ID, not text.
+    if bypass_assert_gate_blocked_by_ac "AC1" "precommit"; then
+        echo "PASS|commit blocked by AC1 (exit=$rc; gate_blocked event with AC1)|$code_path"
     else
-        # Block was for some other reason — record evidence for forensic review.
         local_evidence=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-        echo "FAIL|blocked but not by AC1 (exit=$rc); output: $local_evidence|$code_path"
+        echo "FAIL|blocked but not by AC1 (exit=$rc); no AC1 in gate_blocked event; output: $local_evidence|$code_path"
     fi
 )

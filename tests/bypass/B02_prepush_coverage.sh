@@ -57,10 +57,11 @@ profile="${1:-discovery}"
 
     if [[ $rc -eq 0 ]]; then
         echo "FAIL|push succeeded — pre-push AC3 did not block|$code_path"
-    elif echo "$out" | grep -qiE "coverage|threshold|AC3"; then
-        echo "PASS|push blocked by pre-push AC3 (coverage below threshold)|$code_path"
+    elif bypass_assert_gate_blocked_by_ac "AC3" "prepush"; then
+        # Review fix #1: structured event assertion (gate_blocked with payload.gate=prepush).
+        echo "PASS|push blocked by pre-push AC3 (gate_blocked event with AC3; coverage below threshold)|$code_path"
     else
         ev=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-        echo "FAIL|blocked but not by AC3; output: $ev|$code_path"
+        echo "FAIL|blocked but not by AC3; no prepush AC3 in gate_blocked event; output: $ev|$code_path"
     fi
 )

@@ -54,10 +54,11 @@ profile="${1:-discovery}"
 
     if [[ $rc -eq 0 ]]; then
         echo "FAIL|commit succeeded — AC3 did not block under $profile|$code_path"
-    elif echo "$out" | grep -qiE "AC3|plan.approved|plan-approved|plan not approved"; then
-        echo "PASS|AC3 blocked commit (plan-approved sentinel missing)|$code_path"
+    elif bypass_assert_gate_blocked_by_ac "AC3" "precommit"; then
+        # Review fix #1: structured event assertion.
+        echo "PASS|AC3 blocked commit (gate_blocked event with AC3; plan-approved sentinel missing)|$code_path"
     else
         ev=$(echo "$out" | head -3 | tr '\n' ';' | sed 's/|/_/g')
-        echo "FAIL|blocked but not by AC3; output: $ev|$code_path"
+        echo "FAIL|blocked but not by AC3; no AC3 in gate_blocked event; output: $ev|$code_path"
     fi
 )
