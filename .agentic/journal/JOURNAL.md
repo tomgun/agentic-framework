@@ -6056,3 +6056,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 09:36 - R-015 shipped: ag hooks register/unregister + auto-install on ag init
+
+**Why**: Phase 0 closeout — fresh installs needed a one-shot 'arm Tier 0' command. Without it, projects that cloned the framework had to either know about core.hooksPath OR manually copy the launcher shims. Pairs with R-004 (integrity baseline) so register leaves the project in a verified state, not just hooked.
+
+**Decision**: register/unregister write directly to .git/hooks/ (transparent, immediately visible via 'ls .git/hooks/') rather than core.hooksPath redirection (the F-0300 'install' transport remains for shared-repo workflows). Both transports are preserved — projects pick whichever fits. Test sandbox copies the framework lib into a tmp git repo and runs ag end-to-end (mirrors test_merge_gate.sh pattern).
+
+**What changed**:
+- New ag hooks register subcommand writes the canonical pre-commit + pre-push shim launchers directly to .git/hooks/, backs up any divergent existing hooks under .git/hooks/.backup-<ts>/, then refreshes the R-004 integrity baseline. Idempotent — second run is a no-op. ag hooks unregister restores the most recent backup (or removes shims cleanly when no backup exists). cmd_init now invokes register on both the already-initialized fast path and the guidance path, so fresh installs and re-runs both end with hooks armed. cmd_hooks moved out of operations.sh into its own commands/hooks.sh; install/status/disable preserved alongside the new subcommands.
+
+**Next steps**:
+- Phase 0 closeout complete (R-001..R-016). Phase 1 R-101 (Token Ledger visible) opens.
+
+**Blockers**: —
+

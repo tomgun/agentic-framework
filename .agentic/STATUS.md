@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- R-014 ready for review (PR pending). R-015 ag hooks register is the last Phase 0 item. (Updated: 2026-04-28 09:12 UTC)
+- Phase 0 closeout complete (R-001..R-016). PR #246 carries R-014 + R-015. Phase 1 R-101 (Token Ledger visible) opens. (Updated: 2026-04-28 09:37 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
