@@ -115,6 +115,15 @@ _No active items_
 
 
 
+
+### HN-0089: PR #246: R-014 TUI quota burn-down ring + 95% modal alert
+- **Type**: review
+- **Added**: 2026-04-28
+- **Context**: https://github.com/tomgun/agentic-framework/pull/246 — Phase 0 closeout cluster. Adds colored ring + by-tier tooltip + 95% modal to ag tui. 35 TUI tests + 846 ACs green. Manual TUI smoke pending (no Textual in container).
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0086: PR #241: V5 architectural-decision contributions backfill
