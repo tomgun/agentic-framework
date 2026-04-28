@@ -40,7 +40,9 @@
         "integrity_baseline_updated",
         "intel_invoked",
         "quota_degraded",
-        "contract_migration"
+        "contract_migration",
+        "token_emit_skipped",
+        "token_emit_schema_change"
       ]
     },
     "feature": {

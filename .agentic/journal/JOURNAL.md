@@ -6129,3 +6129,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-28 15:49 - R-101 commit 1: emitter + attribution
+
+**Why**: v3 plan approved 2026-04-28 after 3 rounds of dialectical review; emission was the missing link in the R-007/R-013/R-014 token ledger pipeline.
+
+**What changed**:
+- Shipped Components 1+4 of R-101: .agentic/lib/hooks/token_emit.py with Stop-hook + SessionStart-recovery entry points; current_feature() resolves via gitBranch primary then AGENTS.json by worktree then None; tokens_in carries pure input_tokens (no cache_creation summed) per quota.py:228 convention; schema-drift defensive logging emits token_emit_schema_change events. 12 unit tests cover all 6 fixture cases plus concurrency + watermark prune; all pass plus events.py 18 tests pass.
+
+**Next steps**:
+- Commit 2: register hooks in .claude/hooks.json + integrity baseline regen
+
+**Blockers**: None
+
