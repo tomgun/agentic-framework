@@ -116,15 +116,13 @@ _No active items_
 
 
 
-### HN-0089: PR #246: R-014 + R-015 (Phase 0 closeout — TUI quota ring + ag hooks register)
-- **Type**: review
-- **Added**: 2026-04-28
-- **Context**: https://github.com/tomgun/agentic-framework/pull/246 — Bundles last two redesign-backlog items. R-014: colored ring + by-tier tooltip + 95% modal in ag tui. R-015: ag hooks register/unregister + auto-install on ag init. 35 TUI tests + 7 hooks tests + 846 ACs all green. Manual TUI + manual hooks smoke pending.
-- **Why human needed**: Code review + manual smoke. Phase 0 is feature-complete after this merges.
-- **Impact**: Blocking Phase 1 R-101 (Token Ledger visible).
-
 
 ## Resolved
+
+### HN-0089: PR #246: R-014 + R-015 (Phase 0 closeout — TUI quota ring + ag hooks register)
+- **Resolved**: 2026-04-28
+- **Outcome**: Squash-merged as cb9af7ca on main. Phase 0 feature-complete (R-001..R-016 + R-014 + R-015). Manual smokes deferred to post-V5 — captured in tests/smoke/phase-0-manual-smoke.md and tracked as T-0098.
+
 
 ### HN-0086: PR #241: V5 architectural-decision contributions backfill
 - **Resolved**: 2026-04-28

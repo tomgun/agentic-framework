@@ -6099,3 +6099,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 13:35 - PR #246 merged — Phase 0 closeout shipped (R-014 + R-015)
+
+**Why**: User asked to merge after the review pass + smoke-test deferral was documented; PR was MERGEABLE/CLEAN, 846 framework ACs + 35 TUI tests + 8 hooks tests all green, no other active sessions.
+
+**Decision**: Squash-merge over fast-forward — Wave A/B/R-016 precedent. The 4 individual commits (R-014, R-015, 11-issue review pass, smoke doc) collapsed into cb9af7ca. Manual smokes intentionally deferred since the merge-time agent container can't run pip install textual or a fresh-project sandbox; Phase 1 work doesn't depend on the smokes.
+
+**What changed**:
+- Squash-merged as cb9af7ca. R-014: colored quarter-circle quota ring (○◔◐◕●) + by-tier tooltip + 95%-rising-edge ModalScreen on the ag tui header. R-015: ag hooks register/unregister + auto-install on ag init. R-014 modal trigger lives on the 0.5s tick (≤0.5s latency to fire); HeaderPanel split into update_from (text, 0.5s) + update_tooltip_from (tooltip, 30s + once on mount). R-015 _hooks_dir always returns .git/hooks/ literally (matches AC1; install/F-0300 remains the dedicated core.hooksPath transport); atomic shim writes via temp+mv; backup-dir naming includes pid+seq for collision safety; cmd_init silent on no-op via _hooks_already_registered. Phase 0 (R-001..R-016) feature-complete.
+
+**Next steps**:
+- Phase 1 (R-101 — Token Ledger visible) opens. Update STATUS focus + memory-seed if relevant; manual smokes deferred to post-V5 per T-0098.
+
+**Blockers**: —
+
