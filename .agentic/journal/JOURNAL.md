@@ -6041,3 +6041,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 09:12 - R-014 shipped: TUI quota burn-down ring + alerts
+
+**Why**: Phase 0 closeout cluster — R-014 surfaces the quota signal R-013 already computes; without it, autonomous runs hit Pro/Max limits with no visual warning. Pairs with R-008 ag tui as the user-facing observability layer.
+
+**Decision**: Frozen-dataclass HeaderSnapshot extended with by_tier dict (default_factory). Ring char + color emitted as Rich markup so single header_lines() function serves both the Textual widget (renders color) and tests (substring check). Modal abort routes to existing action_abort no-op pending R-209 signal-to-PID wiring — keeps R-014 scope tight.
+
+**What changed**:
+- Header now renders a colored Unicode quarter-circle ring (○◔◐◕●) next to the percentage, with thresholded color (green<70 / yellow<85 / dark_orange<95 / red≥95). Tooltip on header shows by-tier token breakdown. New ModalScreen fires once per 95% episode (rising-edge logic with ack-suppression and reset-on-fall) and routes to existing action_abort hook. State.py extended with _by_tier accumulation from token-ledger 'tier' field.
+
+**Next steps**:
+- R-015 ag hooks register next (1d) — last item before Phase 0 closes
+
+**Blockers**: —
+

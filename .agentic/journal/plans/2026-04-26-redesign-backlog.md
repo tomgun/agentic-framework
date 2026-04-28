@@ -371,7 +371,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-014 · TUI quota burn-down ring + alerts
-**Status:** planned · **Effort:** 2d · **Deps:** R-008, R-013
+**Status:** shipped · **Effort:** 2d · **Deps:** R-008, R-013
 **Plan ref:** plan §"Quota awareness"
 **Goal:** Live quota visualization in `ag tui` header.
 

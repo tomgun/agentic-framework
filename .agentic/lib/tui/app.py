@@ -67,6 +67,7 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
     from .panels.events import make_panel as make_events
     from .panels.drilldown import make_panel as make_drilldown
     from .panels.health import make_panel as make_health
+    from .panels.quota_alert import make_modal_screen, should_show_modal
 
     state = DashboardState(feature=feature, profile=profile, mode=mode)
     state.set_quota_window(quota_window_tokens)
@@ -92,6 +93,9 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             self._drilldown = None
             self._health = None
             self._selected_idx: Optional[int] = None
+            self._prev_quota_alert: Optional[str] = None
+            self._quota_modal_acknowledged = False
+            self._QuotaAlertScreen = make_modal_screen()
 
         def compose(self) -> ComposeResult:  # type: ignore[override]
             self._header = make_header()
@@ -134,6 +138,27 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             for w in (self._header, self._health):
                 if w is not None:
                     w.update_from(snap)
+            self._maybe_show_quota_modal(snap)
+
+        def _maybe_show_quota_modal(self, snap) -> None:
+            """Push the 95% modal on rising edge. Reset acknowledgement when
+            the alert level drops below 95% so the next episode re-prompts."""
+            cur = snap.health.quota_alert
+            if cur != "95%":
+                self._quota_modal_acknowledged = False
+            if should_show_modal(self._prev_quota_alert, cur,
+                                 self._quota_modal_acknowledged):
+                pct = snap.header.quota_pct or 95.0
+                self.push_screen(
+                    self._QuotaAlertScreen(pct=pct),
+                    self._handle_quota_modal_choice,
+                )
+            self._prev_quota_alert = cur
+
+        def _handle_quota_modal_choice(self, choice) -> None:
+            self._quota_modal_acknowledged = True
+            if choice == "abort":
+                self.action_abort()
 
         # --- key actions ---
 
@@ -144,8 +169,16 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             )
 
         def action_abort(self) -> None:
-            self.notify("Abort signal not yet wired (R-014/R-209). q to quit.",
-                        title="ag tui · abort", severity="warning")
+            # R-014 ships the modal that calls into here; the actual signal-
+            # to-lead-PID wiring is tracked under R-209. Until then this is
+            # a notify so the user sees a confirmation that the modal's
+            # Abort path was reached.
+            self.notify(
+                "Abort acknowledged. Signal-to-lead-PID wiring lands in "
+                "R-209; press q to quit this dashboard now.",
+                title="ag tui · abort",
+                severity="warning",
+            )
 
         def action_next_event(self) -> None:
             snap = state.snapshot()

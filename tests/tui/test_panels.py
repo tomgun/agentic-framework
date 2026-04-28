@@ -306,7 +306,130 @@ def test_header_lines_includes_quota_pct_when_window_set():
         "tokens_in": 250, "tokens_out": 0,
     }))
     line = header.header_lines(ds.snapshot())[0]
-    assert "(25%)" in line
+    # R-014: percentage rendered next to a colored ring char rather than in
+    # bare parens. The percentage itself remains visible to the user.
+    assert "25%" in line
+
+
+def test_header_lines_ring_segment_progression():
+    """R-014 AC1 — quarter-circle ring chars track fill bands."""
+    cases = [
+        (0.0, "○"),
+        (10.0, "◔"),
+        (24.9, "◔"),
+        (25.0, "◐"),
+        (49.0, "◐"),
+        (50.0, "◕"),
+        (74.0, "◕"),
+        (75.0, "●"),
+        (100.0, "●"),
+    ]
+    for pct, expected in cases:
+        assert header._ring_segment(pct) == expected, (pct, expected)
+    # No quota → empty disc
+    assert header._ring_segment(None) == "○"
+
+
+def test_header_lines_color_thresholds():
+    """R-014 AC2 — green<70, yellow<85, dark_orange<95, red≥95."""
+    cases = [
+        (0.0, "green"),
+        (69.9, "green"),
+        (70.0, "yellow"),
+        (84.9, "yellow"),
+        (85.0, "dark_orange"),
+        (94.9, "dark_orange"),
+        (95.0, "red"),
+        (100.0, "red"),
+    ]
+    for pct, expected in cases:
+        assert header._color_for_pct(pct) == expected, (pct, expected)
+    assert header._color_for_pct(None) is None
+
+
+def test_header_lines_ring_emits_color_markup():
+    """R-014 AC1 + AC2 — the rendered header includes the ring char wrapped
+    in Rich color markup matching the threshold."""
+    for tokens, expected_color, expected_ring in [
+        (300, "green", "◐"),       # 30% -> green half-disc
+        (750, "yellow", "●"),      # 75% -> yellow full-disc
+        (900, "dark_orange", "●"), # 90% -> orange full-disc
+        (970, "red", "●"),         # 97% -> red full-disc
+    ]:
+        ds = DashboardState(clock=lambda: 1_000.0)
+        ds.set_quota_window(1000)
+        ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+            "ts": "x", "session_id": "s", "model": "haiku", "tier": "tier1",
+            "tokens_in": tokens, "tokens_out": 0,
+        }))
+        line = header.header_lines(ds.snapshot())[0]
+        assert f"[bold {expected_color}]" in line, (tokens, expected_color, line)
+        assert expected_ring in line, (tokens, expected_ring, line)
+
+
+def test_header_by_tier_accumulates_from_token_ledger():
+    """R-014 AC3 prerequisite — token-ledger records carry a `tier` field
+    and the snapshot exposes a per-tier breakdown."""
+    ds = DashboardState(clock=lambda: 1_000.0)
+    ds.set_quota_window(1000)
+    for tier, ti, to in [("tier1", 100, 50), ("tier2", 200, 0), ("tier1", 50, 0)]:
+        ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+            "ts": "x", "session_id": "s", "model": "haiku", "tier": tier,
+            "tokens_in": ti, "tokens_out": to,
+        }))
+    snap = ds.snapshot()
+    assert snap.header.by_tier == {"tier1": 200, "tier2": 200}
+    assert snap.header.tokens_total == 400
+
+
+def test_header_by_tier_tooltip_format():
+    """R-014 AC3 — tooltip lists per-tier tokens with percentages."""
+    ds = DashboardState(clock=lambda: 1_000.0)
+    ds.set_quota_window(1000)
+    ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+        "ts": "x", "session_id": "s", "model": "haiku", "tier": "tier1",
+        "tokens_in": 300, "tokens_out": 0,
+    }))
+    ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+        "ts": "x", "session_id": "s", "model": "opus", "tier": "tier2",
+        "tokens_in": 100, "tokens_out": 0,
+    }))
+    tooltip = header.by_tier_tooltip(ds.snapshot())
+    assert "tier1" in tooltip and "300" in tooltip
+    assert "tier2" in tooltip and "100" in tooltip
+    assert "75.0%" in tooltip  # tier1 share of 400
+    assert "25.0%" in tooltip  # tier2 share of 400
+
+
+def test_header_by_tier_tooltip_empty_when_no_records():
+    snap = _empty_snap()
+    tooltip = header.by_tier_tooltip(snap)
+    assert "No token-ledger records" in tooltip
+
+
+def test_quota_modal_rising_edge_triggers_once_per_episode():
+    """R-014 AC4 — modal fires on rising edge to 95% and not until the
+    alert level drops and re-rises. Ack suppresses re-show within the
+    same episode."""
+    from tui.panels.quota_alert import should_show_modal
+
+    # Rising edge from no-alert → 95% triggers
+    assert should_show_modal(prev_alert=None, cur_alert="95%",
+                              acknowledged=False) is True
+    # Rising edge from 85% → 95% triggers
+    assert should_show_modal(prev_alert="85%", cur_alert="95%",
+                              acknowledged=False) is True
+    # Already at 95% on previous tick — no re-trigger
+    assert should_show_modal(prev_alert="95%", cur_alert="95%",
+                              acknowledged=False) is False
+    # Acknowledged — suppressed even on transition
+    assert should_show_modal(prev_alert="85%", cur_alert="95%",
+                              acknowledged=True) is False
+    # Below threshold — never shown
+    assert should_show_modal(prev_alert="85%", cur_alert="85%",
+                              acknowledged=False) is False
+    assert should_show_modal(prev_alert=None, cur_alert=None,
+                              acknowledged=False) is False
 
 
 def test_worker_lines_handles_empty_state():
