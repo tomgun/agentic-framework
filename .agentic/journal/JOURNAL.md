@@ -6142,3 +6142,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-28 16:41 - R-101 commit 2: hook registration + integrity baseline
+
+**Why**: v3 plan G4 numbered procedure: edit hooks → integrity update → stage all → commit succeeds. Naming-collision note: integrity.json baselines events.py (which we modified in commit 1) but does NOT baseline the new claude-hooks shims (R-004 only baselines .agentic/lib/hooks/*.py and .claude/hooks.json itself; shim shell scripts are out of scope). hooks.json change is captured.
+
+**What changed**:
+- Registered Stop-token-emit and SessionStart-token-recover shims in .claude/hooks.json (composed alongside existing Stop.sh and SessionStart.sh — telemetry shims always exit 0 so they don't affect existing enforcement). Ran ag integrity update to capture new baseline. End-to-end smoke test on the active session transcript: 242 records emitted, all tier1, single sessionId, sensible token sums (412 net-new input, 271K output, 45M cache reads — the cache-savings story is now visible in the ledger).
+
+**Next steps**:
+- Commit 3: ag intel report --tokens reader extending quota.py with session + rolling-30 projection
+
+**Blockers**: None
+
