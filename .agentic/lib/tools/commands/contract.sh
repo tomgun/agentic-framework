@@ -20,6 +20,7 @@ cmd_contract() {
         validate)         _contract_validate "$@" ;;
         create)           _contract_create "$@" ;;
         promote)          _contract_promote "$@" ;;
+        migrate)          _contract_migrate "$@" ;;
         help|--help|-h)   _contract_help ;;
         *)
             echo -e "${RED}Unknown contract subcommand: $subcmd${NC}"
@@ -43,9 +44,49 @@ _contract_help() {
     echo "  set F-XXXX KEY VAL  Set a contract field"
     echo "  add-assertion F-XXXX TEXT [--type structural|behavioral]"
     echo "  add-migration F-XXXX --trigger TYPE --reason TEXT"
+    echo "  migrate F-XXXX --reason TEXT [--trigger TYPE] [--set K=V | --add-assertion TEXT [--type T]]"
+    echo "                       Sanctioned mutation path for shipped (read-only) contracts."
     echo "  migrations [F-XXXX] [--trigger TYPE]  Show migration history"
     echo ""
     echo "Contracts live in: ${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
+}
+
+# ---------------------------------------------------------------------------
+# Read-only protection helpers (R-005)
+# ---------------------------------------------------------------------------
+# Shipped contracts are chmod 444 by `ag contract promote`. Direct edits via
+# Edit/Write/$EDITOR fail with EACCES. The sanctioned mutation path is
+# `ag contract migrate`, which performs the chmod cycle and records an
+# auditable migration entry.
+
+_contract_is_locked() {
+    local f="$1"
+    [[ -f "$f" ]] && [[ ! -w "$f" ]]
+}
+
+_contract_lock_shipped() {
+    local f="$1"
+    chmod 444 "$f" 2>/dev/null
+}
+
+_contract_unlock_for_migration() {
+    local f="$1"
+    chmod u+w "$f" 2>/dev/null
+}
+
+# Refuse a direct mutation of a locked contract; print the sanctioned path.
+_contract_refuse_if_locked() {
+    local f="$1"
+    local fid="${2:-<feature>}"
+    if _contract_is_locked "$f"; then
+        echo -e "${RED}Refused: $(basename "$f") is a shipped contract (read-only).${NC}" >&2
+        echo "  Sanctioned mutation path:" >&2
+        echo "    ag contract migrate $fid --reason \"<why>\" [--trigger TYPE] \\" >&2
+        echo "      [--set KEY=VALUE | --add-assertion \"<text>\" [--type structural|behavioral]]" >&2
+        echo "  This records an auditable migration entry and re-locks the contract." >&2
+        return 1
+    fi
+    return 0
 }
 
 # ---------------------------------------------------------------------------
@@ -477,6 +518,8 @@ _contract_set() {
         return 1
     fi
 
+    _contract_refuse_if_locked "$contract_file" "$feature_id" || return 1
+
     # Pass values via env vars to prevent shell injection
     _AG_CONTRACT_FILE="$contract_file" \
     _AG_KEY="$key" \
@@ -534,6 +577,8 @@ _contract_add_assertion() {
         echo -e "${RED}Contract not found: $contract_file${NC}"
         return 1
     fi
+
+    _contract_refuse_if_locked "$contract_file" "$feature_id" || return 1
 
     _AG_CONTRACT_FILE="$contract_file" \
     _AG_TEXT="$text" \
@@ -599,6 +644,8 @@ _contract_add_migration() {
         echo -e "${RED}Contract not found: $contract_file${NC}"
         return 1
     fi
+
+    _contract_refuse_if_locked "$contract_file" "$feature_id" || return 1
 
     _AG_CONTRACT_FILE="$contract_file" \
     _AG_TRIGGER="$trigger" \
@@ -876,6 +923,11 @@ _contract_promote() {
         return 1
     fi
 
+    # Unlock for save_contract; we re-lock to 444 below regardless of outcome
+    # (promote either ships new assertions — must lock — or finds nothing to do —
+    # file should already be locked, idempotent re-lock).
+    _contract_unlock_for_migration "$contract_file"
+
     _AG_CONTRACT_FILE="$contract_file" \
     _AG_AC_ID="${ac_id:-}" \
     PYTHONPATH="$ROOT_DIR/.agentic/lib" python3 -c "
@@ -913,5 +965,128 @@ save_contract(contract)
 print(f'\nPromoted {len(promoted)} assertion(s) in {contract.id}')
 print(f'Run: ag contract check {contract.id}  to verify')
 "
-    return $?
+    local rc=$?
+    _contract_lock_shipped "$contract_file"
+    return $rc
+}
+
+_contract_migrate() {
+    local feature_id="${1:-}"
+    shift 2>/dev/null || true
+    local reason=""
+    local trigger="implementation_discovery"
+    local set_kv=""
+    local add_assertion_text=""
+    # Empty default so we can detect "user passed --type" vs "default";
+    # resolved to "behavioral" below once we confirm --add-assertion was set.
+    local add_assertion_type=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --reason)         reason="$2"; shift 2 ;;
+            --trigger)        trigger="$2"; shift 2 ;;
+            --set)            set_kv="$2"; shift 2 ;;
+            --add-assertion)  add_assertion_text="$2"; shift 2 ;;
+            --type)           add_assertion_type="$2"; shift 2 ;;
+            *) shift ;;
+        esac
+    done
+
+    # --type only makes sense with --add-assertion; refuse silent ignore.
+    if [[ -n "$add_assertion_type" ]] && [[ -z "$add_assertion_text" ]]; then
+        echo -e "${RED}--type requires --add-assertion${NC}" >&2
+        echo "  --type sets the new assertion's type field (structural|behavioral)." >&2
+        echo "  Pass it together with --add-assertion \"<text>\"." >&2
+        return 1
+    fi
+    # Default the type when --add-assertion is given without --type.
+    [[ -z "$add_assertion_type" ]] && add_assertion_type="behavioral"
+
+    if [[ -z "$feature_id" ]] || [[ -z "$reason" ]]; then
+        echo -e "${RED}Usage: ag contract migrate F-XXXX --reason \"<text>\" \\${NC}"
+        echo "                  [--trigger external|implementation_discovery|user_request] \\"
+        echo "                  [--set KEY=VALUE | --add-assertion \"<text>\" [--type structural|behavioral]]"
+        echo ""
+        echo "  Sanctioned mutation path for shipped (read-only) contracts."
+        echo "  Records a migration entry, applies the requested change, re-locks the file."
+        return 1
+    fi
+
+    if ! echo "$feature_id" | grep -qE '^(F|NFR|DEV|E)-[0-9]{3,}(\.[1-9][0-9]*)*$'; then
+        echo -e "${RED}Invalid feature ID format: $feature_id${NC}"
+        return 1
+    fi
+
+    local contracts_dir
+    contracts_dir="${CONTRACTS_DIR:-$SPEC_DIR/contracts}"
+    local contract_file="$contracts_dir/${feature_id}.yaml"
+
+    if [[ ! -f "$contract_file" ]]; then
+        echo -e "${RED}Contract not found: $contract_file${NC}"
+        return 1
+    fi
+
+    # Track lock state so we restore the same posture after mutation.
+    local was_locked=0
+    if _contract_is_locked "$contract_file"; then
+        was_locked=1
+        if ! _contract_unlock_for_migration "$contract_file"; then
+            echo -e "${RED}Failed to unlock contract for migration: $contract_file${NC}" >&2
+            return 1
+        fi
+    fi
+
+    # The internal helpers we call (_contract_add_migration, _contract_set,
+    # _contract_add_assertion) all run _contract_refuse_if_locked. The unlock
+    # above ensures those checks pass; we re-lock at the end.
+    local rc=0
+    _contract_add_migration "$feature_id" --trigger "$trigger" --reason "$reason" || rc=$?
+
+    if [[ $rc -eq 0 ]] && [[ -n "$set_kv" ]]; then
+        local key="${set_kv%%=*}"
+        local val="${set_kv#*=}"
+        if [[ "$key" == "$set_kv" ]] || [[ -z "$key" ]] || [[ -z "$val" ]]; then
+            echo -e "${RED}--set must be KEY=VALUE; got: $set_kv${NC}" >&2
+            rc=2
+        else
+            _contract_set "$feature_id" "$key" "$val" || rc=$?
+        fi
+    fi
+
+    if [[ $rc -eq 0 ]] && [[ -n "$add_assertion_text" ]]; then
+        _contract_add_assertion "$feature_id" "$add_assertion_text" --type "$add_assertion_type" || rc=$?
+    fi
+
+    if [[ $was_locked -eq 1 ]]; then
+        _contract_lock_shipped "$contract_file" \
+            || echo -e "${YELLOW}Warning: failed to re-lock $contract_file (chmod 444); run \`chmod 444\` manually${NC}" >&2
+    fi
+
+    # Audit trail (R-007 events spine). Best-effort: failures here don't fail the migration.
+    PYTHONPATH="$ROOT_DIR/.agentic/lib" \
+    _AG_FEATURE="$feature_id" \
+    _AG_REASON="$reason" \
+    _AG_TRIGGER="$trigger" \
+    _AG_RC="$rc" \
+    _AG_SET="$set_kv" \
+    _AG_ADD="$add_assertion_text" \
+    python3 - <<'PY' 2>/dev/null || true
+import os
+from events import append_event
+append_event(
+    type="contract_migration",
+    session_id=os.environ.get("AG_SESSION_ID", "unknown"),
+    actor="ag contract migrate",
+    feature=os.environ["_AG_FEATURE"],
+    payload={
+        "reason": os.environ["_AG_REASON"],
+        "trigger": os.environ["_AG_TRIGGER"],
+        "set": os.environ.get("_AG_SET") or None,
+        "add_assertion": os.environ.get("_AG_ADD") or None,
+        "rc": int(os.environ["_AG_RC"]),
+    },
+)
+PY
+
+    return $rc
 }

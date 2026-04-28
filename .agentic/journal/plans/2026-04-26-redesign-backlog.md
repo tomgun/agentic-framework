@@ -163,7 +163,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-009 · `ag watch` — lightweight terminal event tail
-**Status:** planned · **Effort:** 2d · **Deps:** R-007
+**Status:** shipped · **Effort:** 2d · **Deps:** R-007
 **Plan ref:** plan §"Observability layer" → frontends table
 **Goal:** Color-coded `tail -f` style stream of events.jsonl for SSH sessions where Textual TUI is too heavy.
 
@@ -185,7 +185,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-003 · `ag merge` — local merge gate
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"Tier 0 — Always-on external enforcement" → "Local primitives"
 **Goal:** Standard merge path with deterministic checks before allowing local merge to main. User can configure `git config alias.merge ag-merge` for hard enforcement.
 
@@ -208,7 +208,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-004 · Hook integrity check
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"Tier 0 honest-limit subsection"
 **Goal:** SHA-256 baseline of hook scripts, agent definitions, settings.json hook entries; pre-commit verifies no tampering.
 
@@ -236,7 +236,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-005 · Filesystem read-only protection for shipped contracts
-**Status:** planned · **Effort:** 1d · **Deps:** —
+**Status:** shipped · **Effort:** 1d · **Deps:** —
 **Plan ref:** plan §"Tier 0 — Local primitives"
 **Goal:** Set `chmod 444` on `spec/contracts/*.yaml` files where `lifecycle: shipped` and `protection: contract`. Crude but agent-cannot-bypass-without-deliberate-chmod.
 
@@ -259,7 +259,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-006 · GitHub Actions YAML template (optional CI mirror)
-**Status:** planned · **Effort:** 1d · **Deps:** R-001, R-002
+**Status:** shipped · **Effort:** 1d · **Deps:** R-001, R-002
 **Plan ref:** plan §"Tier 0 — Remote primitives (optional)"
 **Goal:** Drop-in `.github/workflows/agentic-gate.yml` template that runs the same Tier 0 checks on PR-merge for users with GitHub remotes.
 
@@ -284,7 +284,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-010 · `ag fix --skip-contract` — hotfix mode
-**Status:** planned · **Effort:** 2d · **Deps:** R-001
+**Status:** shipped · **Effort:** 2d · **Deps:** R-001
 **Plan ref:** plan §"UX additions for Phase 0"
 **Goal:** Lightweight commit path for hotfixes. Tier 0 still requires test, but skips full spec/contract requirement; audited.
 
@@ -308,7 +308,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-011 · `ag onboard` — new-contributor playbook
-**Status:** planned · **Effort:** 3d · **Deps:** —
+**Status:** shipped · **Effort:** 3d · **Deps:** —
 **Plan ref:** plan §"UX additions for Phase 0" + Theme J18
 **Goal:** Generates `.agentic/ONBOARDING.md` for a contributor joining an existing project. Different from `ag init` (new project).
 
@@ -329,7 +329,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-012 · Pre-commit error messages with concrete next-step suggestions
-**Status:** planned · **Effort:** 1d · **Deps:** R-001
+**Status:** shipped · **Effort:** 1d · **Deps:** R-001
 **Plan ref:** plan §"UX additions for Phase 0"
 **Goal:** Replace bare "BLOCKED" messages with structured guidance ("here's what to do next").
 
@@ -351,7 +351,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-013 · `ag intel report --quota` — Pro/Max session quota usage
-**Status:** planned · **Effort:** 2d · **Deps:** R-007
+**Status:** shipped · **Effort:** 2d · **Deps:** R-007
 **Plan ref:** plan §"Quota awareness (subscription model)"
 **Goal:** Display estimated quota usage in current 5h rolling window. Reads token-ledger.jsonl.
 
@@ -414,7 +414,9 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-016 · Phase 0 verification — bypass test battery (B01–B12)
-**Status:** planned · **Effort:** 5d · **Deps:** R-001, R-002, R-003, R-004, R-005, R-010
+**Status:** shipped · **Effort:** 5.5d · **Deps:** R-001, R-002, R-003, R-004, R-005, R-010
+**Plan:** `.agentic/journal/plans/2026-04-27-R-016-revised-ac-plan.md` (APPROVED v6 after 6 rounds of dialectical review; attack-vector list realigned to actual Phase 0 surfaces — original B01-B12 had 7/12 referencing sibling-doc surfaces Phase 0 didn't ship).
+**Shipped:** 2026-04-28 via PR #244 (squash merge `1dbca588`). Battery: 12 × 3 = 36 cells, 34 PASS + 2 SKIP-by-design + 0 FAIL.
 **Plan ref:** plan §"Verification approach" + sibling-doc bypass tests
 **Goal:** Adversarial test suite proving Tier 0 catches each documented bypass attempt. Cross-profile (discovery, formal, autonomous_formal).
 

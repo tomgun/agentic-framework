@@ -190,6 +190,9 @@ source "$COMMANDS_DIR/implement.sh"
 source "$COMMANDS_DIR/commit.sh"
 source "$COMMANDS_DIR/push.sh"
 source "$COMMANDS_DIR/tui.sh"
+source "$COMMANDS_DIR/watch.sh"
+source "$COMMANDS_DIR/fix.sh"
+source "$COMMANDS_DIR/onboard.sh"
 source "$COMMANDS_DIR/done.sh"
 source "$COMMANDS_DIR/kickoff.sh"
 source "$COMMANDS_DIR/auto.sh"
@@ -200,6 +203,8 @@ source "$COMMANDS_DIR/settings.sh"
 source "$COMMANDS_DIR/operations.sh"
 source "$COMMANDS_DIR/git-init.sh"
 source "$COMMANDS_DIR/contract.sh"
+source "$COMMANDS_DIR/integrity.sh"
+source "$COMMANDS_DIR/merge.sh"
 source "$COMMANDS_DIR/persona.sh"
 source "$COMMANDS_DIR/phase.sh"
 source "$COMMANDS_DIR/intel.sh"
@@ -266,6 +271,9 @@ case "${1:-help}" in
     contract)
         shift; cmd_contract "$@"
         ;;
+    integrity)
+        shift; cmd_integrity "$@"
+        ;;
     persona)
         shift; cmd_persona "$@"
         ;;
@@ -289,11 +297,20 @@ case "${1:-help}" in
     tui)
         shift; cmd_tui "$@"
         ;;
+    watch)
+        shift; cmd_watch "$@"
+        ;;
+    fix)
+        shift; cmd_fix "$@"
+        ;;
+    onboard)
+        shift; cmd_onboard "$@"
+        ;;
     done)
         shift; cmd_done "$@"
         ;;
     merge)
-        cmd_merge "${2:-}" "${3:-}"
+        shift; cmd_merge "$@"
         ;;
     docs)
         shift

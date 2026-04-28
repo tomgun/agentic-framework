@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- V5 contributions backfilled - ready to fan out Phase 0 wave A (R-005 first) (Updated: 2026-04-26 19:31 UTC)
+- Wave B merged (22b4877b). Phase 0 feature-complete except R-014 (TUI quota ring), R-015 (ag hooks register), R-016 (bypass test battery). Phase 1 (R-101+) unblocked. (Updated: 2026-04-27 16:22 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

@@ -34,6 +34,21 @@ Run `ag commit` — it handles quality gates, branch checks, and diff review.
 3. If shipping feature: `bash .agentic/lib/tools/feature.sh F-#### status shipped`
 4. Check doc freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
 
+## Journal entry shape (capability / quality / decisions)
+
+The journal is project memory, not a state-transition log. Structure each entry around what reasoning a future contributor would need to reconstruct *why* — not what `git log` already shows.
+
+**The Topic / Done fields should describe:**
+1. **Capability** — what the project can now do that it couldn't before (new commands, user flows, integration points, behaviors)
+2. **Quality** — what shifted in correctness or robustness (review-found fixes, honest-limits closed, an enforcement layer that became deterministic)
+3. **Decisions** — choices with downstream weight (deps dropped, opt-in vs default, skip-narrowly vs skip-everything semantics, projection denominators)
+
+Use `--why` for the underlying problem the work addressed. Use `--decision` for the single most consequential choice future-readers might re-litigate.
+
+**What stays OUT of journal entries:** SHAs, branch names, raw test counts, VERSION deltas, "merged via squash". Those are state — they live in `git log` / VERSION / STATUS.md / HUMAN_NEEDED.md. A journal entry whose only content is "PR merged, version bumped, tests green" duplicates state and adds zero reasoning.
+
+When tempted to journal a merge event, ask: *"Does this contain a decision, design insight, alternative considered, or assumption worth preserving?"* If the answer is just "we merged the PR / bumped the version / cleaned up state files", skip the journal entry entirely — the post-merge sync (VERSION + STATUS + HUMAN_NEEDED + instruction-file refresh) is automated state, not memory.
+
 ## Rules
 - Never auto-commit in interactive sessions. Show diff to human first.
 - Never bypass hooks (`--no-verify`). Fix the underlying issue.

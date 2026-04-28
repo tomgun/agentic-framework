@@ -110,7 +110,28 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0086: PR #241: V5 architectural-decision contributions backfill
+- **Type**: pr_review
+- **Added**: 2026-04-26
+- **Context**: https://github.com/tomgun/agentic-framework/pull/241 — backfills 20 user insights across 5 threads (real-world failures, M.A. audit, Claude arch PDF, transform-vs-greenfield, iterative pushback). Docs-only on .agentic/CONTRIBUTIONS.md + journal/status state files.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
+
+
+
 ## Resolved
+
+### HN-0088: Sprint 2 / Wave B PR ready
+- **Resolved**: 2026-04-27
+- **Outcome**: PR #243 merged as 22b4877b (squash); Wave B shipped (R-006/R-009/R-010/R-011/R-013); Phase 0 feature-complete except R-014/R-015/R-016
+
+### HN-0087: Review PR #242 — Sprint 2 / Wave A · Tier 0 hardening cluster
+- **Resolved**: 2026-04-27
+- **Outcome**: PR #242 merged as 676985cb (squash); Wave A shipped
+
 
 ### HN-0079: PR #219: F-041 Phase 2 — Anatomy + Token Ledger
 - **Resolved**: 2026-04-02

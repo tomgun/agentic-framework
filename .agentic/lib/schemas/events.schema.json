@@ -39,7 +39,8 @@
         "hotfix_commit",
         "integrity_baseline_updated",
         "intel_invoked",
-        "quota_degraded"
+        "quota_degraded",
+        "contract_migration"
       ]
     },
     "feature": {

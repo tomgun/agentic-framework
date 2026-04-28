@@ -22,11 +22,16 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag status` — see current work items and next steps
 - `ag info F-XXXX` — detailed work item info with next steps
 - `ag next` — show what to do next
-- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` | `ag flush` | `ag backlog` | `ag todo`
+- `ag commit` | `ag commit --skip-gate "<reason>"` (audited Tier 0 bypass) | `ag done` | `ag merge <pr#> [F-XXXX]` (PR via gh) | `ag merge <branch> [--skip-gate "<reason>"]` (local merge gate; R-003) | `ag flush` | `ag backlog` | `ag todo`
 - `ag push [args...]` | `ag push --skip-gate "<reason>"` — sanctioned wrapper that drops a breadcrumb so the pre-push gate (R-002) records intent
+- `ag fix "<reason>"` — hotfix-mode commit (R-010): skips spec-existence + plan-approval, keeps tests/journal/migrations/integrity; emits `hotfix_commit` event; `[hotfix]` footer
 - `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008). Requires `pip install textual`.
+- `ag watch [--filter k=v] [--since 1h] [--from-start] [--once]` — color-coded stream of events.jsonl for SSH (R-009); stdlib only
+- `ag intel report --quota` — Pro/Max session quota usage in last 5h window: per-tier/per-model breakdown, threshold alerts at 70/85/95%, projected exhaustion (R-013)
+- `ag onboard` — generate `.agentic/ONBOARDING.md` for new contributors from STACK/FEATURES/STATUS/journal/ADR (R-011)
 - `ag skills suggest|install|sync|list|remove|update-pins|request` — F-008 marketplace integration: install community quality skills from a curated allowlist with mandatory sha pinning, script quarantine, and Claude+Cursor fan-out
-- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX`
+- `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX` | `ag contract migrate F-XXXX --reason "..." [--set K=V | --add-assertion "..."]` (sanctioned mutation path for shipped/read-only contracts; R-005)
+- `ag integrity status` | `ag integrity update` — hook + agent + .claude config baseline (R-004); pre-commit verifies before any other check
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`
 - `ag kickoff "vision"` | `ag kickoff --review` | `ag kickoff --approve`
@@ -66,7 +71,7 @@ Exiting plan mode creates a DRAFT. Auto-continue immediately — do NOT stop and
 - Never fabricate APIs, data, or behavior. If uncertain, ask.
 - NEVER write code for multiple features outside of `ag auto` commands. If a user says "build everything", "churn all tasks", or similar batch-work phrases, use `ag auto crunch` — not direct Write/Edit calls. The `ag auto` pipeline ensures each feature gets specs, plans, tests, and docs. **Wrong rationalizations:** "I can implement it directly faster" — NO. "ag auto crunch spawns subprocesses, I have full context" — NO. "The user said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
 - No feature inflation: improvements, enforcement, and hardening of existing features are deliverables on those features — not new F-XXXX. Ask "which existing feature owns this?" before proposing a new capability ID.
-- Behavioral corrections belong in instruction files: When a correction applies to this project, update CLAUDE.md or the relevant skill file — don't write a memory as a substitute.
+- **Don't autorecord project things to Claude auto-memory** (`~/.claude/projects/.../memory/`). That system is reserved for cross-project / per-user / per-machine context the user manages directly. Anything project-relevant — corrections, decisions, behavior rules, conventions, journal-entry shape — belongs in repo files (CLAUDE.md, the relevant skill in `.claude/skills/`, JOURNAL.md, ADRs), where every contributor and every machine sees it. Auto-memory is gitignored, single-machine, invisible to other contributors. The user manages auto-memory directly when they want something there.
 
 Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 - STATUS.md: `bash .agentic/lib/tools/status.sh focus "Task"`
@@ -79,11 +84,13 @@ Token-efficient scripts (ALWAYS use these, NEVER edit state files directly):
 
 Framework enforcement uses multiple layers. When adding new gates or enforcement, prefer higher layers:
 1. **Tier 0 git-layer gates** (v5; `precommit_gate.py` / `prepush_gate.py`) — fire in a separate process from any agent session. Pre-commit blocks per-commit (tests, contracts, plan-approved sentinel, JOURNAL freshness, shipped-contract migrations). Pre-push blocks range-shaped (full integration tests, coverage threshold, doc drift, range migrations). Sanctioned bypass: `ag commit --skip-gate "<reason>"` / `ag push --skip-gate "<reason>"` — both audited to events.jsonl. *Honest limit:* pre-commit cannot itself observe `git commit --no-verify` (the flag short-circuits hooks); pre-push catches the same range on push regardless.
-2. **Claude hooks** (real-time, during session) — PreToolUse blocks/warns before action, PostToolUse tracks after, Stop.sh validates at session end, UserPromptSubmit nudges per-prompt. In-session enforcement layer.
-3. **Skills** (just-in-time guidance) — loaded at workflow trigger points via `.claude/skills/`
-4. **`ag` commands** (workflow gates) — `ag done`, `ag implement`, `ag commit` validate preconditions
-5. **Pre-commit hooks (legacy bash)** — `pre-commit-check.sh` 16-check defense-in-depth; will be retired in R-301
-6. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
+2. **Filesystem read-only protection** (R-005; shipped contracts only) — `ag contract promote` chmods `lifecycle: shipped` contracts to `444`, so direct `Edit`/`Write`/`$EDITOR` writes fail with EACCES. The sanctioned mutation path is `ag contract migrate F-XXX --reason "<text>" [--set K=V | --add-assertion "<text>"]`, which records an auditable migration entry, applies the change, and re-locks the file. *Honest limit:* a deliberate `chmod u+w` bypasses this layer; the Tier 0 pre-commit gate's shipped-contract-migration check is the second wall.
+3. **Hook integrity baseline** (R-004) — `.agentic/integrity.json` carries SHA-256 hashes of `.git/hooks/pre-{commit,push}`, `.agentic/lib/hooks/*.py`, `.agentic/lib/integrity.py`, `.claude/hooks.json`, `.claude/settings.json[hooks]`, and `.claude/agents/*.md`. Pre-commit verifies the baseline first (before any other check), so an agent that tampered with a later check still trips this one. `ag integrity update` regenerates the baseline (audited via events.jsonl `integrity_baseline_updated`); `INTEGRITY_SKIP=1` is honored only under `CI=true`. *Honest limit:* a determined human can `ag integrity update` to launder a tamper; HMAC signing (R-209) closes that path.
+4. **Claude hooks** (real-time, during session) — PreToolUse blocks/warns before action, PostToolUse tracks after, Stop.sh validates at session end, UserPromptSubmit nudges per-prompt. In-session enforcement layer.
+5. **Skills** (just-in-time guidance) — loaded at workflow trigger points via `.claude/skills/`
+6. **`ag` commands** (workflow gates) — `ag done`, `ag implement`, `ag commit` validate preconditions
+7. **Pre-commit hooks (legacy bash)** — `pre-commit-check.sh` 16-check defense-in-depth; will be retired in R-301
+8. **Instruction files** (behavioral) — guide agent behavior but no structural enforcement
 
 ## Design Tracking
 

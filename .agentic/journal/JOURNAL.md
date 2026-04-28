@@ -5732,3 +5732,299 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-26 19:56 - R-005 shipped: filesystem RO protection for shipped contracts
+
+**Why**: Closes one of two known Tier 0 honest-limits — filesystem mutation of shipped contracts. Pre-commit gate (R-001) is the second wall.
+
+**Decision**: Two-wall design: chmod 444 blocks accidental writes; pre-commit gate audits deliberate bypasses (chmod u+w + edit + commit). Sanctioned path is ag contract migrate, not lockdown — friction at the bypass, not the happy path.
+
+**What changed**:
+- ag contract promote chmods to 444; ag contract migrate is the sanctioned mutation path with audit trail; existing mutators refuse on locked contracts with sanctioned-path hints; EACCES on direct Edit/Write blocks accidental tampering
+
+**Next steps**:
+- Wave A R-012 next (structured pre-commit error messages w/ next-step suggestions)
+
+**Blockers**: None
+
+
+### Session: 2026-04-26 20:16 - R-012 shipped: structured gate error messages with central catalog
+
+**Why**: Sprint 1 shipped working gates but with minimal failure UX — bare BLOCKED messages with inlined next-steps that drifted between the two gates. R-012 makes failures self-documenting.
+
+**Decision**: Catalog is the source of truth; gates are thin. Adding a new check means adding a BlockReason + a from_reason() call — no inline next_steps allowed. Tests enforce that every from_reason(messages.X) reference resolves.
+
+**What changed**:
+- Extracted message catalog into .agentic/lib/hooks/messages.py (9 BlockReason constants). precommit_gate + prepush_gate both use GateResult.from_reason(); --verbose flag adds expanded detail + plan refs without bloating default output. 11 catalog tests covering invariants and gate integration.
+
+**Next steps**:
+- Wave A R-004 next (hook integrity SHA-256 baseline)
+
+**Blockers**: None
+
+
+### Session: 2026-04-26 20:19 - Removed fabricated CONTRIBUTIONS entries
+
+**Why**: Honest attribution: CONTRIBUTIONS.md is for actual user design inputs, not author framings dressed up as quotes.
+
+**What changed**:
+- User flagged R-005 + R-012 entries as misattributed framings, not actual user insights. Removed both sections cleanly; conversation + journal entries already capture real inputs (Wave A ordering, phase-based PR batching).
+
+**Next steps**:
+- Continue Wave A: R-004 hook integrity baseline
+
+**Blockers**: None
+
+
+### Session: 2026-04-26 20:28 - R-004 shipped: hook integrity baseline
+
+**Why**: Closes the second known Tier 0 honest-limit (sibling to R-005 chmod 444): an agent could quietly modify the hook scripts that run the gate itself.
+
+**Decision**: Partial-JSON hashing of settings.json[hooks] only — cosmetic edits to unrelated keys don't trip the gate. Skip envvar honored only under CI so an agent in a local session cannot disable the check.
+
+**What changed**:
+- Tier 0 layer 3 complete. SHA-256 baseline of .git/hooks/*, .agentic/lib/hooks/*.py, .agentic/lib/integrity.py, .claude/hooks.json, .claude/settings.json[hooks subfield only], .claude/agents/*.md committed to .agentic/integrity.json. Pre-commit runs check_integrity FIRST (so a tampered later check still trips this one). ag integrity status/update commands; INTEGRITY_SKIP=1 honored only under CI=true. 13 unit tests, plain-script runnable. Gate hierarchy now: 1=git-layer, 2=filesystem RO, 3=hook integrity, 4=Claude hooks, ...
+
+**Next steps**:
+- Wave A R-003 last (ag merge local merge gate)
+
+**Blockers**: None
+
+
+### Session: 2026-04-27 05:29 - R-003 shipped: ag merge — local merge gate
+
+**Why**: Closes the merge-side hole — until R-003, local git merge to main bypassed every Tier 0 check between PRs. Now ag merge runs the same contract/pending checks the gates run on commit/push, but at the merge boundary.
+
+**Decision**: Polymorphic on first arg: numeric goes to gh pr merge (existing); branch name goes to new local-merge gate. Same command, two transports. Avoids breaking the well-known PR-merge ergonomic.
+
+**What changed**:
+- Wave A complete (sprint 2). ag merge dispatches numeric → PR path; non-numeric → local merge gate. Discovers feature IDs from commit-message range vs target HEAD; runs ag contract check, ag contract pending, FEATURES.md tracking check, advisory CI mirror check. Sanctioned bypass via --skip-gate '<reason>' (audited). 6 tests pass.
+
+**Next steps**:
+- Wave A merge candidate ready for review; Wave B (R-009 ag watch + R-013 quota report + R-006 GHA template + R-010 ag fix + R-011 ag onboard) unblocked next.
+
+**Blockers**: None
+
+
+### Session: 2026-04-27 08:03 - Wave A review fixes
+
+**Why**: Self-review found 3 real bugs and 2 UX issues; fixing now keeps Wave A as a single coherent merge candidate rather than dragging review-feedback debt into Wave B.
+
+**What changed**:
+- Self-reviewed PR #242 (Wave A) and addressed 5 issues: misleading verbose tip in gate output replaced with explicit invocation; integrity baseline extended to events.py + contracts.py + settings.sh (closes audit/loader tampering hole); malformed JSON now distinct mismatch kind (compute_baseline refuses to persist malformed entries); R-XXX redesign IDs picked up by merge-gate feature regex (with contract + FEATURES.md checks correctly skipped); _contract_migrate --type validation rejects --type without --add-assertion. Added 5 tests.
+
+**Next steps**:
+- Wave A ready for external review
+
+**Blockers**: None
+
+
+### Session: 2026-04-27 09:22 - Sprint 2 / Wave A merged (PR #242 → 676985cb)
+
+**Why**: Sprint 2 closed the two Tier 0 honest-limits documented post-sprint-1 (filesystem mutation of shipped contracts; hook tampering) and made gate failures self-documenting via the central message catalog. R-003 closed the merge-side hole. The hardening-before-polish ordering means Wave B's UX widgets land on a sealed base.
+
+**Decision**: Squash-merge over fast-forward — sprint-1 precedent (single 'Merge sprint 1' commit). The 6 individual commits collapsed into 676985cb. Branch deleted on remote.
+
+**What changed**:
+- Tier 0 hardening cluster shipped. R-005 (chmod 444 on shipped contracts), R-012 (structured gate error catalog + --verbose), R-004 (hook integrity SHA-256 baseline w/ events.py + contracts.py + settings.sh covered), R-003 (ag merge local merge gate). Plus self-review fixes (5 issues addressed in fix(review) commit before merge). Enforcement hierarchy now 8 layers; 50 deterministic tests + 846 validate_framework ACs all green on main.
+
+**Next steps**:
+- Wave B unblocked: R-009 ag watch (2d), R-013 ag intel report --quota (2d), R-006 GHA template (1d), R-010 ag fix --skip-contract (2d), R-011 ag onboard (3d).
+
+**Blockers**: None
+
+
+### Session: 2026-04-27 09:31 - R-009 ag watch shipped
+
+**Why**: SSH sessions need a lightweight observability frontend; TUI too heavy
+
+**Decision**: Skip colorama dep; ANSI codes work natively on supported terminals
+
+**What changed**:
+- Color-coded events.jsonl tail; stdlib + ANSI; filter/since/once flags; 34 tests pass
+
+**Next steps**:
+- R-013 quota report next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:35 - R-013 quota report shipped
+
+**Why**: Pro/Max quota awareness needed before Tier 2/3 work to avoid burnout
+
+**Decision**: Window-based rate (not instantaneous) for projection — more stable and conservative
+
+**What changed**:
+- ag intel report --quota; rolling 5h window; per-tier+per-model breakdown; alerts at 70/85/95%; linear projection; --json output; 22 tests pass
+
+**Next steps**:
+- R-006 GHA template next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:38 - R-006 GHA template shipped
+
+**Why**: Multi-contributor repos and compliance need GitHub-side enforcement; local hooks aren't shared across clones
+
+**Decision**: Belt-and-suspenders only — Tier 0 already strong; mirror catches gaps, doesn't replace
+
+**What changed**:
+- agentic-gate.yml runs precommit+prepush in CI mirror; uploads logs+verification.json; PR comment on failure only; docs/CI_MIRROR.md; cmd_init surfaces template
+
+**Next steps**:
+- R-010 ag fix next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:42 - R-010 ag fix shipped
+
+**Why**: Hotfixes need a fast path that doesn't bypass safety — only ceremony
+
+**Decision**: Skip spec+plan only; tests/migrations/integrity stay required
+
+**What changed**:
+- ag fix "<msg>"; AGENT_FIX_MODE=1 skips check_contracts and check_plan_approved; preserves test/journal/integrity/migration; emits hotfix_commit event on success; [hotfix] footer; 9 tests
+
+**Next steps**:
+- R-011 ag onboard next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:46 - R-011 ag onboard shipped
+
+**Why**: Multi-contributor projects need a fast cold-start path; current state isn't self-explanatory
+
+**Decision**: Generate-from-current-state, not hand-curated; People section is hand-edited stub
+
+**What changed**:
+- ag onboard generates .agentic/ONBOARDING.md from STACK/FEATURES/STATUS/ADR/journal; --force overwrite; -o output; 5-min walkthrough; precommit gate references it; 12 tests
+
+**Next steps**:
+- Instruction file sync next
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 09:49 - Wave B instruction sync
+
+**Why**: Memory-seed and instruction files are how features reach agents in user projects
+
+**Decision**: Same one-liner pattern in every instruction file (consistent with Wave A)
+
+**What changed**:
+- Updated CLAUDE.md (template+root), .cursorrules, copilot, codex, cursor template, memory-seed.md with R-006/R-009/R-010/R-011/R-013; flipped redesign-backlog statuses to shipped; STATUS.md current focus updated
+
+**Next steps**:
+- PR creation
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 13:25 - Wave B review fixes
+
+**Why**: Self-review found medium issue (projection denominator) + 5 minor/trivial; user asked to fix all
+
+**Decision**: Active-span denominator with 60s floor — closer to 'current rate' intuition while protecting against tiny-N nonsense projections
+
+**What changed**:
+- Issue 1: quota projection uses min(window, now-earliest_record_ts) with 60s floor — bursty workloads now project sooner. Issue 2: print_blocked takes project_root (no subprocess on failure path). Issue 3: onboard restores strict mode before python heredoc + checks file written. Issue 4: 7 new bash dispatcher smoke tests for fix.sh + watch.sh. Issue 5: drop unused jsonschema from CI mirror. Issue 6: soften R-110 reference in 70% advice.
+
+**Next steps**:
+- Push to PR #243
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 16:25 - Wave B — UX + observability cluster
+
+**Why**: Tier 0 enforcement is real but not visible enough — Wave B closes the lightweight observability + new-contributor + emergency-path gaps so contributors can see what the gate is doing, what tokens are doing, and have an audited fast-path for genuine emergencies
+
+**Decision**: Stdlib-only for new analysis modules (zero new runtime deps); CI mirror is belt-and-suspenders opt-in (not required); hotfix mode skips ceremony but not safety; quota uses active-span not full-window for projection denominator
+
+**What changed**:
+- Framework gained four user-facing commands (ag watch for SSH-friendly events.jsonl tail; ag intel report --quota for Pro/Max usage; ag fix for emergency commits with audited skip; ag onboard for new-contributor playbook) plus an opt-in GitHub Actions CI mirror. Quality bar moved: hotfix mode skips spec/plan but explicitly keeps tests + migrations + integrity (skip-narrowly, not skip-everything). Quota projection uses active-span (max(window_start, earliest_record_ts)) with a 60s floor — corrects a bursty-vs-steady misjudgement found in self-review. Pre-commit gate's failure path no longer shells out to git rev-parse for a value GateContext already holds. Onboard now fails loud on substitution errors instead of silently writing empty ONBOARDING.md.
+
+**Next steps**:
+- Phase 0 wrap (R-014 TUI quota ring, R-015 ag hooks register, R-016 bypass test battery) before Phase 1 opens
+
+**Blockers**: —
+
+
+### Session: 2026-04-27 16:39 - No-autorecord rule applies to user projects too
+
+**Why**: User asked whether the rule applies to production projects — yes; multi-contributor projects benefit from the same logic since auto-memory is per-user/per-machine and invisible to teammates
+
+**Decision**: Template carries shared concerns (dogfooding); root extends with framework-specific destinations only (FRAMEWORK_DEVELOPMENT, PRINCIPLES). Rule is not duplicated across layers.
+
+**What changed**:
+- Hoisted the no-autorecord rule from framework-dev wrapper into the canonical template (.agentic/lib/agents/claude/CLAUDE.md) so user projects receive it. Propagated the same one-liner into .cursorrules + cursor template, copilot-instructions + template, codex template, and memory-seed.md. Root CLAUDE.md no longer duplicates the rule — points at template instead, with a note that 'project' reads as 'framework' for framework dev.
+
+**Next steps**:
+- —
+
+**Blockers**: —
+
+
+### Session: 2026-04-28 04:50 - R-016 plan v6 APPROVED
+
+**Why**: Original R-016 attack list lifted verbatim from sibling close-out-hardening doc that proposed surfaces (.close-out-pending sentinel, PreToolUse path-deny, content classification, state_enforcement levels) Phase 0 (R-001..R-015) didn't ship — only 2/12 attacks cleanly mapped
+
+**Decision**: Preserve 12-test budget; realign composition to Phase 0 surfaces; six rounds of dialectical review until convergence in round 6 (zero new architectural bugs)
+
+**What changed**:
+- Phase 0 verification battery plan converged after six rounds of dialectical review. Composition: 12 attack-vectors × 3 profiles = 36-cell pass/fail matrix targeting Phase 0 Tier 0 surfaces (R-001..R-010). Test budget preserved from original; attack-vector list realigned to actual surfaces. Manifest-driven pass criteria (known-fails.yaml) ensures FAILs are linked deterministically. Six rounds surfaced 13 architectural bugs total; round 6 found zero new bugs and converged. One pre-existing R-001/R-004 limitation documented as out-of-scope (unbaselined .agentic/hooks/* shim).
+
+**Next steps**:
+- Begin Day-1 implementation — battery.sh scaffold helpers + run_battery.sh orchestrator skeleton
+
+**Blockers**: None
+
+
+### Session: 2026-04-28 06:31 - R-016 battery implementation complete (Day 1-5)
+
+**Why**: Plan-approved sentinel was missing pre-commit; framework profile is autonomous_formal so AC3 enforces; sentinel touched after dialectical review v6 marked plan APPROVED. Commit 1 went through gate cleanly (validate_framework.sh: 846 PASS); commit 2 needed fresh JOURNAL after HEAD advanced.
+
+**Decision**: Two-commit split: implementation (19 files) + state integration (3 files) — cohesive groups; matches recent sprint-style commit pattern in the repo
+
+**What changed**:
+- All 12 B-tests + 6 seeders + scaffold + orchestrator + day1_stub implemented. Final dry-run: 36-cell matrix, 34 PASS + 2 SKIP-by-design + 0 FAIL. Commit b91943cb captures the work. Pre-existing framework bug surfaced and worked around: ag contract list f-string mangled by bash interpolation in contract.sh:405 — needs separate followup, not R-016 scope. STACK.md location bug fixed during day1_stub run (write to root, not .agentic/). Pyyaml runtime dep documented in README.
+
+**Next steps**:
+- Stage commit 2 (backlog status + run_tests.sh opt-in integration); review; merge along with sibling journal-skill commits per branch-mixing decision
+
+**Blockers**: None
+
+
+### Session: 2026-04-28 07:27 - R-016 review-driven hardening
+
+**Why**: Review identified that stderr-text matching was fragile against messages.py wording changes; seeder failures masked root causes; per-cell python3 -c was unnecessary subprocess overhead; AGENT_FIX_MODE leak risk; signal-kill /tmp accumulation; ANSI escapes ignored NO_COLOR
+
+**Decision**: Pivot B-test pass criterion from prose-grep to structured gate_blocked event payload.failures — survives messages.py drift; assertion is now content-addressed by AC ID, not text
+
+**What changed**:
+- PR #244 self-review found 3 high + 3 medium fragility issues. v6 implementation hardened: B-tests now assert blocking via gate_blocked event payload.failures (AC-ID match) instead of grepping stderr prose; seeders bubble explicit SEED_FAIL context; env hygiene catches AGENT_FIX_MODE leaks; cleanup trap covers INT/TERM/HUP signals; results JSON batched into single python pass at end of run; NO_COLOR + non-tty respected for emitted output. Final verification: 36/36 cells unchanged (34 PASS + 2 SKIP-by-design + 0 FAIL).
+
+**Next steps**:
+- Push fixup commit; PR ready for human review/merge
+
+**Blockers**: None
+
+
+### Session: 2026-04-28 08:18 - R-016 shipped — Phase 0 verification battery on main
+
+**Why**: Original R-016 in redesign-backlog had B01-B12 attack list copy-pasted from sibling close-out-hardening doc; only 2/12 attacks cleanly mapped to Phase 0 surfaces. Plan revision realigned attack vectors to declared deps. Six rounds of dialectical Critic+Advocate review surfaced 13 architectural bugs total before convergence.
+
+**Decision**: Realign attack vectors to declared dependencies (preserve 12-test budget; swap composition); structured event assertions (not stderr text) for AC matching; manifest-driven pass criteria for FAILs
+
+**What changed**:
+- PR #244 squash-merged as 1dbca588. Phase 0 closeout's largest single deliverable: adversarial test suite proves Tier 0 catches each documented bypass attempt cross-profile. 12 × 3 = 36-cell pass/fail matrix targeting R-001/R-002/R-004/R-005/R-010 surfaces. Manifest-driven pass criteria via known-fails.yaml — orchestrator exits 2 on unlisted FAILs. Each B-test annotated with code-path-traced reference to the gate function:line it should trigger; structured event assertions (gate_blocked.payload.failures AC-ID match) survive messages.py wording changes. Co-shipped: journal-shape rule in committing-changes skill + no-autorecord rule hoisted into the canonical template (propagates to cursor/copilot/codex/memory-seed). VERSION bumped 0.84.0 → 0.84.1.
+
+**Next steps**:
+- Phase 0 closeout: R-014 (TUI quota burn-down ring) + R-015 (ag hooks register) remain. Then Phase 1 — R-101 Token Ledger visible — opens.
+
+**Blockers**: None
+

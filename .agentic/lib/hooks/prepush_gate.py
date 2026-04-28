@@ -133,6 +133,12 @@ def _import_precommit_gate():
 # ---------------------------------------------------------------------------
 
 
+try:
+    import messages  # type: ignore  # catalog of canonical block reasons (R-012)
+except Exception:  # pragma: no cover
+    messages = None  # type: ignore
+
+
 @dataclass
 class GateResult:
     ac: str
@@ -140,6 +146,25 @@ class GateResult:
     title: str = ""
     detail: str = ""
     next_steps: list[str] = field(default_factory=list)
+    reason: "Optional[messages.BlockReason]" = None  # type: ignore[name-defined]
+
+    @classmethod
+    def from_reason(
+        cls,
+        reason: "messages.BlockReason",  # type: ignore[name-defined]
+        *,
+        failed: bool = True,
+        detail: str = "",
+    ) -> "GateResult":
+        """Build a failed result from a `BlockReason` catalog entry (R-012)."""
+        return cls(
+            ac=reason.ac,
+            failed=failed,
+            title=reason.title,
+            detail=detail,
+            next_steps=list(reason.next_steps),
+            reason=reason,
+        )
 
 
 @dataclass
@@ -333,15 +358,7 @@ def check_full_tests(ctx: GateContext) -> GateResult:
     if out.strip():
         detail += ["--- last output ---", out.rstrip()]
 
-    return GateResult(
-        ac="AC2", failed=True, title="full test suite failing",
-        detail="\n".join(detail),
-        next_steps=[
-            "Reproduce locally: " + ctx.test_command,
-            "Fix failing tests; re-stage; commit; then re-push.",
-            "If you must push through the failure: ag push --skip-gate \"<reason>\"",
-        ],
-    )
+    return GateResult.from_reason(messages.INTEGRATION_TESTS_FAILING, detail="\n".join(detail))
 
 
 # ---------------------------------------------------------------------------
@@ -391,16 +408,13 @@ def check_contract_coverage(ctx: GateContext) -> GateResult:
         return GateResult(ac="AC3", failed=False,
                           title=f"coverage {pct:.1f}% ≥ {ctx.coverage_threshold}%")
 
-    return GateResult(
-        ac="AC3", failed=True,
-        title=f"coverage {pct:.1f}% below {ctx.coverage_threshold}% threshold",
-        detail=("Some shipped/in-progress contracts have assertions without tests "
-                "or verify commands. Pre-push blocks until coverage is restored."),
-        next_steps=[
-            "Run: ag contract coverage   (full report with gap list)",
-            "Add tests/verify cmds for the gap features.",
-            "Or change threshold: edit STACK.md — `contract_coverage_threshold: <N>`",
-        ],
+    return GateResult.from_reason(
+        messages.COVERAGE_BELOW_THRESHOLD,
+        detail=(
+            f"Coverage {pct:.1f}% < {ctx.coverage_threshold}% threshold. "
+            "Some shipped/in-progress contracts have assertions without tests "
+            "or verify commands."
+        ),
     )
 
 
@@ -442,16 +456,13 @@ def check_doc_drift(ctx: GateContext) -> GateResult:
     if drifted == 0:
         return GateResult(ac="AC4", failed=False, title="no doc drift")
 
-    return GateResult(
-        ac="AC4", failed=True,
-        title=f"{drifted} doc(s) drifting from code",
-        detail=("In formal+ profiles, docs that reference changed code must be "
-                "refreshed or de-tracked before push.\n\n" + out[-1500:]),
-        next_steps=[
-            "Run: bash .agentic/lib/tools/drift.sh --docs   (list flagged docs)",
-            "Update each flagged doc OR remove its `tracks:` entry from STACK.md.",
-            "Re-stage docs; commit; re-push.",
-        ],
+    return GateResult.from_reason(
+        messages.DOC_DRIFT,
+        detail=(
+            f"{drifted} doc(s) drifting from code. "
+            "In formal+ profiles, docs referencing changed code must be "
+            "refreshed or de-tracked before push.\n\n" + out[-1500:]
+        ),
     )
 
 
@@ -566,17 +577,12 @@ def check_range_migrations(ctx: GateContext) -> GateResult:
         return GateResult(ac="AC5", failed=False,
                           title="range migration check pass")
 
-    return GateResult(
-        ac="AC5", failed=True,
-        title="shipped contracts changed without migration entries in range",
-        detail="\n  ".join(["these commits modified shipped+protected YAMLs without migrations:"]
-                            + offending),
-        next_steps=[
-            "Inspect: git show <sha> -- <path>",
-            "Add a migration entry in a follow-up commit, OR",
-            "Rewrite history: git rebase -i <remote_oid>; for each offending commit add migrations:",
-            "Or push through: ag push --skip-gate \"<reason>\"   (audited, sparingly)",
-        ],
+    return GateResult.from_reason(
+        messages.RANGE_MIGRATIONS_MISSING,
+        detail="\n  ".join(
+            ["these commits modified shipped+protected YAMLs without migrations:"]
+            + offending
+        ),
     )
 
 
@@ -616,7 +622,9 @@ def _color(s: str, code: str) -> str:
     return s if not sys.stderr.isatty() else f"{code}{s}{_RESET}"
 
 
-def print_blocked(failures: list[GateResult]) -> None:
+def print_blocked(failures: list[GateResult], *, verbose: bool = False) -> None:
+    """Structured BLOCKED output. With `verbose=True`, expand each failure
+    with the catalog's `verbose_detail` + `plan_ref` (R-012)."""
     sys.stderr.write(_color("\n━━━ pre-push gate BLOCKED ━━━\n", _RED + _BOLD))
     sys.stderr.write(f"{len(failures)} check(s) failed:\n\n")
     for i, fail in enumerate(failures, 1):
@@ -628,9 +636,23 @@ def print_blocked(failures: list[GateResult]) -> None:
             sys.stderr.write(_color("    suggested next steps:\n", _YELLOW))
             for step in fail.next_steps:
                 sys.stderr.write(f"      • {step}\n")
+        if verbose and fail.reason is not None:
+            if fail.reason.verbose_detail:
+                sys.stderr.write("\n")
+                for line in fail.reason.verbose_detail.splitlines():
+                    sys.stderr.write(f"    {line}\n")
+            if fail.reason.plan_ref:
+                sys.stderr.write(f"\n    Plan ref: {fail.reason.plan_ref}\n")
         sys.stderr.write("\n")
     sys.stderr.write(_color("To bypass with audit (use sparingly):\n", _YELLOW))
-    sys.stderr.write("  ag push --skip-gate \"<reason>\"\n\n")
+    sys.stderr.write("  ag push --skip-gate \"<reason>\"\n")
+    if not verbose:
+        sys.stderr.write(_color(
+            "Tip: re-run with explicit invocation for expanded detail + plan refs:\n"
+            "  python3 .agentic/lib/hooks/prepush_gate.py --verbose\n",
+            _YELLOW,
+        ))
+    sys.stderr.write("\n")
 
 
 def print_passed(results: list[GateResult]) -> None:
@@ -654,7 +676,7 @@ _CHECKS = [
 ]
 
 
-def run_gate(ctx: GateContext) -> int:
+def run_gate(ctx: GateContext, *, verbose: bool = False) -> int:
     results = [check(ctx) for check in _CHECKS]
     failures = [r for r in results if r.failed]
     _emit_event(
@@ -665,7 +687,7 @@ def run_gate(ctx: GateContext) -> int:
                  "blocked": bool(failures)},
     )
     if failures:
-        print_blocked(failures)
+        print_blocked(failures, verbose=verbose)
         _emit_event(
             type="gate_blocked", session_id=ctx.session_id,
             payload={"gate": "prepush",
@@ -682,6 +704,8 @@ def main(argv: Optional[list[str]] = None) -> int:
                         help="Run as if invoked by CI (currently identical).")
     parser.add_argument("--print-context", action="store_true",
                         help="Print resolved context and exit.")
+    parser.add_argument("--verbose", "-v", action="store_true",
+                        help="Print expanded explanations and plan refs for blocked checks (R-012).")
     # git invokes pre-push with `<remote-name> <remote-url>` as positional args.
     parser.add_argument("remote_name", nargs="?", default="")
     parser.add_argument("remote_url", nargs="?", default="")
@@ -711,7 +735,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 f"pre-push gate skipped (audited): {reason}\n", _YELLOW))
         return 0
 
-    return run_gate(ctx)
+    return run_gate(ctx, verbose=args.verbose)
 
 
 if __name__ == "__main__":
