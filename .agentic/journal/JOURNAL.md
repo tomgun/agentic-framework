@@ -5998,3 +5998,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-28 08:18 - R-016 shipped — Phase 0 verification battery on main
+
+**Why**: Original R-016 in redesign-backlog had B01-B12 attack list copy-pasted from sibling close-out-hardening doc; only 2/12 attacks cleanly mapped to Phase 0 surfaces. Plan revision realigned attack vectors to declared deps. Six rounds of dialectical Critic+Advocate review surfaced 13 architectural bugs total before convergence.
+
+**Decision**: Realign attack vectors to declared dependencies (preserve 12-test budget; swap composition); structured event assertions (not stderr text) for AC matching; manifest-driven pass criteria for FAILs
+
+**What changed**:
+- PR #244 squash-merged as 1dbca588. Phase 0 closeout's largest single deliverable: adversarial test suite proves Tier 0 catches each documented bypass attempt cross-profile. 12 × 3 = 36-cell pass/fail matrix targeting R-001/R-002/R-004/R-005/R-010 surfaces. Manifest-driven pass criteria via known-fails.yaml — orchestrator exits 2 on unlisted FAILs. Each B-test annotated with code-path-traced reference to the gate function:line it should trigger; structured event assertions (gate_blocked.payload.failures AC-ID match) survive messages.py wording changes. Co-shipped: journal-shape rule in committing-changes skill + no-autorecord rule hoisted into the canonical template (propagates to cursor/copilot/codex/memory-seed). VERSION bumped 0.84.0 → 0.84.1.
+
+**Next steps**:
+- Phase 0 closeout: R-014 (TUI quota burn-down ring) + R-015 (ag hooks register) remain. Then Phase 1 — R-101 Token Ledger visible — opens.
+
+**Blockers**: None
+
