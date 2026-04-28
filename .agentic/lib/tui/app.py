@@ -67,6 +67,7 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
     from .panels.events import make_panel as make_events
     from .panels.drilldown import make_panel as make_drilldown
     from .panels.health import make_panel as make_health
+    from .panels.quota_alert import make_modal_screen, should_show_modal
 
     state = DashboardState(feature=feature, profile=profile, mode=mode)
     state.set_quota_window(quota_window_tokens)
@@ -92,6 +93,9 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             self._drilldown = None
             self._health = None
             self._selected_idx: Optional[int] = None
+            self._prev_quota_alert: Optional[str] = None
+            self._quota_modal_acknowledged = False
+            self._QuotaAlertScreen = make_modal_screen()
 
         def compose(self) -> ComposeResult:  # type: ignore[override]
             self._header = make_header()
@@ -111,10 +115,12 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             tail.start(on_record=lambda rec: state.apply_record(rec))
             # Full panel refresh — events arrive at human-perceivable cadence.
             self.set_interval(0.5, self._refresh)
-            # Quota burn-down ring updates on a slower cadence per AC6 — the
-            # token-ledger doesn't change shape often enough to warrant the
-            # same 0.5s rebuild as the events panel.
+            # Quota tick handles the tooltip rebuild + health resync. Token
+            # ledger doesn't change shape often, so 30s is plenty. set_interval
+            # doesn't fire immediately on register, so seed once now so the
+            # tooltip isn't empty until the first 30s tick.
             self.set_interval(30.0, self._refresh_quota_only)
+            self._refresh_quota_only()
 
         def on_unmount(self) -> None:  # type: ignore[override]
             tail.stop()
@@ -125,15 +131,46 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
                       self._drilldown, self._health):
                 if w is not None:
                     w.update_from(snap)
+            # Modal trigger lives on the fast tick so the rising edge to 95%
+            # is caught within ~0.5s rather than waiting up to 30s for the
+            # quota refresh — the underlying snapshot data is already fresh
+            # via the streams tail.
+            self._maybe_show_quota_modal(snap)
 
         def _refresh_quota_only(self) -> None:
-            """Quota-specific tick — updates only header + health (where the
-            quota signals appear). R-014 layers the burn-down ring on top
-            of this hook."""
+            """Quota-specific 30s tick — refreshes the by-tier tooltip on the
+            header (more expensive than the line text) and lets the health
+            panel resync. The modal trigger runs on the 0.5s `_refresh`
+            tick (see `_maybe_show_quota_modal`)."""
             snap = state.snapshot()
-            for w in (self._header, self._health):
-                if w is not None:
-                    w.update_from(snap)
+            if self._header is not None:
+                self._header.update_tooltip_from(snap)
+            if self._health is not None:
+                self._health.update_from(snap)
+
+        def _maybe_show_quota_modal(self, snap) -> None:
+            """Push the 95% modal on rising edge. Reset acknowledgement when
+            the alert level drops below 95% so the next episode re-prompts."""
+            cur = snap.health.quota_alert
+            if cur != "95%":
+                self._quota_modal_acknowledged = False
+            if should_show_modal(self._prev_quota_alert, cur,
+                                 self._quota_modal_acknowledged):
+                # Default fallback: the alert is "95%" so quota_pct must be
+                # >= 95.0; this branch only runs in pathological races where
+                # the snapshot lost it. Use an explicit None check so a
+                # legitimate 0.0 reading wouldn't fall back to 95.
+                pct = snap.header.quota_pct if snap.header.quota_pct is not None else 95.0
+                self.push_screen(
+                    self._QuotaAlertScreen(pct=pct),
+                    self._handle_quota_modal_choice,
+                )
+            self._prev_quota_alert = cur
+
+        def _handle_quota_modal_choice(self, choice) -> None:
+            self._quota_modal_acknowledged = True
+            if choice == "abort":
+                self.action_abort()
 
         # --- key actions ---
 
@@ -144,8 +181,16 @@ def run_tui(*, journal_dir: Path, feature: str = "—",
             )
 
         def action_abort(self) -> None:
-            self.notify("Abort signal not yet wired (R-014/R-209). q to quit.",
-                        title="ag tui · abort", severity="warning")
+            # R-014 ships the modal that calls into here; the actual signal-
+            # to-lead-PID wiring is tracked under R-209. Until then this is
+            # a notify so the user sees a confirmation that the modal's
+            # Abort path was reached.
+            self.notify(
+                "Abort acknowledged. Signal-to-lead-PID wiring lands in "
+                "R-209; press q to quit this dashboard now.",
+                title="ag tui · abort",
+                severity="warning",
+            )
 
         def action_next_event(self) -> None:
             snap = state.snapshot()

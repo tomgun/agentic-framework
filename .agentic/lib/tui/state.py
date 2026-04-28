@@ -59,6 +59,7 @@ class HeaderSnapshot:
     started_at: Optional[str]
     elapsed_seconds: int
     eta_seconds: Optional[int]
+    by_tier: dict[str, int] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -235,6 +236,7 @@ class DashboardState:
         self._workers: dict[str, _WorkerState] = {}
         self._events: list[EventSnapshot] = []
         self._tokens_total = 0
+        self._by_tier: dict[str, int] = {}
         self._quota_window_tokens: Optional[int] = None
         self._escalations = 0
         self._last_blocked_reason: Optional[str] = None
@@ -328,10 +330,17 @@ class DashboardState:
         self._push_event(ev)
 
     def _apply_token_ledger(self, r: dict) -> None:
+        tier = r.get("tier")
+        if not isinstance(tier, str) or not tier:
+            tier = "unknown"
+        line_total = 0
         for f in ("tokens_in", "tokens_out"):
             v = r.get(f)
             if isinstance(v, int) and v > 0:
-                self._tokens_total += v
+                line_total += v
+        if line_total > 0:
+            self._tokens_total += line_total
+            self._by_tier[tier] = self._by_tier.get(tier, 0) + line_total
 
     # -- helpers ---------------------------------------------------------
 
@@ -437,6 +446,7 @@ class DashboardState:
                     started_at=self._started_at,
                     elapsed_seconds=elapsed,
                     eta_seconds=None,
+                    by_tier=dict(self._by_tier),
                 ),
                 workers=workers,
                 events=list(self._events),

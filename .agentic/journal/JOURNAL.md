@@ -6041,3 +6041,61 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: —
 
+
+### Session: 2026-04-28 09:12 - R-014 shipped: TUI quota burn-down ring + alerts
+
+**Why**: Phase 0 closeout cluster — R-014 surfaces the quota signal R-013 already computes; without it, autonomous runs hit Pro/Max limits with no visual warning. Pairs with R-008 ag tui as the user-facing observability layer.
+
+**Decision**: Frozen-dataclass HeaderSnapshot extended with by_tier dict (default_factory). Ring char + color emitted as Rich markup so single header_lines() function serves both the Textual widget (renders color) and tests (substring check). Modal abort routes to existing action_abort no-op pending R-209 signal-to-PID wiring — keeps R-014 scope tight.
+
+**What changed**:
+- Header now renders a colored Unicode quarter-circle ring (○◔◐◕●) next to the percentage, with thresholded color (green<70 / yellow<85 / dark_orange<95 / red≥95). Tooltip on header shows by-tier token breakdown. New ModalScreen fires once per 95% episode (rising-edge logic with ack-suppression and reset-on-fall) and routes to existing action_abort hook. State.py extended with _by_tier accumulation from token-ledger 'tier' field.
+
+**Next steps**:
+- R-015 ag hooks register next (1d) — last item before Phase 0 closes
+
+**Blockers**: —
+
+
+### Session: 2026-04-28 09:36 - R-015 shipped: ag hooks register/unregister + auto-install on ag init
+
+**Why**: Phase 0 closeout — fresh installs needed a one-shot 'arm Tier 0' command. Without it, projects that cloned the framework had to either know about core.hooksPath OR manually copy the launcher shims. Pairs with R-004 (integrity baseline) so register leaves the project in a verified state, not just hooked.
+
+**Decision**: register/unregister write directly to .git/hooks/ (transparent, immediately visible via 'ls .git/hooks/') rather than core.hooksPath redirection (the F-0300 'install' transport remains for shared-repo workflows). Both transports are preserved — projects pick whichever fits. Test sandbox copies the framework lib into a tmp git repo and runs ag end-to-end (mirrors test_merge_gate.sh pattern).
+
+**What changed**:
+- New ag hooks register subcommand writes the canonical pre-commit + pre-push shim launchers directly to .git/hooks/, backs up any divergent existing hooks under .git/hooks/.backup-<ts>/, then refreshes the R-004 integrity baseline. Idempotent — second run is a no-op. ag hooks unregister restores the most recent backup (or removes shims cleanly when no backup exists). cmd_init now invokes register on both the already-initialized fast path and the guidance path, so fresh installs and re-runs both end with hooks armed. cmd_hooks moved out of operations.sh into its own commands/hooks.sh; install/status/disable preserved alongside the new subcommands.
+
+**Next steps**:
+- Phase 0 closeout complete (R-001..R-016). Phase 1 R-101 (Token Ledger visible) opens.
+
+**Blockers**: —
+
+
+### Session: 2026-04-28 13:00 - PR #246 review fixes — addressed all 11 issues
+
+**Why**: External review of PR #246 surfaced 11 actionable issues (4 R-014, 7 R-015) covering modal latency, falsy-coalesce, tooltip cadence, format-change doc, AC1 deviation, idiom, race window, atomicity, init UX, baseline semantics, test fragility. Each addressed in place; tests extended; no behavioural regressions.
+
+**Decision**: _hooks_dir always returns .git/hooks/ (matches AC1 literally; install/F-0300 remains the dedicated transport for core.hooksPath workflows). Modal trigger moved to fast tick — same snapshot data, lower latency, no extra cost. Header panel split into text vs tooltip update methods (cheap text rebuild stays at 0.5s; tooltip per-tier sort/% math at 30s). Atomic shim writes use sibling temp + mv to preserve prior state on crash mid-write.
+
+**What changed**:
+- R-014: modal trigger moved from 30s to 0.5s tick (catches 95% rising edge promptly); HeaderPanel split into update_from (text, every 0.5s) + update_tooltip_from (heavier by-tier math, every 30s); 0.0 falsy-coalesce replaced with explicit None check; format-change docstring added with regex migration hint. R-015: dropped core.hooksPath redirect from _hooks_dir (AC1 literal); replaced diff -q <(cat) with diff -q -; backup-dir now timestamp+pid+seq; atomic shim writes via temp+mv; cmd_init silent on no-op via new _hooks_already_registered helper; explicit design-choice comment block on unregister + integrity update; AC3 test parses JSON structurally; new AC6b test covers the silent path.
+
+**Next steps**:
+- PR review pass complete. Ready for re-review + merge.
+
+**Blockers**: —
+
+
+### Session: 2026-04-28 13:32 - Phase 0 manual smokes deferred to post-V5
+
+**Why**: User asked to document the smoke procedures for later. The two manual checks couldn't run in the merge-time container (need pip install textual + a fresh sandbox); deferring is acceptable since deterministic tests + 846 ACs cover the structural correctness.
+
+**What changed**:
+- Captured both manual verifications (R-014 Textual ring/modal, R-015 ag hooks register against fresh project) in tests/smoke/phase-0-manual-smoke.md with expected-behaviour tables. T-0098 added with trigger condition + background + related links per the TODO-context rule.
+
+**Next steps**:
+- Squash-merge PR #246 when ready; smokes will run after the full V5 refactoring is shipped
+
+**Blockers**: —
+

@@ -371,7 +371,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-014 · TUI quota burn-down ring + alerts
-**Status:** planned · **Effort:** 2d · **Deps:** R-008, R-013
+**Status:** shipped · **Effort:** 2d · **Deps:** R-008, R-013
 **Plan ref:** plan §"Quota awareness"
 **Goal:** Live quota visualization in `ag tui` header.
 
@@ -392,7 +392,7 @@ R-007 (JSONL schema) → R-001 (pre-commit gate) → R-002 (pre-push gate) → R
 ---
 
 ### R-015 · `ag hooks register` + integrity baseline init
-**Status:** planned · **Effort:** 1d · **Deps:** R-004
+**Status:** shipped · **Effort:** 1d · **Deps:** R-004
 **Plan ref:** plan §"Tier 0 — Local primitives" + R-004
 **Goal:** Single command installs git hooks + initializes integrity baseline. Idempotent.
 

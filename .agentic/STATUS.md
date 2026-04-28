@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Wave B merged (22b4877b). Phase 0 feature-complete except R-014 (TUI quota ring), R-015 (ag hooks register), R-016 (bypass test battery). Phase 1 (R-101+) unblocked. (Updated: 2026-04-27 16:22 UTC)
+- Phase 0 closeout complete (R-001..R-016). PR #246 carries R-014 + R-015. Phase 1 R-101 (Token Ledger visible) opens. (Updated: 2026-04-28 09:37 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
@@ -34,4 +34,4 @@ Purpose: the living "truth" of where the Agentic Framework development is today.
 ## Release notes (optional)
 - v0.58.0: F-0239 structural enforcement for post-merge workflow
 - See CHANGELOG.md for full history
-- QA: QA: 0/1 verified, 12 pending
+- QA: QA: 0/1 verified, 12 pending OVERDUE
