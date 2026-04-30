@@ -60,6 +60,15 @@ class HeaderSnapshot:
     elapsed_seconds: int
     eta_seconds: Optional[int]
     by_tier: dict[str, int] = field(default_factory=dict)
+    # R-101: per-session + rolling-window view, populated from token-ledger
+    # ingestion below. The header panel renders a one-line "Session • Roll •
+    # Top feature" summary when current_session_tokens > 0.
+    current_session_id: Optional[str] = None
+    current_session_tokens: int = 0
+    rolling_window_tokens: int = 0
+    rolling_window_sessions: int = 0
+    top_feature_label: Optional[str] = None
+    top_feature_tokens: int = 0
 
 
 @dataclass(frozen=True)
@@ -238,6 +247,14 @@ class DashboardState:
         self._tokens_total = 0
         self._by_tier: dict[str, int] = {}
         self._quota_window_tokens: Optional[int] = None
+        # R-101: per-session running totals + per-session top-feature counts.
+        # Bounded growth: pruned to last `_session_window` distinct sessions
+        # by last-seen monotonic clock. We also track the last session_id
+        # seen so the panel can surface "current session" without re-scanning.
+        self._session_window: int = 30
+        self._session_totals: dict[str, dict] = {}
+        self._session_seen: dict[str, float] = {}
+        self._recent_session_id: Optional[str] = None
         self._escalations = 0
         self._last_blocked_reason: Optional[str] = None
         self._has_unresolved_human_needed = False
@@ -338,9 +355,39 @@ class DashboardState:
             v = r.get(f)
             if isinstance(v, int) and v > 0:
                 line_total += v
-        if line_total > 0:
-            self._tokens_total += line_total
-            self._by_tier[tier] = self._by_tier.get(tier, 0) + line_total
+        if line_total <= 0:
+            return
+        self._tokens_total += line_total
+        self._by_tier[tier] = self._by_tier.get(tier, 0) + line_total
+
+        # R-101: per-session aggregation. Records lacking session_id are
+        # tier-counted above but skipped here — they can't contribute to
+        # session views.
+        sid = r.get("session_id")
+        if not isinstance(sid, str) or not sid:
+            return
+        feature = r.get("feature")
+        if not isinstance(feature, str) or not feature:
+            feature = "(untagged)"
+        bucket = self._session_totals.setdefault(
+            sid, {"tokens": 0, "features": {}}
+        )
+        bucket["tokens"] += line_total
+        bucket["features"][feature] = bucket["features"].get(feature, 0) + line_total
+        self._session_seen[sid] = self._clock()
+        self._recent_session_id = sid
+
+        # Bounded growth: when we cross 2x the window, prune oldest by
+        # last-seen so memory stays O(window).
+        if len(self._session_totals) > self._session_window * 2:
+            ordered = sorted(self._session_seen.items(), key=lambda kv: -kv[1])
+            keep = {sid for sid, _ in ordered[: self._session_window]}
+            self._session_totals = {
+                k: v for k, v in self._session_totals.items() if k in keep
+            }
+            self._session_seen = {
+                k: v for k, v in self._session_seen.items() if k in keep
+            }
 
     # -- helpers ---------------------------------------------------------
 
@@ -437,6 +484,40 @@ class DashboardState:
             if quota_alert == "95%":
                 health_status = "red"
 
+            # R-101: per-session + rolling-window aggregation
+            current_session_id = self._recent_session_id
+            current_session_tokens = 0
+            rolling_total = 0
+            rolling_count = 0
+            top_feature_tokens = 0
+            top_feature_label: Optional[str] = None
+            if self._session_totals:
+                ordered = sorted(
+                    self._session_seen.items(),
+                    key=lambda kv: -kv[1],
+                )[: self._session_window]
+                rolling_count = len(ordered)
+                feature_counts: dict[str, int] = {}
+                for sid, _ in ordered:
+                    bucket = self._session_totals.get(sid)
+                    if not bucket:
+                        continue
+                    rolling_total += bucket["tokens"]
+                    for f, v in bucket["features"].items():
+                        feature_counts[f] = feature_counts.get(f, 0) + v
+                if current_session_id:
+                    current_bucket = self._session_totals.get(current_session_id)
+                    if current_bucket:
+                        current_session_tokens = current_bucket["tokens"]
+                # Pick the highest-burn non-untagged label; fall back to
+                # untagged if it's the only thing present.
+                tagged = {k: v for k, v in feature_counts.items() if k != "(untagged)"}
+                source = tagged or feature_counts
+                if source:
+                    top_feature_label, top_feature_tokens = max(
+                        source.items(), key=lambda kv: kv[1]
+                    )
+
             return DashboardSnapshot(
                 header=HeaderSnapshot(
                     feature=self.feature, profile=self.profile, mode=self.mode,
@@ -447,6 +528,12 @@ class DashboardState:
                     elapsed_seconds=elapsed,
                     eta_seconds=None,
                     by_tier=dict(self._by_tier),
+                    current_session_id=current_session_id,
+                    current_session_tokens=current_session_tokens,
+                    rolling_window_tokens=rolling_total,
+                    rolling_window_sessions=rolling_count,
+                    top_feature_label=top_feature_label,
+                    top_feature_tokens=top_feature_tokens,
                 ),
                 workers=workers,
                 events=list(self._events),

@@ -6168,3 +6168,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-30 20:13 - R-101 commit 4/5
+
+**Why**: Five-panel layout had to stay intact; folding into header.py was cheaper than adding a sixth panel
+
+**What changed**:
+- TUI header now shows the R-101 view: a second line with Session / Roll (N sess) / Top feature beneath the existing R-014 quota ring. State.py grew per-session aggregation bounded by a 30-session window with O(1) prune. Header CSS switched to height: auto so the panel collapses back to one line when no token data has been ingested.
+
+**Next steps**:
+- Commit 5/5: instruction file updates
+
+**Blockers**: None
+

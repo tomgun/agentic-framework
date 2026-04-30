@@ -82,12 +82,23 @@ def _fmt_duration(seconds: int) -> str:
     return f"{s}s"
 
 
+def _fmt_tokens_short(n: int) -> str:
+    """Compact display: 287000 → 287K, 4100000 → 4.1M (R-101)."""
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.1f}M"
+    if n >= 1_000:
+        return f"{n // 1_000}K"
+    return str(n)
+
+
 def header_lines(snap: "DashboardSnapshot") -> list[str]:
     """Return the header line(s) as Rich-markup strings.
 
-    When the snapshot has a quota window, the percentage is rendered as a
-    colored ring (`◔ 25%`) wrapped in `[<color>]…[/]` so Textual prints it
-    in the alert color. Without a window, the raw token count is shown.
+    Line 1 (always): feature/profile/mode/tokens-total/ring/elapsed/ETA.
+    Line 2 (R-101, when there's per-session data): "Session 287K • Roll 4.1M
+      (12 sess) • Top F-006 612K". Skipped when no session data has been
+      ingested yet — keeps the header at one line until the ledger has
+      something to say.
     """
     h = snap.header
     parts = [
@@ -110,7 +121,25 @@ def header_lines(snap: "DashboardSnapshot") -> list[str]:
     parts.append(f"elapsed={_fmt_duration(h.elapsed_seconds)}")
     if h.eta_seconds is not None:
         parts.append(f"ETA={_fmt_duration(h.eta_seconds)}")
-    return ["  |  ".join(parts)]
+    lines = ["  |  ".join(parts)]
+
+    # R-101: second line — per-session + rolling-window summary.
+    if h.current_session_tokens > 0 or h.rolling_window_tokens > 0:
+        bits: list[str] = []
+        if h.current_session_tokens > 0:
+            bits.append(f"Session {_fmt_tokens_short(h.current_session_tokens)}")
+        if h.rolling_window_sessions > 0:
+            bits.append(
+                f"Roll {_fmt_tokens_short(h.rolling_window_tokens)} "
+                f"({h.rolling_window_sessions} sess)"
+            )
+        if h.top_feature_label and h.top_feature_tokens > 0:
+            bits.append(
+                f"Top {h.top_feature_label} {_fmt_tokens_short(h.top_feature_tokens)}"
+            )
+        if bits:
+            lines.append("[dim]" + " • ".join(bits) + "[/]")
+    return lines
 
 
 def by_tier_tooltip(snap: "DashboardSnapshot") -> str:
@@ -140,7 +169,9 @@ def make_panel():
     from textual.widgets import Static  # type: ignore
 
     class HeaderPanel(Static):
-        DEFAULT_CSS = "HeaderPanel { dock: top; height: 1; padding: 0 1; background: $primary-darken-2; color: $text; }"
+        # height: auto so the panel grows to two lines when R-101 token-ledger
+        # data is present and shrinks back to one when it isn't.
+        DEFAULT_CSS = "HeaderPanel { dock: top; height: auto; padding: 0 1; background: $primary-darken-2; color: $text; }"
 
         def update_from(self, snap: "DashboardSnapshot") -> None:
             """Rewrite the header text. Cheap; safe to call on every tick.
