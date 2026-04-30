@@ -6181,3 +6181,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-30 20:17 - R-101 commit 5/5
+
+**Why**: Per instruction-files-are-part-of-the-feature: a new ag command must reach all agents to be useful
+
+**What changed**:
+- Instruction-file sync. Added ag intel report --tokens to: CLAUDE.md (root + template), cursorrules (root + template), copilot-instructions.md (.github + template), codex-instructions.md (template), memory-seed.md (quick commands + tokens trigger word), CHANGELOG.md Unreleased. The view is now discoverable from every agent surface.
+
+**Next steps**:
+- PR: open feat/R-101-token-ledger-visible PR; doc gate via ag done post-merge bumps VERSION
+
+**Blockers**: None
+

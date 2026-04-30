@@ -23,6 +23,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag watch [--filter k=v] [--since 1h] [--from-start] [--once]` — color-coded events.jsonl tail for SSH (R-009); stdlib only
 - `ag fix "<reason>"` — hotfix-mode commit (R-010): skips spec-existence + plan-approval, keeps tests/journal/migrations/integrity
 - `ag intel report --quota` — Pro/Max session usage in last 5h: per-tier/per-model breakdown, alerts at 70/85/95% (R-013)
+- `ag intel report --tokens` — current session + rolling-30 token usage by tier/model/feature (R-101)
 - `ag onboard` — generate `.agentic/ONBOARDING.md` for new contributors (R-011)
 - `ag phase list F-XXXX` | `ag phase done F-XXXX <id>` | `ag phase active` | `ag phase sync`
 - `ag auto task F-XXXX` | `ag auto epic F-XXXX` | `ag auto verify` | `ag auto crunch`

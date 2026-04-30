@@ -33,6 +33,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag tui` — Textual mission-control dashboard (R-008) live-tailing JSONL streams; needs `pip install textual`
 - `ag watch [--filter k=v] [--since 1h] [--from-start] [--once]` — color-coded events.jsonl tail for SSH (R-009); stdlib only
 - `ag intel report --quota` — Pro/Max session quota usage in last 5h: per-tier/per-model breakdown, alerts at 70/85/95%, projected exhaustion (R-013)
+- `ag intel report --tokens` — current-session + rolling-30-session token usage: by tier/model/feature (R-101)
 - `ag onboard` — generate `.agentic/ONBOARDING.md` for new contributors (R-011)
 - `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX` | `ag contract migrate F-XXXX --reason "..." [--set K=V | --add-assertion "..."]` (sanctioned mutation path for shipped/read-only contracts; R-005)
 - `ag integrity status` | `ag integrity update` — hook + agent + .claude config baseline (R-004); pre-commit verifies before any other check
