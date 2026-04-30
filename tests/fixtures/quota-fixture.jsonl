@@ -1,0 +1,8 @@
+{"ts":"2026-04-28T10:00:00.000Z","session_id":"sess-A","model":"claude-opus-4-7","tier":"tier1","tokens_in":10000,"tokens_out":2000,"cache_read_tokens":50000,"cache_write_tokens":1500,"feature":"F-006","actor":"assistant"}
+{"ts":"2026-04-28T10:30:00.000Z","session_id":"sess-A","model":"claude-opus-4-7","tier":"tier1","tokens_in":12000,"tokens_out":3500,"cache_read_tokens":62000,"cache_write_tokens":1700,"feature":"F-006","actor":"assistant"}
+{"ts":"2026-04-28T10:45:00.000Z","session_id":"sess-A","model":"claude-haiku-4-5","tier":"tier1","tokens_in":4000,"tokens_out":900,"cache_read_tokens":18000,"cache_write_tokens":400,"feature":"F-006","actor":"assistant"}
+{"ts":"2026-04-28T11:15:00.000Z","session_id":"sess-B","model":"claude-opus-4-7","tier":"tier1","tokens_in":7500,"tokens_out":1800,"cache_read_tokens":31000,"cache_write_tokens":900,"feature":"F-008","actor":"assistant"}
+{"ts":"2026-04-28T11:25:00.000Z","session_id":"sess-B","model":"claude-opus-4-7","tier":"tier2","tokens_in":3000,"tokens_out":600,"cache_read_tokens":9000,"cache_write_tokens":250,"actor":"assistant"}
+{"ts":"2026-04-28T11:40:00.000Z","session_id":"sess-B","model":"claude-haiku-4-5","tier":"tier1","tokens_in":2500,"tokens_out":700,"cache_read_tokens":11000,"cache_write_tokens":300,"feature":"F-008","actor":"assistant"}
+{"ts":"2026-04-28T12:00:00.000Z","session_id":"sess-C","model":"claude-opus-4-7","tier":"tier1","tokens_in":15000,"tokens_out":4200,"cache_read_tokens":80000,"cache_write_tokens":2200,"feature":"F-006","actor":"assistant"}
+{"ts":"2026-04-28T12:30:00.000Z","session_id":"sess-C","model":"claude-opus-4-7","tier":"tier1","tokens_in":18000,"tokens_out":5000,"cache_read_tokens":92000,"cache_write_tokens":2400,"feature":"F-006","actor":"assistant"}

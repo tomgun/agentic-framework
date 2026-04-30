@@ -1,0 +1,23 @@
+{
+  "advice": [],
+  "alert_level": null,
+  "by_model": {
+    "claude-haiku-4-5": 8100,
+    "claude-opus-4-7": 82600
+  },
+  "by_tier": {
+    "tier1": 87100,
+    "tier2": 3600
+  },
+  "cache_read_tokens": 353000,
+  "ceiling_tokens": 200000,
+  "projected_exhaustion": "2026-04-28T16:36:54.773980+00:00",
+  "quota_pct": 45.4,
+  "record_count": 8,
+  "tokens_in": 72000,
+  "tokens_out": 18700,
+  "tokens_total": 90700,
+  "window_end": "2026-04-28T13:00:00+00:00",
+  "window_seconds": 18000,
+  "window_start": "2026-04-28T08:00:00+00:00"
+}

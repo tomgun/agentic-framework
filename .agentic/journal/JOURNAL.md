@@ -6155,3 +6155,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-30 20:09 - R-101 commit 3/5
+
+**Why**: ACs 1-3 of R-101 explicitly required current-session + rolling-30 + breakdowns; commits 1+2 only fed the ledger, the report side was still empty
+
+**What changed**:
+- Read-side ag intel report --tokens lands. quota.build_token_report() streams the ledger once, aggregates per session, returns rolling-N. intel.sh --tokens wires through. Golden-master fixture (8 records, 3 sessions, pinned now) plus 16 new tests in test_token_report.py guard the M1 cache_creation accounting from regressing.
+
+**Next steps**:
+- Commit 4/5: TUI tokens line in header.py
+
+**Blockers**: None
+

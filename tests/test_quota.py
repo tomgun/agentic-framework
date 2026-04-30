@@ -520,6 +520,7 @@ def test_main_runs_on_empty_ledger(tmp_path: Path, capsys):
     p = tmp_path / "token-ledger.jsonl"
     p.write_text("", encoding="utf-8")
     rc = quota.main([
+        "--report", "quota",
         "--token-ledger", str(p),
         "--no-color",
     ])
@@ -549,6 +550,7 @@ def test_main_json_flag(tmp_path: Path, capsys):
         ],
     )
     rc = quota.main([
+        "--report", "quota",
         "--token-ledger", str(p),
         "--ceiling-tokens", "1000000",
         "--no-color",
@@ -558,6 +560,39 @@ def test_main_json_flag(tmp_path: Path, capsys):
     blob = capsys.readouterr().out
     parsed = json.loads(blob)
     assert parsed["tokens_total"] == 200
+
+
+def test_main_tokens_report_runs_on_fixture(tmp_path: Path, capsys):
+    """CLI sub-command --report tokens dispatches to build_token_report."""
+    p = tmp_path / "token-ledger.jsonl"
+    real_now = datetime.now(timezone.utc)
+    ts_recent = (real_now - timedelta(seconds=60)).strftime(
+        "%Y-%m-%dT%H:%M:%S.000Z"
+    )
+    _write_ledger(
+        p,
+        [
+            {
+                "ts": ts_recent,
+                "session_id": "s-token-cli",
+                "model": "claude-opus-4-7",
+                "tier": "tier1",
+                "tokens_in": 1000,
+                "tokens_out": 200,
+                "feature": "F-006",
+            }
+        ],
+    )
+    rc = quota.main([
+        "--report", "tokens",
+        "--token-ledger", str(p),
+        "--no-color",
+        "--json",
+    ])
+    assert rc == 0
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed["current_session"]["session_id"] == "s-token-cli"
+    assert parsed["record_count"] == 1
 
 
 # ---------------------------------------------------------------------------
