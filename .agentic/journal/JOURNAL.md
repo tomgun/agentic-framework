@@ -6194,3 +6194,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-05-01 08:50 - R-101 review fixups
+
+**Why**: Independent review surfaced real correctness gaps; fixing on the same PR keeps the audit trail clean rather than merging known-buggy
+
+**What changed**:
+- Round-1 review found 5 issues: HIGH regex missed R-XXX prefixes (this PR's own branch dogfooded the bug — smoke test showed Top (untagged) 43K). MEDIUM watermark temp+rename invalidated flock semantic across writers. MEDIUM _safe_event swallowed all telemetry failures silently. LOW no-ts session exclusion, LOW --report break. All fixed: regex now matches schema's full {F,R,DEV,E,NFR}-N pattern; watermark write now in-place truncate+write under flock; _safe_event writes one stderr line on failure; docstring + CHANGELOG nits added. Three new regression tests: test_feature_attribution_branch_redesign_prefixes, test_watermark_concurrency_no_lost_updates (8 workers × 50 iters = 400 RMWs, no lost updates), test_safe_event_warns_to_stderr_when_telemetry_fails.
+
+**Next steps**:
+- Push fixup to PR #247; await CI mirror
+
+**Blockers**: None
+

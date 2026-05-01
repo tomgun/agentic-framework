@@ -96,7 +96,14 @@ import events  # noqa: E402  — events.append_token_ledger / append_event
 # ---------------------------------------------------------------------------
 
 
-_BRANCH_FEATURE_RE = re.compile(r"^(?:feat|fix|hotfix)/(F-\d{3,4})(?:[-_].*)?$")
+_BRANCH_FEATURE_RE = re.compile(
+    # Match every feature-id prefix the schema enumerates:
+    # F-XXX (capabilities), DEV-XXX (developer tooling), E-XXX (epics),
+    # NFR-XXX (non-functional requirements), R-XXX (redesign tracker).
+    # Mirrors the `feature` field pattern in events.schema.json so the
+    # emitter and the schema can never disagree on what counts as a feature.
+    r"^(?:feat|fix|hotfix)/((?:F|R|DEV|E|NFR)-\d+(?:\.[1-9][0-9]*)*)(?:[-_].*)?$"
+)
 _DEFAULT_TIER = "tier1"
 _DEFAULT_ACTOR = "assistant"
 _WATERMARK_PRUNE_DAYS = 30
@@ -129,7 +136,13 @@ def agents_json_path(project_root: Optional[Path] = None) -> Path:
 
 
 def parse_branch_feature(branch: Optional[str]) -> Optional[str]:
-    """Return F-XXXX captured from a `feat|fix|hotfix/F-XXXX-…` branch, else None."""
+    """Return the feature id captured from a `feat|fix|hotfix/{F,R,DEV,E,NFR}-N…` branch, else None.
+
+    The set of accepted prefixes mirrors the `feature` field in
+    events.schema.json. R-XXX (redesign tracker) is included so framework
+    work-on-the-framework branches like `feat/R-101-…` get attributed
+    instead of falling through to "(untagged)".
+    """
     if not isinstance(branch, str) or not branch:
         return None
     m = _BRANCH_FEATURE_RE.match(branch.strip())
@@ -224,13 +237,43 @@ def _flock_with_retry(fd: int, op: int, *, attempts: int = 50, delay: float = 0.
 
 
 def _read_watermarks(path: Path) -> dict:
-    """Return current watermark dict or {} if missing/unreadable."""
+    """Return current watermark dict or {} if missing/unreadable.
+
+    Path-based read used by tests and SessionStart-recovery (which iterates
+    over watermarks before holding flock). The hot path in main_stop /
+    main_recover uses `_read_watermarks_fd` instead so the read happens on
+    the same fd the flock guards — avoiding the TOCTOU window between
+    open(path) and flock acquisition.
+    """
     if not path.exists():
         return {}
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         return data if isinstance(data, dict) else {}
     except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _read_watermarks_fd(fd: int) -> dict:
+    """Read watermarks from an open fd held under flock.
+
+    Reads the entire file from offset 0. Used by the production hot path so
+    the read+modify+write cycle stays bound to a single inode that the flock
+    actually serializes against.
+    """
+    try:
+        os.lseek(fd, 0, os.SEEK_SET)
+        chunks: list[bytes] = []
+        while True:
+            buf = os.read(fd, 65536)
+            if not buf:
+                break
+            chunks.append(buf)
+        if not chunks:
+            return {}
+        data = json.loads(b"".join(chunks).decode("utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
         return {}
 
 
@@ -259,12 +302,34 @@ def _prune_watermarks(data: dict, *, now: Optional[datetime] = None, days: int =
     return data
 
 
-def _write_watermarks_atomic(path: Path, data: dict) -> None:
-    """Atomic write via temp+rename; caller is responsible for holding flock."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + f".tmp.{os.getpid()}")
-    tmp.write_text(json.dumps(data, sort_keys=True, indent=2), encoding="utf-8")
-    os.replace(tmp, path)
+def _write_watermarks_inplace(fd: int, data: dict) -> None:
+    """Truncate + write watermarks to the held fd without changing the inode.
+
+    The earlier implementation used temp+rename for crash-atomicity, but
+    rename swaps the inode underneath any concurrent fd. A second writer that
+    opened the wm_path AFTER the rename gets a fresh inode — and its flock
+    no longer serializes against an outstanding flock on the unlinked inode.
+    Two simultaneous Stop hooks could then have one update silently lost.
+
+    In-place truncate+write keeps every writer bound to the same inode, so
+    flock holds its serialization guarantee. Crash-safety is weaker (a kill
+    between truncate and write leaves the file partially written), but
+    `_read_watermarks{,_fd}` returns `{}` on JSON decode error, and the
+    next emit re-walks from the previous valid watermark — at most one
+    duplicate record per session, idempotent with the per-line watermark
+    update inside `emit_for_transcript`.
+    """
+    payload = json.dumps(data, sort_keys=True, indent=2).encode("utf-8")
+    os.lseek(fd, 0, os.SEEK_SET)
+    os.ftruncate(fd, 0)
+    os.write(fd, payload)
+    try:
+        os.fsync(fd)
+    except OSError:
+        # fsync can fail on some filesystems (e.g. tmpfs in tests); the
+        # caller's flock + the JSON-on-error fallback in _read_watermarks
+        # are enough to keep correctness.
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -360,7 +425,16 @@ def _build_record(line: dict) -> Optional[dict]:
 
 
 def _safe_event(event_type: str, payload: dict) -> None:
-    """Emit a telemetry event; swallow all errors (telemetry never blocks)."""
+    """Emit a telemetry event; swallow errors (telemetry never blocks).
+
+    R9 mitigation depends on schema-drift events reaching events.jsonl so the
+    user sees them via `ag watch --filter type=token_emit_schema_change`. If
+    `events.append_event` itself fails (disk full, lock contention, encoding
+    error), a silent swallow would defeat that purpose. We log a single
+    one-line warning to stderr so the failure is at least observable in
+    Claude Code's hook output, while still keeping `exit 0` semantics so
+    the hook never blocks the user's session.
+    """
     try:
         events.append_event(
             type=event_type,
@@ -369,8 +443,15 @@ def _safe_event(event_type: str, payload: dict) -> None:
             payload=payload,
             feature=None,
         )
-    except Exception:
-        pass
+    except Exception as exc:
+        try:
+            sys.stderr.write(
+                f"[token_emit] telemetry write failed: "
+                f"event_type={event_type} err={type(exc).__name__}: {exc}\n"
+            )
+        except Exception:
+            # stderr itself is unwritable — give up; we tried.
+            pass
 
 
 # ---------------------------------------------------------------------------
@@ -499,14 +580,17 @@ def main_stop() -> int:
 
     wm_path = watermark_path()
     wm_path.parent.mkdir(parents=True, exist_ok=True)
-    # Open with O_RDWR | O_CREAT for flock + atomic update.
+    # Open ONCE for the read+modify+write cycle. Reading and writing both
+    # happen on this fd — under flock — so the inode flock guards never
+    # changes underneath a concurrent writer (see _write_watermarks_inplace
+    # for the rationale).
     fd = os.open(str(wm_path), os.O_RDWR | os.O_CREAT, 0o644)
     try:
         _flock_with_retry(fd, fcntl.LOCK_EX)
-        watermarks = _read_watermarks(wm_path)
+        watermarks = _read_watermarks_fd(fd)
         _prune_watermarks(watermarks)
         emit_for_transcript(transcript_path, watermarks)
-        _write_watermarks_atomic(wm_path, watermarks)
+        _write_watermarks_inplace(fd, watermarks)
     finally:
         try:
             fcntl.flock(fd, fcntl.LOCK_UN)
@@ -561,11 +645,11 @@ def main_recover() -> int:
     fd = os.open(str(wm_path_p), os.O_RDWR | os.O_CREAT, 0o644)
     try:
         _flock_with_retry(fd, fcntl.LOCK_EX)
-        watermarks = _read_watermarks(wm_path_p)
+        watermarks = _read_watermarks_fd(fd)
         _prune_watermarks(watermarks)
         for tp in transcripts:
             emit_for_transcript(tp, watermarks)
-        _write_watermarks_atomic(wm_path_p, watermarks)
+        _write_watermarks_inplace(fd, watermarks)
     finally:
         try:
             fcntl.flock(fd, fcntl.LOCK_UN)

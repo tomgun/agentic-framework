@@ -298,11 +298,30 @@ def test_fixture_d_missing_transcript_emits_skip_event():
 
 
 def test_feature_attribution_branch_primary():
-    """Case (i): gitBranch matches feat/F-XXXX → feature_id from regex."""
+    """Case (i): gitBranch matches feat|fix|hotfix/<prefix>-N → feature_id from regex."""
+    # F-XXX (capabilities) — both 3-digit and 4-digit forms
     assert token_emit.parse_branch_feature("feat/F-0006-token-ledger") == "F-0006"
     assert token_emit.parse_branch_feature("feat/F-0123") == "F-0123"
     assert token_emit.parse_branch_feature("fix/F-9999-bug") == "F-9999"
     assert token_emit.parse_branch_feature("hotfix/F-0042") == "F-0042"
+    # 2-digit and 1-digit forms are accepted (matches schema's open-ended `\d+`)
+    assert token_emit.parse_branch_feature("feat/F-12") == "F-12"
+    assert token_emit.parse_branch_feature("feat/F-1") == "F-1"
+    # Sub-feature IDs (dotted form, mirrors events.schema.json `feature` pattern)
+    assert token_emit.parse_branch_feature("feat/F-0006.1-subfeature") == "F-0006.1"
+
+
+def test_feature_attribution_branch_redesign_prefixes():
+    """Spec-schema prefixes beyond F-: R (redesign), DEV, E (epic), NFR.
+
+    Reproduces the bug where `feat/R-101-…` (this PR's own branch) was
+    silently misattributed as `(untagged)` because the regex only knew F-XXX.
+    """
+    assert token_emit.parse_branch_feature("feat/R-101-token-ledger-visible") == "R-101"
+    assert token_emit.parse_branch_feature("hotfix/R-013-quota") == "R-013"
+    assert token_emit.parse_branch_feature("feat/DEV-024-tooling") == "DEV-024"
+    assert token_emit.parse_branch_feature("feat/E-002-epic") == "E-002"
+    assert token_emit.parse_branch_feature("feat/NFR-005-perf") == "NFR-005"
 
 
 def test_feature_attribution_branch_no_match():
@@ -312,8 +331,10 @@ def test_feature_attribution_branch_no_match():
     assert token_emit.parse_branch_feature("chore/state") is None
     assert token_emit.parse_branch_feature(None) is None
     assert token_emit.parse_branch_feature("") is None
-    # Out-of-grammar: 2-digit IDs
-    assert token_emit.parse_branch_feature("feat/F-12") is None
+    # Unknown prefix — shouldn't be inferred as a feature
+    assert token_emit.parse_branch_feature("feat/X-001-unknown") is None
+    # Wrong shape — verb other than feat|fix|hotfix
+    assert token_emit.parse_branch_feature("chore/F-001") is None
 
 
 def test_feature_attribution_agents_json_secondary():
@@ -446,6 +467,37 @@ def test_schema_drift_emits_telemetry_when_input_tokens_missing():
         shutil.rmtree(sandbox, ignore_errors=True)
 
 
+def test_safe_event_warns_to_stderr_when_telemetry_fails():
+    """When events.append_event raises, _safe_event must surface a one-line
+    warning to stderr. Without this, schema-drift telemetry can vanish
+    silently when events.jsonl itself can't be written.
+    """
+    import io
+
+    original_append = events.append_event
+
+    def boom(**kwargs):
+        raise OSError(28, "No space left on device")
+
+    captured = io.StringIO()
+    original_stderr = sys.stderr
+    sys.stderr = captured
+    events.append_event = boom  # type: ignore
+    try:
+        # Should not raise; should write to stderr.
+        token_emit._safe_event(
+            "token_emit_skipped", {"reason": "test", "session_id": "s"}
+        )
+    finally:
+        events.append_event = original_append  # type: ignore
+        sys.stderr = original_stderr
+
+    out = captured.getvalue()
+    assert "telemetry write failed" in out
+    assert "OSError" in out
+    assert "token_emit_skipped" in out
+
+
 # ---------------------------------------------------------------------------
 # Concurrency — 4 different sessionIds writing to the same ledger.
 #
@@ -501,6 +553,96 @@ def test_concurrency_four_sessions_no_corruption():
         assert len(by_session) == 4
         for sid, recs in by_session.items():
             assert len(recs) == per_session, f"{sid}: {len(recs)} != {per_session}"
+    finally:
+        shutil.rmtree(sandbox, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
+# Watermark concurrency — two processes simultaneously updating the wm file
+# under flock must both land. Reproduces the "temp+rename invalidates flock"
+# race the original implementation had.
+# ---------------------------------------------------------------------------
+
+
+def _wm_concurrency_worker(args):
+    """Read+modify+write the watermark file under flock 50× per worker.
+
+    Each worker writes its key (`worker-{i}`) with a monotonically-increasing
+    counter. After all workers finish, the wm file must contain every
+    worker's final counter value — no lost updates.
+    """
+    import fcntl as _fcntl
+    import os as _os
+    import time as _time
+
+    wm_path_s, worker_id, iterations = args
+    sys.path.insert(0, str(_LIB_DIR))
+    sys.path.insert(0, str(_HOOKS_DIR))
+    import token_emit as te  # noqa: E402
+
+    final_counter = 0
+    for i in range(iterations):
+        fd = _os.open(wm_path_s, _os.O_RDWR | _os.O_CREAT, 0o644)
+        try:
+            te._flock_with_retry(fd, _fcntl.LOCK_EX)
+            data = te._read_watermarks_fd(fd)
+            counter = int(data.get(f"worker-{worker_id}", {}).get("counter", 0))
+            counter += 1
+            data[f"worker-{worker_id}"] = {
+                "last_uuid": f"u-{counter}",
+                "last_seen": "2026-05-01T00:00:00Z",
+                "counter": counter,
+            }
+            te._write_watermarks_inplace(fd, data)
+            final_counter = counter
+        finally:
+            try:
+                _fcntl.flock(fd, _fcntl.LOCK_UN)
+            finally:
+                _os.close(fd)
+        # Tiny sleep to broaden the interleaving window
+        _time.sleep(0.0005)
+    return (worker_id, final_counter)
+
+
+def test_watermark_concurrency_no_lost_updates():
+    """Eight workers, 50 iterations each = 400 read-modify-write cycles
+    against the same wm file. Every worker's final counter must match its
+    iteration count — proving no concurrent writer's update was overwritten.
+
+    Regression guard: the prior temp+rename implementation could lose
+    updates when two writers' flocks fell on different inodes.
+    """
+    sandbox = _make_sandbox()
+    try:
+        wm_path = sandbox / ".agentic" / "session" / ".token-ledger-watermarks.json"
+        wm_path.parent.mkdir(parents=True, exist_ok=True)
+
+        n_workers = 8
+        iterations = 50
+        configs = [(str(wm_path), i, iterations) for i in range(n_workers)]
+
+        with multiprocessing.Pool(processes=n_workers) as pool:
+            results = pool.map(_wm_concurrency_worker, configs)
+
+        # Every worker must have completed all `iterations`.
+        for wid, counter in results:
+            assert counter == iterations, (
+                f"worker {wid} reports counter={counter}, expected {iterations}"
+            )
+
+        # The on-disk file must hold every worker's final counter.
+        final = json.loads(wm_path.read_text(encoding="utf-8"))
+        assert len(final) == n_workers, (
+            f"wm file has {len(final)} keys; expected {n_workers}: "
+            f"{sorted(final.keys())}"
+        )
+        for i in range(n_workers):
+            entry = final.get(f"worker-{i}")
+            assert entry is not None, f"worker-{i} missing from wm file"
+            assert entry.get("counter") == iterations, (
+                f"worker-{i} counter={entry.get('counter')}, expected {iterations}"
+            )
     finally:
         shutil.rmtree(sandbox, ignore_errors=True)
 

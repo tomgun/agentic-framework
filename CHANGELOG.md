@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Workflow docs, checklists, quality standards, subagent definitions, full skill bundles (~130 files, ~25K lines) — content absorbed into 7 role prompts + `conventions.md` + CLI enforcement
 
 ### Changed
+- **`python3 -m quota` now requires `--report quota|tokens`** (R-101 prerequisite) — the user-facing `ag intel report --quota` / `--tokens` wrapper is unaffected and continues to work. Direct invokers of `python3 -m quota` (none found in-tree) need to add `--report quota` to keep the previous behavior.
 - **Skills reduced to trigger-word stubs** — 13 files, ~370 lines total (down from full bundles with instructions + scripts + references)
 - **Tool templates updated** for v2 workflow commands (`ag start/transition/check/verify/ship/status/info/next`)
 - **memory-seed.md trimmed** to 18 lines (role prompts carry the guidance now)

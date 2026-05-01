@@ -346,6 +346,15 @@ def build_token_report(
 
     The ledger is streamed once. Out-of-order timestamps are tolerated; we sort
     sessions by their *latest* record timestamp when picking the rolling slice.
+
+    **Edge case — sessions with no parseable timestamps.** If every record in
+    a session has an unparseable `ts` field, that session sorts after sessions
+    *with* timestamps and may be excluded from `rolling_window` when there
+    are more than `window_sessions` other sessions present. Its records still
+    increment `record_count`, so a discrepancy between `record_count` and
+    `Σ(rolling_window[*].record_count)` is the diagnostic signal. In normal
+    operation the emitter always writes ISO timestamps, so this only surfaces
+    on manually-corrupted ledgers — but it's documented here for callers.
     """
     if window_sessions < 1:
         window_sessions = 1
