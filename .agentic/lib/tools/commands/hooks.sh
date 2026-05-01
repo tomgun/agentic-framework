@@ -112,10 +112,96 @@ _hooks_write_shim_atomic() {
 }
 
 # ---------------------------------------------------------------------------
+# Statusline installer — used by both `register` and `install`.
+# ---------------------------------------------------------------------------
+#
+# Merges the canonical statusLine block from
+#   .agentic/lib/claude-hooks/statusline.json
+# into .claude/settings.json, preserving every other key the user has set.
+# Skips with a warning if a custom statusLine already exists (don't clobber
+# user customizations); pass `--force` to override.
+#
+# Stays JSON-merge rather than file-copy because settings.json typically
+# also holds permissions/mcpServers and is more user-specific than
+# hooks.json. Python is used for the merge — jq isn't a hard dependency.
+
+_install_statusline() {
+    local force="${1:-}"
+    local snippet_src="$ROOT_DIR/.agentic/lib/claude-hooks/statusline.json"
+    local settings_target="$ROOT_DIR/.claude/settings.json"
+
+    if [[ ! -f "$snippet_src" ]]; then
+        echo -e "${YELLOW}⚠ Statusline source not found ($snippet_src) — skipped.${NC}"
+        return 0
+    fi
+
+    mkdir -p "$ROOT_DIR/.claude"
+
+    SNIPPET_SRC="$snippet_src" SETTINGS_TARGET="$settings_target" FORCE="$force" \
+        python3 - <<'PY'
+import json
+import os
+import sys
+
+snippet_path = os.environ["SNIPPET_SRC"]
+settings_path = os.environ["SETTINGS_TARGET"]
+force = os.environ.get("FORCE") == "--force"
+
+with open(snippet_path, "r", encoding="utf-8") as fh:
+    snippet = json.load(fh)
+new_status = snippet.get("statusLine")
+if not isinstance(new_status, dict):
+    print("⚠ statusline.json missing statusLine block — skipped.", file=sys.stderr)
+    sys.exit(0)
+
+settings = {}
+existed = os.path.exists(settings_path)
+if existed:
+    try:
+        with open(settings_path, "r", encoding="utf-8") as fh:
+            settings = json.load(fh)
+        if not isinstance(settings, dict):
+            settings = {}
+    except json.JSONDecodeError:
+        print(
+            f"⚠ Existing {settings_path} is not valid JSON; aborting statusline install.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+current = settings.get("statusLine")
+if isinstance(current, dict) and current == new_status:
+    print(f"✓ Statusline: verified ({settings_path} already up to date)")
+    sys.exit(0)
+
+if isinstance(current, dict) and not force:
+    cmd = current.get("command", "?")
+    print(
+        f"⚠ Statusline: a different statusLine is already configured (command={cmd}); "
+        f"skipped to preserve your customization. Re-run with `ag hooks register --force-statusline` to overwrite."
+    )
+    sys.exit(0)
+
+settings["statusLine"] = new_status
+with open(settings_path, "w", encoding="utf-8") as fh:
+    json.dump(settings, fh, indent=2)
+    fh.write("\n")
+verb = "updated" if existed else "installed"
+print(f"✓ Statusline: {verb} ({settings_path})")
+PY
+}
+
+
+# ---------------------------------------------------------------------------
 # register / unregister (R-015)
 # ---------------------------------------------------------------------------
 
 _hooks_register() {
+    local force_statusline=""
+    if [ "${1:-}" = "--force-statusline" ]; then
+        force_statusline="--force"
+    fi
+
     _hooks_require_git_repo || return 1
 
     local hooks_dir
@@ -135,6 +221,9 @@ _hooks_register() {
         # Re-run integrity in case the user touched gate scripts but not the
         # shims. `ag integrity update` no-ops if nothing drifted.
         cmd_integrity update >/dev/null 2>&1 || true
+        # Statusline is independent of the shims — run on every register so
+        # users get the latest snippet without unregistering first.
+        _install_statusline "$force_statusline"
         return 0
     fi
 
@@ -166,6 +255,8 @@ _hooks_register() {
     else
         echo -e "${YELLOW}⚠ Integrity baseline update skipped (run \`ag integrity update\` manually if needed).${NC}"
     fi
+
+    _install_statusline "$force_statusline"
 }
 
 _hooks_unregister() {
@@ -221,6 +312,10 @@ _hooks_unregister() {
 
 _hooks_install() {
     # Install both git hooks and Claude Code hooks (F-0300)
+    local force_statusline=""
+    if [ "${1:-}" = "--force-statusline" ]; then
+        force_statusline="--force"
+    fi
     local installed_any=false
 
     # Git hooks (if git is available)
@@ -248,6 +343,10 @@ _hooks_install() {
     else
         echo -e "${YELLOW}⚠ Claude hooks: source not found (.agentic/lib/claude-hooks/hooks.json)${NC}"
     fi
+
+    # Statusline (per-user .claude/settings.json — JSON-merge so we don't
+    # clobber permissions/mcpServers/etc.)
+    _install_statusline "$force_statusline"
 
     if [[ "$installed_any" == "false" ]]; then
         echo -e "${RED}✗ No hooks installed${NC}"
@@ -358,10 +457,16 @@ _hooks_disable() {
 _hooks_help() {
     echo -e "${BOLD}ag hooks${NC} — git + Claude Code hook management"
     echo ""
-    echo "  register             Write Tier 0 shims to .git/hooks/pre-commit + pre-push"
-    echo "                       and refresh the integrity baseline (R-015). Idempotent."
+    echo "  register [--force-statusline]"
+    echo "                       Write Tier 0 shims to .git/hooks/pre-commit + pre-push,"
+    echo "                       refresh the integrity baseline (R-015), and merge the"
+    echo "                       Agentic statusLine block into .claude/settings.json."
+    echo "                       Idempotent. Use --force-statusline to overwrite an"
+    echo "                       existing custom statusLine."
     echo "  unregister           Remove the shims; restore the most recent backup if any."
-    echo "  install              Install via core.hooksPath = .agentic/hooks/ (F-0300)."
+    echo "  install [--force-statusline]"
+    echo "                       Install via core.hooksPath = .agentic/hooks/ (F-0300),"
+    echo "                       copy .claude/hooks.json, and merge the statusLine block."
     echo "  status               Show current hook configuration (shim form + core.hooksPath form)."
     echo "  disable --confirm    Unset core.hooksPath (does NOT remove shims; use unregister for that)."
 }
@@ -375,9 +480,9 @@ cmd_hooks() {
     local flag="${2:-}"
 
     case "$subcmd" in
-        register)               _hooks_register ;;
+        register)               _hooks_register "$flag" ;;
         unregister)             _hooks_unregister ;;
-        install)                _hooks_install ;;
+        install)                _hooks_install "$flag" ;;
         status)                 _hooks_status ;;
         disable)                _hooks_disable "$flag" ;;
         help|--help|-h|"")      _hooks_help ;;

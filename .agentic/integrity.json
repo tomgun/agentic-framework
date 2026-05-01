@@ -10,7 +10,7 @@
     ".agentic/lib/integrity.py": "8c2912890f0b439e47b7d1f536d8b6219d8aff11852f373dfd610209e6b0892a",
     ".agentic/lib/settings.sh": "241cabc83eaf599d741e99da01cff29855e1c641eaf4bef948c0951d1f8fc51f",
     ".claude/hooks.json": "decdc189cdf2a64ab8d46c23f4715d6206d7157b98f8d0b9f19e0e4e1b947701",
-    ".git/hooks/pre-commit": "d23ca987299772da59535a1f036a0ed3e3c210243df51a28e4b0f0ee770edac7",
-    ".git/hooks/pre-push": "b915149c18e5d2545d9bf2719f7c93041d7fd67e0727fd17c418623ffc22215b"
+    ".git/hooks/pre-commit": "03eb03c9019192b1348aa28240aec6928cb4be8435a6bf2948b7d56ce9a151d5",
+    ".git/hooks/pre-push": "c3ed404215847ca360912068cbed9f69617fd7da13b2a5f0058551a6144b3c0d"
   }
 }

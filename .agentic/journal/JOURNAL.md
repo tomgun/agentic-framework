@@ -6207,3 +6207,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-05-01 15:22 - Statusline (R-101 follow-up)
+
+**Why**: User asked for status bar with ctx + 5h + week + project + branch + task; framework-wide install path was the right place since the statusline benefits all users running ag hooks register
+
+**What changed**:
+- Added Claude Code statusline showing project / branch / ctx % / 5h % reset / wk % reset / current task. statusline.py reads transcript_path for ctx %, quota.compute_quota for both windows, STATUS.md/AGENTS.json/git-log for task. statusline.sh shim runs as Claude Code's statusLine command. ag hooks register/install both auto-merge the snippet into .claude/settings.json (preserves existing permissions/mcpServers/customStatusLine; --force-statusline overrides). Documented quota_pro_max_weekly_tokens setting in STACK.template.md. Five live smoke scenarios verified including missing transcript / empty stdin / non-git cwd graceful paths.
+
+**Next steps**:
+- Push to PR #247; manual visual verification after Claude Code restart
+
+**Blockers**: None
+

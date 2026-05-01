@@ -132,6 +132,12 @@ Purpose: a single source of truth for "how we build and run software here".
 - intel_capture: retro
 # How user preferences/decisions are captured. retro: session-end review (saves tokens) | realtime: per-prompt LLM nudge | off: disabled. All profiles default to retro.
 
+### Token quotas (optional — drives `ag intel report --quota` and the Claude Code statusline)
+# - quota_pro_max_window_tokens: 88000000
+# 5h Pro/Max window ceiling. When set, statusline shows "5h N% reset HH:MM" and `ag intel report --quota` alerts at 70/85/95%. Typical value: 88M for Pro, look up your plan's actual limit. Anthropic does not expose actual remaining-quota via API, so this is a local-ledger estimate (see R-013 honest-limit).
+# - quota_pro_max_weekly_tokens: 800000000
+# 7-day rolling weekly cap (Pro/Max plans). When set, statusline shows "wk N% reset Sun HH:MM". Same honest-limit caveat — derived from local ledger, not the Anthropic dashboard.
+
 ### Debug
 - btrace: off
 # Behavioral trace for debugging framework decisions. off: no tracing (zero overhead) | on: trace hook I/O, gate decisions, pattern matches | verbose: on + sub-check detail + settings resolution. All profiles default to off. Override per-session: AGENTIC_BTRACE=on

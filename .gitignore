@@ -79,6 +79,10 @@ tests/llm/.test-state
 
 # Claude Code generated files (source of truth is .agentic/lib/claude-hooks/hooks.json)
 .claude/hooks.json
+# Per-user .claude/settings.json — `ag hooks register` JSON-merges the
+# canonical statusLine block from .agentic/lib/claude-hooks/statusline.json
+# into this file along with any user customizations (permissions, mcpServers).
+.claude/settings.json
 
 # Local notes (not part of framework)
 *.local.md
