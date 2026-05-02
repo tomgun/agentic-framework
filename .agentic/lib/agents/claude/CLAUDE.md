@@ -28,6 +28,8 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 - `ag tui` — Textual mission-control dashboard live-tailing events.jsonl / delegation.jsonl / token-ledger.jsonl (R-008). Requires `pip install textual`.
 - `ag watch [--filter k=v] [--since 1h] [--from-start] [--once]` — color-coded stream of events.jsonl for SSH (R-009); stdlib only
 - `ag intel report --quota` — Pro/Max session quota usage in last 5h window: per-tier/per-model breakdown, threshold alerts at 70/85/95%, projected exhaustion (R-013)
+- `ag intel report --tokens` — current-session + rolling-30-session token usage from token-ledger.jsonl: per-tier/per-model/per-feature breakdown (R-101). Use this to spot which features are burning the most tokens session over session.
+- `ag hooks register` (and `ag hooks install`) also installs a Claude Code statusline showing `project | branch | ctx N% | 5h N% reset HH:MM | wk N% reset Day HH:MM | task`. The 5h/wk segments render only when `quota_pro_max_window_tokens` / `quota_pro_max_weekly_tokens` are set in STACK.md. Pass `--force-statusline` to overwrite an existing custom statusLine.
 - `ag onboard` — generate `.agentic/ONBOARDING.md` for new contributors from STACK/FEATURES/STATUS/journal/ADR (R-011)
 - `ag skills suggest|install|sync|list|remove|update-pins|request` — F-008 marketplace integration: install community quality skills from a curated allowlist with mandatory sha pinning, script quarantine, and Claude+Cursor fan-out
 - `ag contract check F-XXXX` | `ag contract coverage` | `ag contract pending` | `ag contract list` | `ag contract promote F-XXXX` | `ag contract migrate F-XXXX --reason "..." [--set K=V | --add-assertion "..."]` (sanctioned mutation path for shipped/read-only contracts; R-005)

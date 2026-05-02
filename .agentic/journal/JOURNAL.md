@@ -6129,3 +6129,107 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-04-28 15:49 - R-101 commit 1: emitter + attribution
+
+**Why**: v3 plan approved 2026-04-28 after 3 rounds of dialectical review; emission was the missing link in the R-007/R-013/R-014 token ledger pipeline.
+
+**What changed**:
+- Shipped Components 1+4 of R-101: .agentic/lib/hooks/token_emit.py with Stop-hook + SessionStart-recovery entry points; current_feature() resolves via gitBranch primary then AGENTS.json by worktree then None; tokens_in carries pure input_tokens (no cache_creation summed) per quota.py:228 convention; schema-drift defensive logging emits token_emit_schema_change events. 12 unit tests cover all 6 fixture cases plus concurrency + watermark prune; all pass plus events.py 18 tests pass.
+
+**Next steps**:
+- Commit 2: register hooks in .claude/hooks.json + integrity baseline regen
+
+**Blockers**: None
+
+
+### Session: 2026-04-28 16:41 - R-101 commit 2: hook registration + integrity baseline
+
+**Why**: v3 plan G4 numbered procedure: edit hooks → integrity update → stage all → commit succeeds. Naming-collision note: integrity.json baselines events.py (which we modified in commit 1) but does NOT baseline the new claude-hooks shims (R-004 only baselines .agentic/lib/hooks/*.py and .claude/hooks.json itself; shim shell scripts are out of scope). hooks.json change is captured.
+
+**What changed**:
+- Registered Stop-token-emit and SessionStart-token-recover shims in .claude/hooks.json (composed alongside existing Stop.sh and SessionStart.sh — telemetry shims always exit 0 so they don't affect existing enforcement). Ran ag integrity update to capture new baseline. End-to-end smoke test on the active session transcript: 242 records emitted, all tier1, single sessionId, sensible token sums (412 net-new input, 271K output, 45M cache reads — the cache-savings story is now visible in the ledger).
+
+**Next steps**:
+- Commit 3: ag intel report --tokens reader extending quota.py with session + rolling-30 projection
+
+**Blockers**: None
+
+
+### Session: 2026-04-30 20:09 - R-101 commit 3/5
+
+**Why**: ACs 1-3 of R-101 explicitly required current-session + rolling-30 + breakdowns; commits 1+2 only fed the ledger, the report side was still empty
+
+**What changed**:
+- Read-side ag intel report --tokens lands. quota.build_token_report() streams the ledger once, aggregates per session, returns rolling-N. intel.sh --tokens wires through. Golden-master fixture (8 records, 3 sessions, pinned now) plus 16 new tests in test_token_report.py guard the M1 cache_creation accounting from regressing.
+
+**Next steps**:
+- Commit 4/5: TUI tokens line in header.py
+
+**Blockers**: None
+
+
+### Session: 2026-04-30 20:13 - R-101 commit 4/5
+
+**Why**: Five-panel layout had to stay intact; folding into header.py was cheaper than adding a sixth panel
+
+**What changed**:
+- TUI header now shows the R-101 view: a second line with Session / Roll (N sess) / Top feature beneath the existing R-014 quota ring. State.py grew per-session aggregation bounded by a 30-session window with O(1) prune. Header CSS switched to height: auto so the panel collapses back to one line when no token data has been ingested.
+
+**Next steps**:
+- Commit 5/5: instruction file updates
+
+**Blockers**: None
+
+
+### Session: 2026-04-30 20:17 - R-101 commit 5/5
+
+**Why**: Per instruction-files-are-part-of-the-feature: a new ag command must reach all agents to be useful
+
+**What changed**:
+- Instruction-file sync. Added ag intel report --tokens to: CLAUDE.md (root + template), cursorrules (root + template), copilot-instructions.md (.github + template), codex-instructions.md (template), memory-seed.md (quick commands + tokens trigger word), CHANGELOG.md Unreleased. The view is now discoverable from every agent surface.
+
+**Next steps**:
+- PR: open feat/R-101-token-ledger-visible PR; doc gate via ag done post-merge bumps VERSION
+
+**Blockers**: None
+
+
+### Session: 2026-05-01 08:50 - R-101 review fixups
+
+**Why**: Independent review surfaced real correctness gaps; fixing on the same PR keeps the audit trail clean rather than merging known-buggy
+
+**What changed**:
+- Round-1 review found 5 issues: HIGH regex missed R-XXX prefixes (this PR's own branch dogfooded the bug — smoke test showed Top (untagged) 43K). MEDIUM watermark temp+rename invalidated flock semantic across writers. MEDIUM _safe_event swallowed all telemetry failures silently. LOW no-ts session exclusion, LOW --report break. All fixed: regex now matches schema's full {F,R,DEV,E,NFR}-N pattern; watermark write now in-place truncate+write under flock; _safe_event writes one stderr line on failure; docstring + CHANGELOG nits added. Three new regression tests: test_feature_attribution_branch_redesign_prefixes, test_watermark_concurrency_no_lost_updates (8 workers × 50 iters = 400 RMWs, no lost updates), test_safe_event_warns_to_stderr_when_telemetry_fails.
+
+**Next steps**:
+- Push fixup to PR #247; await CI mirror
+
+**Blockers**: None
+
+
+### Session: 2026-05-01 15:22 - Statusline (R-101 follow-up)
+
+**Why**: User asked for status bar with ctx + 5h + week + project + branch + task; framework-wide install path was the right place since the statusline benefits all users running ag hooks register
+
+**What changed**:
+- Added Claude Code statusline showing project / branch / ctx % / 5h % reset / wk % reset / current task. statusline.py reads transcript_path for ctx %, quota.compute_quota for both windows, STATUS.md/AGENTS.json/git-log for task. statusline.sh shim runs as Claude Code's statusLine command. ag hooks register/install both auto-merge the snippet into .claude/settings.json (preserves existing permissions/mcpServers/customStatusLine; --force-statusline overrides). Documented quota_pro_max_weekly_tokens setting in STACK.template.md. Five live smoke scenarios verified including missing transcript / empty stdin / non-git cwd graceful paths.
+
+**Next steps**:
+- Push to PR #247; manual visual verification after Claude Code restart
+
+**Blockers**: None
+
+
+### Session: 2026-05-02 20:27 - R-101 statusline review fixup
+
+**Why**: Per-prompt CPU on the statusline path matters because Claude Code calls it on every render — fixing now beats fixing after ledger growth surfaces lag in user reports
+
+**What changed**:
+- Independent review of HEAD 9f8bf1bd flagged one HIGH perf issue: statusline.quota_summary called compute_quota then re-iterated the ledger to find earliest_record_ts — two full passes per quota window, four per prompt with both 5h and 7d ceilings configured. At 100K records that's user-visible lag. Other findings (watermark crash safety, concurrent reads, regex correctness, env-var passing in heredoc, gitignore behavior) verified as already-correct. Fix: added earliest_record_ts to QuotaReport, captured during compute_quota's existing loop, statusline.quota_summary now reads the field instead of re-iterating. Two new regression tests in test_quota.py guard the value.
+
+**Next steps**:
+- Push to PR #247; await re-review
+
+**Blockers**: None
+

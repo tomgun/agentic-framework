@@ -110,6 +110,7 @@ _intel_help() {
     echo "  ${BOLD}Metrics${NC}"
     echo "  stats [--session]         Show token metrics (session + lifetime)"
     echo "  report --quota            Pro/Max quota usage in last 5h window (R-013)"
+    echo "  report --tokens           Per-session + rolling-30 token usage (R-101)"
 }
 
 # ---------------------------------------------------------------------------
@@ -124,18 +125,25 @@ _intel_report() {
                 kind="quota"
                 shift
                 ;;
+            --tokens)
+                kind="tokens"
+                shift
+                ;;
             --json|--no-color)
                 extra+=("$1"); shift
                 ;;
-            --window-seconds|--ceiling-tokens|--token-ledger|--journal-dir)
+            --window-seconds|--ceiling-tokens|--token-ledger|--journal-dir|--session|--window-sessions)
                 extra+=("$1" "${2:-}"); shift 2
                 ;;
             -h|--help)
                 echo -e "${BOLD}ag intel report${NC} — JSONL-backed reports"
                 echo ""
-                echo "  --quota              Pro/Max quota usage report (5h trailing window)"
-                echo "  --window-seconds N   Override window (default 18000 = 5h)"
-                echo "  --ceiling-tokens N   Override quota ceiling (default: STACK.md)"
+                echo "  --quota              Pro/Max quota usage report (5h trailing window, R-013)"
+                echo "  --tokens             Per-session + rolling-window report (R-101)"
+                echo "  --window-seconds N   --quota only: override window (default 18000 = 5h)"
+                echo "  --ceiling-tokens N   --quota only: override quota ceiling (default: STACK.md)"
+                echo "  --session ID         --tokens only: session id featured as 'current' (default: most recent)"
+                echo "  --window-sessions N  --tokens only: rolling window size (default 30)"
                 echo "  --json               Emit JSON instead of human-readable text"
                 echo "  --no-color           Disable ANSI colors"
                 return 0
@@ -147,31 +155,34 @@ _intel_report() {
         esac
     done
 
-    if [[ "$kind" != "quota" ]]; then
-        echo -e "${RED}ag intel report requires --quota (more report types coming).${NC}"
+    if [[ -z "$kind" ]]; then
+        echo -e "${RED}ag intel report requires --quota or --tokens.${NC}"
         return 2
     fi
 
-    # Resolve ceiling from STACK.md when not overridden on the CLI.
+    # --quota only: resolve ceiling from STACK.md when not overridden.
     local ceiling_arg=()
-    local has_ceiling=0
-    for arg in "${extra[@]}"; do
-        if [[ "$arg" == "--ceiling-tokens" ]]; then
-            has_ceiling=1
-            break
-        fi
-    done
-    if [[ "$has_ceiling" -eq 0 ]]; then
-        local stack_ceiling
-        stack_ceiling=$(get_setting "quota_pro_max_window_tokens" "")
-        if [[ -n "$stack_ceiling" ]]; then
-            ceiling_arg=(--ceiling-tokens "$stack_ceiling")
+    if [[ "$kind" == "quota" ]]; then
+        local has_ceiling=0
+        for arg in "${extra[@]}"; do
+            if [[ "$arg" == "--ceiling-tokens" ]]; then
+                has_ceiling=1
+                break
+            fi
+        done
+        if [[ "$has_ceiling" -eq 0 ]]; then
+            local stack_ceiling
+            stack_ceiling=$(get_setting "quota_pro_max_window_tokens" "")
+            if [[ -n "$stack_ceiling" ]]; then
+                ceiling_arg=(--ceiling-tokens "$stack_ceiling")
+            fi
         fi
     fi
 
     local journal_dir="$ROOT_DIR/.agentic/journal"
     PYTHONPATH="$ROOT_DIR/.agentic/lib${PYTHONPATH:+:$PYTHONPATH}" \
         python3 -m quota \
+        --report "$kind" \
         --journal-dir "$journal_dir" \
         "${ceiling_arg[@]}" \
         "${extra[@]}"

@@ -75,6 +75,9 @@ EVENT_TYPES: tuple[str, ...] = (
     "intel_invoked",
     "quota_degraded",
     "contract_migration",
+    # R-101 token-ledger emitter telemetry
+    "token_emit_skipped",
+    "token_emit_schema_change",
 )
 
 DELEGATION_VERDICTS: tuple[str, ...] = (

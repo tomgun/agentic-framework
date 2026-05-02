@@ -68,7 +68,48 @@ class QuotaReport:
     quota_pct: Optional[float]   # 0.0 .. 100.0 (None when ceiling unknown)
     alert_level: Optional[str]   # "70%" | "85%" | "95%" | None
     projected_exhaustion: Optional[datetime]
+    # Earliest in-window record timestamp; None when the window is empty.
+    # Captured during the same iteration that builds totals so callers
+    # (e.g. statusline reset-time computation) don't have to re-walk the
+    # ledger. Added in the R-101 statusline review pass.
+    earliest_record_ts: Optional[datetime] = None
     advice: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class SessionRow:
+    session_id: str
+    started_at: Optional[datetime]
+    ended_at: Optional[datetime]
+    tokens_in: int
+    tokens_out: int
+    cache_read_tokens: int
+    record_count: int
+    top_model: Optional[str]
+    top_tier: Optional[str]
+    top_feature: Optional[str]
+
+    @property
+    def tokens_total(self) -> int:
+        return self.tokens_in + self.tokens_out
+
+
+@dataclass(frozen=True)
+class TokenReport:
+    """R-101 read-side projection of token-ledger.jsonl.
+
+    `current_session` is the most recent (or explicitly named) session;
+    `rolling_window` is the last N sessions including that one.
+    Breakdowns (by_tier/by_model/by_feature) are computed across the rolling
+    window so the report mirrors the rolling-30 cut R-101 AC-2 calls for.
+    """
+    current_session: Optional[SessionRow]
+    rolling_window: list[SessionRow]
+    by_tier: dict[str, int]
+    by_model: dict[str, int]
+    by_feature: dict[str, int]
+    record_count: int
+    window_sessions: int
 
 
 # ---------------------------------------------------------------------------
@@ -279,7 +320,167 @@ def compute_quota(
         quota_pct=quota_pct,
         alert_level=alert,
         projected_exhaustion=projection,
+        earliest_record_ts=earliest_ts,
         advice=advice,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Token report (R-101): per-session + rolling-window projection
+# ---------------------------------------------------------------------------
+
+
+def _top_key(counts: dict[str, int]) -> Optional[str]:
+    if not counts:
+        return None
+    return max(counts.items(), key=lambda kv: kv[1])[0]
+
+
+def build_token_report(
+    *,
+    token_ledger_path: Path,
+    session_id: Optional[str] = None,
+    window_sessions: int = 30,
+) -> TokenReport:
+    """
+    Build R-101's per-session + rolling-window projection.
+
+    `session_id=None` selects the most-recent session present in the ledger.
+    `window_sessions` limits the rolling window to the N most-recent sessions
+    (including the current one). Breakdowns are computed across the rolling
+    window — the slice the user actually cares about.
+
+    The ledger is streamed once. Out-of-order timestamps are tolerated; we sort
+    sessions by their *latest* record timestamp when picking the rolling slice.
+
+    **Edge case — sessions with no parseable timestamps.** If every record in
+    a session has an unparseable `ts` field, that session sorts after sessions
+    *with* timestamps and may be excluded from `rolling_window` when there
+    are more than `window_sessions` other sessions present. Its records still
+    increment `record_count`, so a discrepancy between `record_count` and
+    `Σ(rolling_window[*].record_count)` is the diagnostic signal. In normal
+    operation the emitter always writes ISO timestamps, so this only surfaces
+    on manually-corrupted ledgers — but it's documented here for callers.
+    """
+    if window_sessions < 1:
+        window_sessions = 1
+
+    # Per-session aggregation
+    sessions: dict[str, dict] = {}
+    record_count = 0
+
+    for rec in _iter_records(token_ledger_path):
+        sid = rec.get("session_id")
+        if not isinstance(sid, str) or not sid:
+            continue
+        ts = _parse_ts(rec)
+        ti = _coerce_int(rec.get("tokens_in"))
+        to = _coerce_int(rec.get("tokens_out"))
+        cr = _coerce_int(rec.get("cache_read_tokens"))
+        model = rec.get("model")
+        model = model if isinstance(model, str) and model else "unknown"
+        tier = rec.get("tier")
+        tier = tier if isinstance(tier, str) and tier else "unknown"
+        feature = rec.get("feature")
+        if not isinstance(feature, str) or not feature:
+            feature = "(untagged)"
+
+        bucket = sessions.setdefault(
+            sid,
+            {
+                "tokens_in": 0,
+                "tokens_out": 0,
+                "cache_read": 0,
+                "first_ts": None,
+                "last_ts": None,
+                "models": {},
+                "tiers": {},
+                "features": {},
+                "record_count": 0,
+            },
+        )
+        bucket["tokens_in"] += ti
+        bucket["tokens_out"] += to
+        bucket["cache_read"] += cr
+        bucket["record_count"] += 1
+        line_total = ti + to
+        bucket["models"][model] = bucket["models"].get(model, 0) + line_total
+        bucket["tiers"][tier] = bucket["tiers"].get(tier, 0) + line_total
+        bucket["features"][feature] = bucket["features"].get(feature, 0) + line_total
+        if ts is not None:
+            if bucket["first_ts"] is None or ts < bucket["first_ts"]:
+                bucket["first_ts"] = ts
+            if bucket["last_ts"] is None or ts > bucket["last_ts"]:
+                bucket["last_ts"] = ts
+        record_count += 1
+
+    if not sessions:
+        return TokenReport(
+            current_session=None,
+            rolling_window=[],
+            by_tier={},
+            by_model={},
+            by_feature={},
+            record_count=0,
+            window_sessions=window_sessions,
+        )
+
+    # Sort by last-seen timestamp, descending. Sessions with no parseable
+    # timestamps sink to the end (deterministic by session_id).
+    def _sort_key(item):
+        sid, b = item
+        last = b["last_ts"]
+        return (last is not None, last, sid)
+
+    ordered = sorted(sessions.items(), key=_sort_key, reverse=True)
+    rolling = ordered[:window_sessions]
+
+    def _row(sid: str, b: dict) -> SessionRow:
+        return SessionRow(
+            session_id=sid,
+            started_at=b["first_ts"],
+            ended_at=b["last_ts"],
+            tokens_in=b["tokens_in"],
+            tokens_out=b["tokens_out"],
+            cache_read_tokens=b["cache_read"],
+            record_count=b["record_count"],
+            top_model=_top_key(b["models"]),
+            top_tier=_top_key(b["tiers"]),
+            top_feature=_top_key(b["features"]),
+        )
+
+    rolling_rows = [_row(sid, b) for sid, b in rolling]
+
+    if session_id is None:
+        current = rolling_rows[0] if rolling_rows else None
+    else:
+        current = None
+        for sid, b in ordered:
+            if sid == session_id:
+                current = _row(sid, b)
+                break
+        if current is None and session_id in sessions:
+            current = _row(session_id, sessions[session_id])
+
+    by_tier: dict[str, int] = {}
+    by_model: dict[str, int] = {}
+    by_feature: dict[str, int] = {}
+    for sid, b in rolling:
+        for k, v in b["tiers"].items():
+            by_tier[k] = by_tier.get(k, 0) + v
+        for k, v in b["models"].items():
+            by_model[k] = by_model.get(k, 0) + v
+        for k, v in b["features"].items():
+            by_feature[k] = by_feature.get(k, 0) + v
+
+    return TokenReport(
+        current_session=current,
+        rolling_window=rolling_rows,
+        by_tier=by_tier,
+        by_model=by_model,
+        by_feature=by_feature,
+        record_count=record_count,
+        window_sessions=window_sessions,
     )
 
 
@@ -350,6 +551,11 @@ def render_report(
                 "projected_exhaustion": (
                     report.projected_exhaustion.isoformat()
                     if report.projected_exhaustion
+                    else None
+                ),
+                "earliest_record_ts": (
+                    report.earliest_record_ts.isoformat()
+                    if report.earliest_record_ts
                     else None
                 ),
                 "advice": report.advice,
@@ -452,6 +658,127 @@ def render_report(
     return "\n".join(lines)
 
 
+def _fmt_tokens_short(n: int) -> str:
+    """Compact display: 612000 → 612K, 4100000 → 4.1M."""
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.1f}M"
+    if n >= 1_000:
+        return f"{n // 1_000}K"
+    return str(n)
+
+
+def _serialize_session_row(row: SessionRow) -> dict:
+    return {
+        "session_id": row.session_id,
+        "started_at": row.started_at.isoformat() if row.started_at else None,
+        "ended_at": row.ended_at.isoformat() if row.ended_at else None,
+        "tokens_in": row.tokens_in,
+        "tokens_out": row.tokens_out,
+        "tokens_total": row.tokens_total,
+        "cache_read_tokens": row.cache_read_tokens,
+        "record_count": row.record_count,
+        "top_model": row.top_model,
+        "top_tier": row.top_tier,
+        "top_feature": row.top_feature,
+    }
+
+
+def render_token_report(
+    report: TokenReport,
+    *,
+    color: bool = True,
+    json_output: bool = False,
+) -> str:
+    """Render an R-101 `TokenReport` for human consumption (or `--json`)."""
+    if json_output:
+        payload = {
+            "current_session": (
+                _serialize_session_row(report.current_session)
+                if report.current_session
+                else None
+            ),
+            "rolling_window": [
+                _serialize_session_row(row) for row in report.rolling_window
+            ],
+            "by_tier": report.by_tier,
+            "by_model": report.by_model,
+            "by_feature": report.by_feature,
+            "record_count": report.record_count,
+            "window_sessions": report.window_sessions,
+        }
+        return json.dumps(payload, indent=2, sort_keys=True)
+
+    bold = _BOLD if color else ""
+    dim = _DIM if color else ""
+    reset = _RESET if color else ""
+
+    lines: list[str] = []
+    if report.record_count == 0:
+        lines.append(
+            f"{bold}Token Ledger{reset} — "
+            f"{dim}no data yet — run a session and try again.{reset}"
+        )
+        return "\n".join(lines)
+
+    cur = report.current_session
+    if cur is not None:
+        if cur.started_at and cur.ended_at:
+            duration_s = (cur.ended_at - cur.started_at).total_seconds()
+            duration = _fmt_duration(duration_s) if duration_s >= 60 else "<1m"
+        else:
+            duration = "—"
+        sid_short = cur.session_id[:8] + ("…" if len(cur.session_id) > 8 else "")
+        lines.append(f"{bold}Token Ledger — current session ({duration}){reset}")
+        lines.append(
+            f"  Session: {dim}{sid_short}{reset}  "
+            f"Tokens: {bold}{_fmt_tokens_short(cur.tokens_total)}{reset} "
+            f"(in {_fmt_tokens_short(cur.tokens_in)} • "
+            f"out {_fmt_tokens_short(cur.tokens_out)})"
+        )
+        if cur.cache_read_tokens or cur.top_model:
+            cache_part = (
+                f"Cache reads: {_fmt_tokens_short(cur.cache_read_tokens)}"
+                if cur.cache_read_tokens
+                else ""
+            )
+            model_part = f"Top model: {cur.top_model}" if cur.top_model else ""
+            joined = "  ".join(p for p in (cache_part, model_part) if p)
+            if joined:
+                lines.append(f"  {joined}")
+
+    n = len(report.rolling_window)
+    total = sum(r.tokens_total for r in report.rolling_window)
+    lines.append(f"{bold}Rolling {n} sessions{reset}")
+    if n:
+        avg = total // n
+        heaviest = max(report.rolling_window, key=lambda r: r.tokens_total)
+        heaviest_label = (
+            heaviest.top_feature
+            if heaviest.top_feature and heaviest.top_feature != "(untagged)"
+            else heaviest.session_id[:8]
+        )
+        lines.append(
+            f"  Total: {_fmt_tokens_short(total)}  "
+            f"Avg/session: {_fmt_tokens_short(avg)}  "
+            f"Heaviest: {_fmt_tokens_short(heaviest.tokens_total)} ({heaviest_label})"
+        )
+
+    def _breakdown(label: str, counts: dict[str, int], top_n: int = 6) -> None:
+        if not counts:
+            return
+        items = sorted(counts.items(), key=lambda kv: -kv[1])[:top_n]
+        rendered = " • ".join(f"{k} {_fmt_tokens_short(v)}" for k, v in items)
+        lines.append(f"  By {label}: {rendered}")
+
+    _breakdown("tier", report.by_tier)
+    _breakdown("model", report.by_model)
+    _breakdown("feature", report.by_feature)
+
+    lines.append("")
+    lines.append(f"{dim}Records counted: {report.record_count}.{reset}")
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -459,8 +786,18 @@ def render_report(
 
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        prog="ag intel report --quota",
-        description="Pro/Max quota usage report from token-ledger.jsonl.",
+        prog="ag intel report",
+        description=(
+            "Token-ledger reports. Use --report quota for Pro/Max 5h window "
+            "(R-013) or --report tokens for per-session + rolling-window view "
+            "(R-101)."
+        ),
+    )
+    p.add_argument(
+        "--report",
+        choices=("quota", "tokens"),
+        required=True,
+        help="Which projection to compute.",
     )
     p.add_argument(
         "--token-ledger",
@@ -478,13 +815,24 @@ def _build_parser() -> argparse.ArgumentParser:
         "--window-seconds",
         type=int,
         default=DEFAULT_WINDOW_SECONDS,
-        help="Trailing window length in seconds (default: 18000 = 5h).",
+        help="--report quota only: trailing window length in seconds (default 18000 = 5h).",
     )
     p.add_argument(
         "--ceiling-tokens",
         type=int,
         default=None,
-        help="Pro/Max window ceiling. Read from STACK.md when omitted.",
+        help="--report quota only: ceiling. Read from STACK.md when omitted.",
+    )
+    p.add_argument(
+        "--session",
+        default=None,
+        help="--report tokens only: session_id to feature as 'current' (default: most recent).",
+    )
+    p.add_argument(
+        "--window-sessions",
+        type=int,
+        default=30,
+        help="--report tokens only: rolling window size in sessions (default 30).",
     )
     p.add_argument(
         "--no-color",
@@ -508,15 +856,26 @@ def main(argv: Optional[list[str]] = None) -> int:
         journal = args.journal_dir or Path.cwd() / ".agentic" / "journal"
         path = journal / "token-ledger.jsonl"
 
-    report = compute_quota(
-        token_ledger_path=path,
-        ceiling_tokens=args.ceiling_tokens,
-        window_seconds=args.window_seconds,
-    )
     color = not args.no_color and sys.stdout.isatty() and os.environ.get(
         "NO_COLOR"
     ) is None
-    print(render_report(report, color=color, json_output=args.json))
+
+    if args.report == "quota":
+        report = compute_quota(
+            token_ledger_path=path,
+            ceiling_tokens=args.ceiling_tokens,
+            window_seconds=args.window_seconds,
+        )
+        print(render_report(report, color=color, json_output=args.json))
+        return 0
+
+    # args.report == "tokens"
+    token_report = build_token_report(
+        token_ledger_path=path,
+        session_id=args.session,
+        window_sessions=args.window_sessions,
+    )
+    print(render_token_report(token_report, color=color, json_output=args.json))
     return 0
 
 

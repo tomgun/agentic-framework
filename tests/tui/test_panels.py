@@ -407,6 +407,107 @@ def test_header_by_tier_tooltip_empty_when_no_records():
     assert "No token-ledger records" in tooltip
 
 
+# ---------------------------------------------------------------------------
+# R-101 — per-session + rolling-window header line
+# ---------------------------------------------------------------------------
+
+
+def test_r101_state_tracks_per_session_totals():
+    ds = DashboardState(clock=lambda: 1_000.0)
+    for ti, sid, feature in [
+        (1000, "sess-A", "F-006"),
+        (2000, "sess-A", "F-006"),
+        (500, "sess-B", "F-008"),
+    ]:
+        ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+            "ts": "x", "session_id": sid, "model": "haiku", "tier": "tier1",
+            "tokens_in": ti, "tokens_out": 0, "feature": feature,
+        }))
+    snap = ds.snapshot()
+    # Most-recent session is sess-B (last apply call)
+    assert snap.header.current_session_id == "sess-B"
+    assert snap.header.current_session_tokens == 500
+    # Rolling window aggregates both sessions
+    assert snap.header.rolling_window_tokens == 3500
+    assert snap.header.rolling_window_sessions == 2
+    # Top feature across rolling window: F-006 wins (3000 vs 500)
+    assert snap.header.top_feature_label == "F-006"
+    assert snap.header.top_feature_tokens == 3000
+
+
+def test_r101_header_lines_emit_session_summary_when_data_present():
+    ds = DashboardState(clock=lambda: 1_000.0)
+    ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+        "ts": "x", "session_id": "sess-A", "model": "haiku", "tier": "tier1",
+        "tokens_in": 200_000, "tokens_out": 87_000, "feature": "F-006",
+    }))
+    lines = header.header_lines(ds.snapshot())
+    assert len(lines) == 2
+    assert "Session" in lines[1]
+    assert "287K" in lines[1]
+    assert "Roll" in lines[1]
+    assert "F-006" in lines[1]
+
+
+def test_r101_header_lines_skip_session_summary_when_no_data():
+    snap = _empty_snap()
+    lines = header.header_lines(snap)
+    # No token-ledger data → only the original line, no R-101 second line
+    assert len(lines) == 1
+
+
+def test_r101_header_lines_skip_session_summary_for_records_without_session_id():
+    """Records without a session_id still increment the global tokens_total
+    (legacy behavior) but cannot contribute to the per-session view, so the
+    R-101 line should not appear when ALL records lack session_id."""
+    ds = DashboardState(clock=lambda: 1_000.0)
+    ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+        # No session_id field
+        "ts": "x", "model": "haiku", "tier": "tier1",
+        "tokens_in": 100, "tokens_out": 0,
+    }))
+    lines = header.header_lines(ds.snapshot())
+    assert len(lines) == 1
+
+
+def test_r101_top_feature_prefers_tagged_over_untagged():
+    """When a session has both tagged and (untagged) work, the panel should
+    surface the tagged label. Falls back to (untagged) only when nothing
+    else is present."""
+    ds = DashboardState(clock=lambda: 1_000.0)
+    # Untagged record (lots of tokens) + tagged record (fewer tokens)
+    ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+        "ts": "x", "session_id": "sess-A", "model": "haiku", "tier": "tier1",
+        "tokens_in": 5_000, "tokens_out": 0,  # no feature → (untagged)
+    }))
+    ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+        "ts": "x", "session_id": "sess-A", "model": "haiku", "tier": "tier1",
+        "tokens_in": 1_000, "tokens_out": 0, "feature": "F-006",
+    }))
+    snap = ds.snapshot()
+    assert snap.header.top_feature_label == "F-006"
+    assert snap.header.top_feature_tokens == 1_000
+
+
+def test_r101_session_window_pruning_bounded():
+    """Distinct session count above 2× window prunes oldest by last-seen."""
+    tick = {"v": 0.0}
+    ds = DashboardState(clock=lambda: tick["v"])
+    ds._session_window = 3  # smaller window for the test
+    # Push 7 distinct sessions with monotonically increasing seen-time
+    for i in range(7):
+        tick["v"] = float(i)
+        ds.apply_record(StreamRecord(stream="token-ledger", line_no=0, record={
+            "ts": "x", "session_id": f"sess-{i}", "model": "haiku", "tier": "tier1",
+            "tokens_in": 100, "tokens_out": 0,
+        }))
+    # After crossing 2× window (6), pruning fires; memory bounded.
+    assert len(ds._session_totals) <= ds._session_window * 2
+    # The most recent sessions (sess-4..sess-6) must still be present.
+    for sid in ("sess-4", "sess-5", "sess-6"):
+        assert sid in ds._session_totals
+
+
 def test_quota_modal_rising_edge_triggers_once_per_episode():
     """R-014 AC4 — modal fires on rising edge to 95% and not until the
     alert level drops and re-rises. Ack suppresses re-show within the

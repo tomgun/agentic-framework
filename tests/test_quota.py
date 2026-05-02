@@ -89,6 +89,76 @@ def test_in_window_record_counted(tmp_path: Path):
     assert rep.record_count == 1
 
 
+def test_earliest_record_ts_captured_during_iteration(tmp_path: Path):
+    """The R-101 statusline reset-time computation depends on
+    QuotaReport.earliest_record_ts being set in the same compute_quota
+    pass that builds totals — otherwise statusline would re-walk the
+    ledger per call. Regression guard."""
+    p = tmp_path / "tl.jsonl"
+    _write_ledger(
+        p,
+        [
+            # Out-of-window: must be ignored.
+            {
+                "ts": _ts(6 * 3600),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 50,
+                "tokens_out": 50,
+            },
+            # In-window, latest first in file order to confirm we pick the
+            # min, not the first-seen.
+            {
+                "ts": _ts(120),  # 2 minutes ago
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            },
+            {
+                "ts": _ts(3600),  # 1 hour ago — earliest in-window record
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            },
+        ],
+    )
+    rep = quota.compute_quota(
+        token_ledger_path=p, ceiling_tokens=1_500_000, now=_NOW
+    )
+    assert rep.earliest_record_ts is not None
+    expected = _NOW - timedelta(seconds=3600)
+    assert rep.earliest_record_ts == expected
+
+
+def test_earliest_record_ts_none_when_window_empty(tmp_path: Path):
+    """When the rolling window has no records, earliest_record_ts is None
+    so callers can skip rendering reset times."""
+    p = tmp_path / "tl.jsonl"
+    _write_ledger(
+        p,
+        [
+            # Single record, well outside the 5h window.
+            {
+                "ts": _ts(6 * 3600),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            }
+        ],
+    )
+    rep = quota.compute_quota(
+        token_ledger_path=p, ceiling_tokens=1_500_000, now=_NOW
+    )
+    assert rep.earliest_record_ts is None
+
+
 def test_out_of_window_record_excluded(tmp_path: Path):
     p = tmp_path / "tl.jsonl"
     _write_ledger(
@@ -520,6 +590,7 @@ def test_main_runs_on_empty_ledger(tmp_path: Path, capsys):
     p = tmp_path / "token-ledger.jsonl"
     p.write_text("", encoding="utf-8")
     rc = quota.main([
+        "--report", "quota",
         "--token-ledger", str(p),
         "--no-color",
     ])
@@ -549,6 +620,7 @@ def test_main_json_flag(tmp_path: Path, capsys):
         ],
     )
     rc = quota.main([
+        "--report", "quota",
         "--token-ledger", str(p),
         "--ceiling-tokens", "1000000",
         "--no-color",
@@ -558,6 +630,39 @@ def test_main_json_flag(tmp_path: Path, capsys):
     blob = capsys.readouterr().out
     parsed = json.loads(blob)
     assert parsed["tokens_total"] == 200
+
+
+def test_main_tokens_report_runs_on_fixture(tmp_path: Path, capsys):
+    """CLI sub-command --report tokens dispatches to build_token_report."""
+    p = tmp_path / "token-ledger.jsonl"
+    real_now = datetime.now(timezone.utc)
+    ts_recent = (real_now - timedelta(seconds=60)).strftime(
+        "%Y-%m-%dT%H:%M:%S.000Z"
+    )
+    _write_ledger(
+        p,
+        [
+            {
+                "ts": ts_recent,
+                "session_id": "s-token-cli",
+                "model": "claude-opus-4-7",
+                "tier": "tier1",
+                "tokens_in": 1000,
+                "tokens_out": 200,
+                "feature": "F-006",
+            }
+        ],
+    )
+    rc = quota.main([
+        "--report", "tokens",
+        "--token-ledger", str(p),
+        "--no-color",
+        "--json",
+    ])
+    assert rc == 0
+    parsed = json.loads(capsys.readouterr().out)
+    assert parsed["current_session"]["session_id"] == "s-token-cli"
+    assert parsed["record_count"] == 1
 
 
 # ---------------------------------------------------------------------------

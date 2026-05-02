@@ -1,0 +1,7 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/tools/statusline.sh",
+    "padding": 1
+  }
+}

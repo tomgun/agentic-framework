@@ -22,6 +22,12 @@
             "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/SessionStart.sh",
             "timeout": 5000,
             "description": "Validate environment and load session context"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/SessionStart-token-recover.sh",
+            "timeout": 5000,
+            "description": "Recover unprocessed token-ledger entries from prior session crashes (R-101)"
           }
         ]
       }
@@ -107,6 +113,12 @@
             "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/Stop.sh",
             "timeout": 5000,
             "description": "Enforcement: blocks session stop until ag verify passes (exit 2 = deny)"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.agentic/lib/claude-hooks/Stop-token-emit.sh",
+            "timeout": 5000,
+            "description": "Emit token-ledger records for the just-completed turn(s) (R-101)"
           }
         ]
       }
