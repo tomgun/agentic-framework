@@ -118,15 +118,13 @@ _No active items_
 
 
 
-### HN-0090: PR #247: R-101 token-ledger visible
-- **Type**: review
-- **Added**: 2026-04-30
-- **Context**: https://github.com/tomgun/agentic-framework/pull/247 — feat/R-101-token-ledger-visible. Emits + reads token-ledger.jsonl; adds ag intel report --tokens + TUI second line. 5 commits, 49 new tests. G5 golden-master fixture guards M1 accounting. Plan: .agentic/journal/plans/2026-04-28-R-101-token-ledger-visible-plan.md (v3 APPROVED).
-- **Why human needed**: Requires human action/decision
-- **Impact**: Blocking: [specify what's blocked]
-
 
 ## Resolved
+
+### HN-0090: PR #247: R-101 token-ledger visible
+- **Resolved**: 2026-05-02
+- **Outcome**: Merged as commit dd38f82a on main
+
 
 ### HN-0089: PR #246: R-014 + R-015 (Phase 0 closeout — TUI quota ring + ag hooks register)
 - **Resolved**: 2026-04-28

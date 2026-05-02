@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Phase 0 feature-complete (R-001..R-016). Phase 1 R-101 (Token Ledger visible) opens next. (Updated: 2026-04-28 13:35 UTC)
+- R-101 merged (dd38f82a). Phase 1 R-102 next. (Updated: 2026-05-02 20:31 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

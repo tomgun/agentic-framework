@@ -98,6 +98,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 - **Background**: PR #246 closed Phase 0 with deterministic tests + 846 framework ACs all green. The two manual smokes (Textual ring rendering + 95% modal; `ag hooks register` against a fresh project) were deferred at merge time because they need `pip install textual` and a sandbox, which the merge-time agent container couldn't provide.
 - **Related**: `.agentic/journal/plans/2026-04-26-redesign-backlog.md` (R-014 + R-015 "Verify" sections), `.agentic/lib/tui/panels/quota_alert.py`, `.agentic/lib/tools/commands/hooks.sh`.
 
+### T-0099: ag done / ag merge feature-id validators reject R-XXX (and DEV-/E-/NFR-) — only accept F-XXXX. Schema accepts all five prefixes (events.schema.json + token_emit branch regex). Quick fix: extend the validator regex in done/merge commands to match the same prefix set.
+- **Added**: 2026-05-02
+
 ---
 
 ## Promoted to Backlog
