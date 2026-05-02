@@ -89,6 +89,76 @@ def test_in_window_record_counted(tmp_path: Path):
     assert rep.record_count == 1
 
 
+def test_earliest_record_ts_captured_during_iteration(tmp_path: Path):
+    """The R-101 statusline reset-time computation depends on
+    QuotaReport.earliest_record_ts being set in the same compute_quota
+    pass that builds totals — otherwise statusline would re-walk the
+    ledger per call. Regression guard."""
+    p = tmp_path / "tl.jsonl"
+    _write_ledger(
+        p,
+        [
+            # Out-of-window: must be ignored.
+            {
+                "ts": _ts(6 * 3600),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 50,
+                "tokens_out": 50,
+            },
+            # In-window, latest first in file order to confirm we pick the
+            # min, not the first-seen.
+            {
+                "ts": _ts(120),  # 2 minutes ago
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            },
+            {
+                "ts": _ts(3600),  # 1 hour ago — earliest in-window record
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            },
+        ],
+    )
+    rep = quota.compute_quota(
+        token_ledger_path=p, ceiling_tokens=1_500_000, now=_NOW
+    )
+    assert rep.earliest_record_ts is not None
+    expected = _NOW - timedelta(seconds=3600)
+    assert rep.earliest_record_ts == expected
+
+
+def test_earliest_record_ts_none_when_window_empty(tmp_path: Path):
+    """When the rolling window has no records, earliest_record_ts is None
+    so callers can skip rendering reset times."""
+    p = tmp_path / "tl.jsonl"
+    _write_ledger(
+        p,
+        [
+            # Single record, well outside the 5h window.
+            {
+                "ts": _ts(6 * 3600),
+                "session_id": "s",
+                "model": "sonnet",
+                "tier": "tier2",
+                "tokens_in": 100,
+                "tokens_out": 100,
+            }
+        ],
+    )
+    rep = quota.compute_quota(
+        token_ledger_path=p, ceiling_tokens=1_500_000, now=_NOW
+    )
+    assert rep.earliest_record_ts is None
+
+
 def test_out_of_window_record_excluded(tmp_path: Path):
     p = tmp_path / "tl.jsonl"
     _write_ledger(

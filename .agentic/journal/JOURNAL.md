@@ -6220,3 +6220,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-05-02 20:27 - R-101 statusline review fixup
+
+**Why**: Per-prompt CPU on the statusline path matters because Claude Code calls it on every render — fixing now beats fixing after ledger growth surfaces lag in user reports
+
+**What changed**:
+- Independent review of HEAD 9f8bf1bd flagged one HIGH perf issue: statusline.quota_summary called compute_quota then re-iterated the ledger to find earliest_record_ts — two full passes per quota window, four per prompt with both 5h and 7d ceilings configured. At 100K records that's user-visible lag. Other findings (watermark crash safety, concurrent reads, regex correctness, env-var passing in heredoc, gitignore behavior) verified as already-correct. Fix: added earliest_record_ts to QuotaReport, captured during compute_quota's existing loop, statusline.quota_summary now reads the field instead of re-iterating. Two new regression tests in test_quota.py guard the value.
+
+**Next steps**:
+- Push to PR #247; await re-review
+
+**Blockers**: None
+

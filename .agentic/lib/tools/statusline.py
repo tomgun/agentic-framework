@@ -204,22 +204,15 @@ def quota_summary(
     )
     pct = report.quota_pct or 0.0
 
-    # Reset = earliest in-window record + window_seconds. Re-iterate the
-    # ledger since QuotaReport doesn't expose `earliest_ts`. Cheap; the
-    # file is bounded by R-007's per-line cap and pruning.
-    earliest: Optional[datetime] = None
-    for rec in quota._iter_records(ledger):  # noqa: SLF001 — internal helper, intentional
-        ts = quota._parse_ts(rec)  # noqa: SLF001
-        if ts is None:
-            continue
-        if ts < report.window_start or ts > report.window_end:
-            continue
-        if earliest is None or ts < earliest:
-            earliest = ts
-    if earliest is None:
+    # Reset = earliest in-window record + window_seconds. compute_quota
+    # captures earliest_record_ts during its existing loop (added after a
+    # review pass flagged the duplicate iteration), so callers don't have
+    # to re-walk the ledger. With both 5h and 7d ceilings configured,
+    # this halves per-prompt CPU on the statusline path.
+    if report.earliest_record_ts is None:
         return (pct, None)
     from datetime import timedelta
-    return (pct, earliest + timedelta(seconds=window_seconds))
+    return (pct, report.earliest_record_ts + timedelta(seconds=window_seconds))
 
 
 # ---------------------------------------------------------------------------

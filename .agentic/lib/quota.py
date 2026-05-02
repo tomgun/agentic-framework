@@ -68,6 +68,11 @@ class QuotaReport:
     quota_pct: Optional[float]   # 0.0 .. 100.0 (None when ceiling unknown)
     alert_level: Optional[str]   # "70%" | "85%" | "95%" | None
     projected_exhaustion: Optional[datetime]
+    # Earliest in-window record timestamp; None when the window is empty.
+    # Captured during the same iteration that builds totals so callers
+    # (e.g. statusline reset-time computation) don't have to re-walk the
+    # ledger. Added in the R-101 statusline review pass.
+    earliest_record_ts: Optional[datetime] = None
     advice: list[str] = field(default_factory=list)
 
 
@@ -315,6 +320,7 @@ def compute_quota(
         quota_pct=quota_pct,
         alert_level=alert,
         projected_exhaustion=projection,
+        earliest_record_ts=earliest_ts,
         advice=advice,
     )
 
@@ -545,6 +551,11 @@ def render_report(
                 "projected_exhaustion": (
                     report.projected_exhaustion.isoformat()
                     if report.projected_exhaustion
+                    else None
+                ),
+                "earliest_record_ts": (
+                    report.earliest_record_ts.isoformat()
+                    if report.earliest_record_ts
                     else None
                 ),
                 "advice": report.advice,
