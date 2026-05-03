@@ -119,6 +119,15 @@ _No active items_
 
 
 
+
+### HN-0091: PR #248: Statusline zero-config rate limits + Docker repo-name
+- **Type**: review
+- **Added**: 2026-05-03
+- **Context**: https://github.com/tomgun/agentic-framework/pull/248 — drops STACK.md ceiling gating, shows rate_limits directly from Claude Code envelope. New format with ANSI-dimmed freshness trailer. Repo name now resolves correctly inside Docker via git remote URL.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0090: PR #247: R-101 token-ledger visible
