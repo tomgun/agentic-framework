@@ -3,22 +3,24 @@
 Reads the Claude Code statusLine envelope on stdin and prints a single-line
 status to stdout:
 
-    agentic-framework | feat/R-101 | ctx 47% | 5h 23% reset 22:30 | wk 18% reset Sun | R-101 PR review
+    agentic-framework | feat/R-101 | ctx 47% | 23% 5h, 18% 7d - reset 22:30, Sun 14:00 EEST (updated at main agent response) | R-101 PR review
 
 Components:
-  * **project** — basename of the git toplevel (or `cwd` fallback).
+  * **project** — repo name from `git config remote.origin.url` (so it
+    survives Docker mount-point dirs like `/workspace`); falls back to git
+    toplevel basename, then cwd basename.
   * **branch** — current git branch.
   * **ctx %** — latest assistant turn's `input_tokens + cache_read_input_tokens
     + cache_creation_input_tokens` against the model's context window. Source:
     `transcript_path` from stdin. Falls back to "ctx —" if no usage block.
-  * **5h quota %** — uses `quota.compute_quota` against the local
-    `token-ledger.jsonl` and the STACK.md `quota_pro_max_window_tokens`
-    setting. Reset shows the earliest in-window record's ts + 5h, formatted
-    as local HH:MM. Hidden when no ceiling configured.
-  * **wk quota %** — same projection over a rolling 7-day window, against
-    `quota_pro_max_weekly_tokens` (Pro/Max plans have a separate weekly
-    cap). Reset shows the abbreviated weekday when the earliest in-window
-    record drops out (e.g. "Sun"). Hidden when no ceiling configured.
+  * **rate-limit cluster** — single bar segment built from
+    `envelope.rate_limits`. Shape:
+        `N% 5h, M% 7d - reset HH:MM, Day HH:MM TZ (updated at main agent response)`
+    Pcts and resets list each window in the order present. One shared TZ
+    label at the end of the reset block. The trailing parenthetical is
+    ANSI-dimmed — anchors that values are a snapshot from the last
+    main-agent turn (`/usage` triggers a refresh). Hidden entirely when
+    the envelope has no usable rate_limits.
   * **task** — first non-comment "## Current focus" item from
     `.agentic/STATUS.md`, fallback to AGENTS.json `feature_id`, fallback to
     HEAD commit subject.
@@ -26,14 +28,7 @@ Components:
 This is a TELEMETRY surface: every component fails open. Any individual
 section that errors is replaced with `?` rather than crashing the line.
 
-Stdlib only.
-
-Honest limit on quota resets
-----------------------------
-Anthropic's plan-anchored 5h and 7d windows reset at wall-clock times tied
-to your plan signup, which the API does not expose. The "reset" times here
-are derived from the rolling-window edge of the local ledger — they're a
-useful estimate, not a guaranteed match for the Anthropic dashboard.
+Stdlib only. Zero config — reads what Claude Code pipes in.
 """
 from __future__ import annotations
 
@@ -45,12 +40,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-# Make `import quota` work — same trick our other tools use.
-_LIB_DIR = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(_LIB_DIR))
-
-import quota  # noqa: E402
-
+# ANSI: dim the freshness anchor so it reads as a footnote rather than data.
+# Claude Code passes ANSI through to the terminal. Fail-safe: if the terminal
+# strips them, the parenthetical still reads correctly as plain text.
+_DIM = "\x1b[2m"
+_RESET = "\x1b[0m"
 
 # ---------------------------------------------------------------------------
 # Model context-window table
@@ -146,73 +140,34 @@ def ctx_used_tokens(usage: dict) -> int:
 
 
 # ---------------------------------------------------------------------------
-# 5h quota window — reuse quota.compute_quota
+# Rate limits — read from Claude Code envelope
 # ---------------------------------------------------------------------------
 
 
-def stack_md_setting(stack_path: Path, key: str) -> Optional[str]:
-    """Best-effort STACK.md key reader. Matches `key: value` lines."""
-    if not stack_path.exists():
-        return None
-    try:
-        for line in stack_path.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if line.startswith(f"{key}:"):
-                return line.split(":", 1)[1].strip()
-    except OSError:
-        return None
-    return None
+def quota_from_blob(envelope: dict, key: str) -> Optional[tuple[float, Optional[datetime]]]:
+    """Return (pct, reset_dt) from `envelope.rate_limits.<key>`.
 
-
-_FIVE_HOURS_SECONDS = 5 * 60 * 60
-_SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60
-
-
-def quota_summary(
-    project_root: Path,
-    *,
-    ceiling_setting: str,
-    window_seconds: int,
-) -> Optional[tuple[float, Optional[datetime]]]:
-    """Return (quota_pct, reset_ts) for one rolling-window projection.
-
-    `ceiling_setting` names the STACK.md key; `window_seconds` selects 5h
-    or 7d (or any other interval). `reset_ts` is the earliest in-window
-    record's ts + window — i.e., the wall clock when that record drops out
-    of the rolling window. Returns None when no ceiling is configured;
-    returns (pct, None) when the ledger is empty.
+    `key` is "five_hour" or "seven_day". Returns None when the envelope
+    has no usable percentage for that window. `reset_dt` is None when the
+    envelope omits `resets_at`.
     """
-    ceiling_raw = stack_md_setting(project_root / "STACK.md", ceiling_setting)
-    if not ceiling_raw:
+    rl = envelope.get("rate_limits") or {}
+    section = rl.get(key) or {}
+    pct_raw = section.get("used_percentage")
+    if pct_raw is None:
         return None
     try:
-        ceiling = int(ceiling_raw)
-    except ValueError:
+        pct = float(pct_raw)
+    except (TypeError, ValueError):
         return None
-    if ceiling <= 0:
-        return None
-
-    ledger = project_root / ".agentic" / "journal" / "token-ledger.jsonl"
-    now = datetime.now(timezone.utc)
-    report = quota.compute_quota(
-        token_ledger_path=ledger,
-        ceiling_tokens=ceiling,
-        window_seconds=window_seconds,
-        now=now,
-    )
-    pct = report.quota_pct or 0.0
-
-    # Reset = earliest in-window record + window_seconds. compute_quota
-    # captures earliest_record_ts during its existing loop (added after a
-    # review pass flagged the duplicate iteration), so callers don't have
-    # to re-walk the ledger. With both 5h and 7d ceilings configured,
-    # this halves per-prompt CPU on the statusline path.
-    if report.earliest_record_ts is None:
-        return (pct, None)
-    from datetime import timedelta
-    return (pct, report.earliest_record_ts + timedelta(seconds=window_seconds))
+    resets_at = section.get("resets_at")
+    reset_dt: Optional[datetime] = None
+    if resets_at is not None:
+        try:
+            reset_dt = datetime.fromtimestamp(int(resets_at), tz=timezone.utc)
+        except (TypeError, ValueError, OSError, OverflowError):
+            reset_dt = None
+    return (pct, reset_dt)
 
 
 # ---------------------------------------------------------------------------
@@ -236,7 +191,33 @@ def _git(*args: str, cwd: str) -> Optional[str]:
     return out.stdout.strip() or None
 
 
+def _repo_name_from_remote(cwd: str) -> Optional[str]:
+    """Repo name parsed from `git config remote.origin.url`.
+
+    Resilient to mount-point directory names (e.g. `/workspace` inside
+    Docker, where the toplevel basename is meaningless). Handles common
+    URL forms: `git@host:user/repo.git`, `https://host/user/repo`,
+    trailing slashes, and the `.git` suffix.
+    """
+    url = _git("config", "--get", "remote.origin.url", cwd=cwd)
+    if not url:
+        return None
+    cleaned = url.rstrip("/")
+    if cleaned.endswith(".git"):
+        cleaned = cleaned[:-4]
+    last = cleaned.rsplit("/", 1)[-1].rsplit(":", 1)[-1]
+    return last or None
+
+
 def project_name(cwd: str) -> str:
+    """Project label for the bar.
+
+    Order: git remote name (survives Docker mount-point dirs) → toplevel
+    basename → cwd basename → "?".
+    """
+    remote = _repo_name_from_remote(cwd)
+    if remote:
+        return remote
     toplevel = _git("rev-parse", "--show-toplevel", cwd=cwd)
     if toplevel:
         return Path(toplevel).name
@@ -309,22 +290,83 @@ def fmt_pct(numerator: int, denominator: int) -> str:
     return f"{pct:.0f}%"
 
 
-def fmt_local_hhmm(dt: datetime) -> str:
-    return dt.astimezone().strftime("%H:%M")
+def _tz_label(local_dt: datetime) -> str:
+    """Best-effort timezone marker for a localized datetime.
 
-
-def fmt_local_day_or_hhmm(dt: datetime, *, now: Optional[datetime] = None) -> str:
-    """Format weekly reset times more usefully than HH:MM.
-
-    Within 24h: show "HH:MM" (a clock time tomorrow morning is more useful
-    than "Tue"). Beyond 24h: show abbreviated weekday + HH:MM ("Sun 14:00").
+    Prefers the IANA abbreviation from `%Z` (e.g. "EEST", "PST"). On systems
+    where `%Z` returns empty or a numeric offset, falls back to a normalized
+    `UTC±N` form derived from `%z`. Returns "" if neither is available.
     """
+    name = local_dt.strftime("%Z")
+    if name and not name.startswith("+") and not name.startswith("-"):
+        return name
+    offset = local_dt.strftime("%z")
+    if not offset or len(offset) < 5:
+        return ""
+    sign = offset[0]
+    try:
+        hours = int(offset[1:3])
+        minutes = int(offset[3:5])
+    except ValueError:
+        return ""
+    if hours == 0 and minutes == 0:
+        return "UTC"
+    if minutes == 0:
+        return f"UTC{sign}{hours}"
+    return f"UTC{sign}{hours}:{minutes:02d}"
+
+
+def _hhmm_with_optional_day(dt: datetime, *, now: Optional[datetime] = None) -> str:
+    """HH:MM if within 24h, else `Day HH:MM`. No timezone — caller appends
+    one shared TZ for the whole reset cluster."""
     now = now or datetime.now(timezone.utc)
-    delta_hours = (dt - now).total_seconds() / 3600.0
     local = dt.astimezone()
-    if delta_hours < 24:
+    if (dt - now).total_seconds() / 3600.0 < 24:
         return local.strftime("%H:%M")
     return local.strftime("%a %H:%M")
+
+
+def _format_rate_limit_cluster(envelope: dict) -> Optional[str]:
+    """Render the rate-limit segment of the bar, or None if no data.
+
+    Shape: `N% 5h, M% 7d - reset HH:MM, Day HH:MM TZ <dim>(updated at main
+    agent response)<reset>`. The reset block uses one shared TZ label;
+    individual reset entries are skipped when their window omits
+    `resets_at`. The trailer is dim-styled (ANSI) so it reads as a
+    footnote, not data.
+    """
+    five = quota_from_blob(envelope, "five_hour")
+    seven = quota_from_blob(envelope, "seven_day")
+    if five is None and seven is None:
+        return None
+
+    pct_bits: list[str] = []
+    reset_bits: list[str] = []
+    tz_label = ""
+    now = datetime.now(timezone.utc)
+
+    if five is not None:
+        pct, reset_dt = five
+        pct_bits.append(f"{pct:.0f}% 5h")
+        if reset_dt is not None:
+            local = reset_dt.astimezone()
+            reset_bits.append(local.strftime("%H:%M"))
+            tz_label = _tz_label(local) or tz_label
+
+    if seven is not None:
+        pct, reset_dt = seven
+        pct_bits.append(f"{pct:.0f}% 7d")
+        if reset_dt is not None:
+            reset_bits.append(_hhmm_with_optional_day(reset_dt, now=now))
+            tz_label = _tz_label(reset_dt.astimezone()) or tz_label
+
+    bits = ", ".join(pct_bits)
+    if reset_bits:
+        bits += " - reset " + ", ".join(reset_bits)
+        if tz_label:
+            bits += " " + tz_label
+    bits += f" {_DIM}(updated at main agent response){_RESET}"
+    return bits
 
 
 # ---------------------------------------------------------------------------
@@ -363,42 +405,13 @@ def build_statusline(envelope: dict) -> str:
         return f"ctx {fmt_pct(used, window)}"
     parts.append(_safe("ctx", _ctx))
 
-    # 5h quota
-    def _quota_5h() -> Optional[str]:
-        summary = quota_summary(
-            project_root,
-            ceiling_setting="quota_pro_max_window_tokens",
-            window_seconds=_FIVE_HOURS_SECONDS,
-        )
-        if summary is None:
-            return None
-        pct, reset_ts = summary
-        bits = f"5h {pct:.0f}%"
-        if reset_ts is not None:
-            bits += f" reset {fmt_local_hhmm(reset_ts)}"
-        return bits
-    quota_5h_part = _safe("5h", lambda: _quota_5h() or "")
-    if quota_5h_part:
-        parts.append(quota_5h_part)
-
-    # Weekly quota — Pro/Max plans have a separate 7d cap. STACK key is
-    # quota_pro_max_weekly_tokens; absent → segment hidden.
-    def _quota_weekly() -> Optional[str]:
-        summary = quota_summary(
-            project_root,
-            ceiling_setting="quota_pro_max_weekly_tokens",
-            window_seconds=_SEVEN_DAYS_SECONDS,
-        )
-        if summary is None:
-            return None
-        pct, reset_ts = summary
-        bits = f"wk {pct:.0f}%"
-        if reset_ts is not None:
-            bits += f" reset {fmt_local_day_or_hhmm(reset_ts)}"
-        return bits
-    quota_wk_part = _safe("wk", lambda: _quota_weekly() or "")
-    if quota_wk_part:
-        parts.append(quota_wk_part)
+    # Rate-limit cluster — from envelope.rate_limits.{five_hour,seven_day}.
+    # Format: "N% 5h, M% 7d - reset HH:MM, Day HH:MM TZ <dim>(updated at
+    # main agent response)<reset>". Reset block omitted if no item carries
+    # `resets_at`; either window may be missing.
+    rl_part = _safe("rl", lambda: _format_rate_limit_cluster(envelope) or "")
+    if rl_part:
+        parts.append(rl_part)
 
     # Task
     parts.append(_safe("task", lambda: current_task(project_root)))

@@ -6233,3 +6233,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-05-03 16:22 - Statusline zero-config rate limits
+
+**Why**: Framework users were not seeing any rate-limit info in the bar because STACK.md ceilings were never set; ledger-based projection was an estimate while Anthropic now ships exact values in the rate_limits envelope. Also: project name showed as 'workspace' inside Docker, hiding the actual repo name.
+
+**Decision**: Drop the ledger-based statusline path; keep ledger for ag intel analytics. Single bar segment for rate limits. ANSI dim only on the freshness trailer.
+
+**What changed**:
+- Statusline now reads rate_limits straight from Claude Code envelope (no STACK.md ceilings needed). New format: 'N% 5h, M% 7d - reset HH:MM, Day HH:MM TZ (updated at main agent response)' with the trailer ANSI-dimmed. Project label now derived from git remote.origin.url so the bar shows 'agentic-framework' inside Docker mounts (was 'workspace'). 16 new tests covering blob parsing, dimmed trailer, shared-TZ reset block, repo-name fallback chain. Token ledger + STACK ceilings stay intact for ag intel report --quota/--tokens.
+
+**Next steps**:
+- Open PR
+
+**Blockers**: None
+
