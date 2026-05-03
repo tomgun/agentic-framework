@@ -3,13 +3,16 @@
 Reads the Claude Code statusLine envelope on stdin and prints a single-line
 status to stdout:
 
-    agentic-framework | feat/R-101 | ctx 47% | 23% 5h, 18% 7d - reset 22:30, Sun 14:00 EEST (updated at main agent response) | R-101 PR review
+    agentic-framework | feat/R-101 | Claude Opus 4.7 | ctx 47% | 23% 5h, 18% 7d - reset 22:30, Sun 14:00 EEST (updated at main agent response) | R-101 PR review
 
 Components:
   * **project** — repo name from `git config remote.origin.url` (so it
     survives Docker mount-point dirs like `/workspace`); falls back to git
     toplevel basename, then cwd basename.
   * **branch** — current git branch.
+  * **model** — `model.display_name` from the envelope ("Claude Opus 4.7"),
+    falling back to `model.id` ("claude-opus-4-7"). Hidden if neither is
+    available.
   * **ctx %** — latest assistant turn's `input_tokens + cache_read_input_tokens
     + cache_creation_input_tokens` against the model's context window. Source:
     `transcript_path` from stdin. Falls back to "ctx —" if no usage block.
@@ -140,8 +143,24 @@ def ctx_used_tokens(usage: dict) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Rate limits — read from Claude Code envelope
+# Model + rate limits — read from Claude Code envelope
 # ---------------------------------------------------------------------------
+
+
+def model_label(envelope: dict) -> Optional[str]:
+    """Display name (or id fallback) of the active model from the envelope.
+
+    Prefers `model.display_name` ("Claude Opus 4.7") over `model.id`
+    ("claude-opus-4-7"). Returns None when the envelope omits both — caller
+    drops the segment entirely instead of rendering a placeholder.
+    """
+    model = envelope.get("model")
+    if not isinstance(model, dict):
+        return None
+    name = model.get("display_name") or model.get("id")
+    if isinstance(name, str) and name.strip():
+        return name.strip()
+    return None
 
 
 def quota_from_blob(envelope: dict, key: str) -> Optional[tuple[float, Optional[datetime]]]:
@@ -392,6 +411,12 @@ def build_statusline(envelope: dict) -> str:
     # Project + branch
     parts.append(_safe("proj", lambda: project_name(cwd)))
     parts.append(_safe("branch", lambda: git_branch(cwd)))
+
+    # Model — display_name preferred, id fallback. Hidden when envelope
+    # omits both (rare).
+    model_part = _safe("model", lambda: model_label(envelope) or "")
+    if model_part:
+        parts.append(model_part)
 
     # ctx %
     def _ctx() -> str:

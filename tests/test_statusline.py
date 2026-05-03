@@ -177,6 +177,44 @@ def test_statusline_rate_limit_cluster_is_single_bar_segment():
     assert "(updated at main agent response)" in rl_segment
 
 
+def test_statusline_includes_model_display_name_when_present():
+    line = statusline.build_statusline({
+        "cwd": str(PROJECT_ROOT),
+        "model": {"id": "claude-opus-4-7", "display_name": "Claude Opus 4.7"},
+    })
+    plain = _strip_ansi(line)
+    assert "Claude Opus 4.7" in plain
+
+
+def test_statusline_falls_back_to_model_id_when_display_name_missing():
+    line = statusline.build_statusline({
+        "cwd": str(PROJECT_ROOT),
+        "model": {"id": "claude-opus-4-7"},
+    })
+    plain = _strip_ansi(line)
+    assert "claude-opus-4-7" in plain
+    assert "Claude Opus" not in plain
+
+
+def test_statusline_omits_model_segment_when_envelope_lacks_model():
+    line = statusline.build_statusline({"cwd": str(PROJECT_ROOT)})
+    plain = _strip_ansi(line)
+    parts = [p.strip() for p in plain.split("|")]
+    for p in parts:
+        assert "claude-" not in p.lower()
+        assert "opus" not in p.lower()
+        assert "sonnet" not in p.lower()
+        assert "haiku" not in p.lower()
+
+
+def test_model_label_returns_none_for_malformed_envelope():
+    assert statusline.model_label({}) is None
+    assert statusline.model_label({"model": None}) is None
+    assert statusline.model_label({"model": "claude-opus"}) is None
+    assert statusline.model_label({"model": {}}) is None
+    assert statusline.model_label({"model": {"id": ""}}) is None
+
+
 def test_repo_name_from_remote_handles_common_url_forms():
     # Direct unit test on the helper. Stub _git to return each URL form.
     saved_git = statusline._git
