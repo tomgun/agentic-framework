@@ -1,16 +1,10 @@
 [
   {
     "type": "task",
-    "description": "T-0094: Investigate ExitPlanMode PostToolUse \u2014 does Claude Code emit PostToolUse for built-in tools? (F-004/F-023)",
-    "added_at": "2026-04-10T13:26:03Z",
-    "added_by": "agent",
-    "became_current_at": "2026-05-14T15:26:24Z"
-  },
-  {
-    "type": "task",
     "description": "T-0023: Fix memory-seed sync worktree bug \u2014 resolve main repo path, generate structured diffs (F-022)",
     "added_at": "2026-04-10T13:26:03Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-05-14T15:46:27Z"
   },
   {
     "type": "task",

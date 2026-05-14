@@ -6276,3 +6276,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: Pre-existing VERSION drift (root=0.85.1 vs lib=0.84.3) shows in validate_framework.sh; unrelated to this fix.
 
+
+### Session: 2026-05-14 20:04 - T-0094 investigation deferred
+
+**Why**: User flagged that /workspace JSONL evidence pre-dates current framework version; conclusion would be premature
+
+**Decision**: Defer rather than file as bug or claim a fix — re-probe after v5 with same instrumentation
+
+**What changed**:
+- Partial probe inside /workspace container corroborated original observation (banner from on-plan-mode-exit.sh missing in 4 ExitPlanMode sessions) but data pre-dates current Mac framework + CC version. Removed from BACKLOG.json, kept TODO.md entry with retest angles. Backlog advances to T-0023.
+
+**Next steps**:
+- After v5 lands, retest with current framework + current CC (try hooks in .claude/settings.json, watch .cache/tool_use_counter + framework.log)
+
+**Blockers**: v5 still in progress — investigation premature
+

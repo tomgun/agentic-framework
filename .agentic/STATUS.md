@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- ADR-001 roadmap execution: T-0094: Investigate ExitPlanMode PostToolUse — does Claude Code emit PostToolUse for built-in tools? (F-004/F-023) (T-0094: Investigate ExitPlanMode PostToolUse — does Claude Code emit PostToolUse for built-in tools? (F-004/F-023)) is current backlog item (Updated: 2026-05-14 15:26 UTC)
+- T-0094 deferred to post-v5; T-0023 (memory-seed worktree bug) is next (Updated: 2026-05-14 15:47 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
