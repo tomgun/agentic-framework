@@ -101,6 +101,9 @@ Purpose: quick-capture inbox for ideas, tasks, and reminders. Triage to FEATURES
 ### T-0099: ag done / ag merge feature-id validators reject R-XXX (and DEV-/E-/NFR-) — only accept F-XXXX. Schema accepts all five prefixes (events.schema.json + token_emit branch regex). Quick fix: extend the validator regex in done/merge commands to match the same prefix set.
 - **Added**: 2026-05-02
 
+### T-0100: T-0078a: verify-contracts.sh:66 substitutes $ROOT_DIR into Python heredoc (project_root = Path('$ROOT_DIR')); if parent ag was booted with poisoned ROOT_DIR (inherited from outer shell rather than self-resolved via paths.sh fallback), YAML contract verification runs against wrong project root even after T-0078 subprocess-boundary fixes. Background: Critic raised this during T-0078 review. The two-point fix at operations.sh:546 + contracts.py:514 closes the documented 5 phantom failures; this follow-up addresses the parent-boot poisoning case. Investigate: (1) is parent-boot poisoning reproducible in current test infrastructure? (2) if yes, fix shape — either strip ROOT_DIR around operations.sh:511 and rely on paths.sh:41 fallback, or rewrite verify-contracts.sh:66 to re-resolve project_root from cwd or AGENTIC_LIB+BASH_SOURCE rather than env. Related: T-0078 plan at .agentic/journal/plans/2026-05-14-T-0078-plan.md (see 'Notable non-fix' section).
+- **Added**: 2026-05-14
+
 ---
 
 ## Promoted to Backlog

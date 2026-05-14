@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- R-101 statusline follow-up shipped (v0.85.1) (Updated: 2026-05-14 09:23 UTC)
+- T-0078: subprocess env leak fix — pending PR review (Updated: 2026-05-14 10:11 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
