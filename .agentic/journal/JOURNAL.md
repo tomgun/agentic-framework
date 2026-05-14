@@ -6248,3 +6248,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-05-14 09:23 - Statusline zero-config rate limits merged
+
+**Why**: R-101 follow-up landed; ledger-based rate limits required STACK.md ceilings and didn't work for fresh users — envelope-based source removes that prerequisite.
+
+**What changed**:
+- PR #248 merged to main: statusline now reads rate_limits directly from Claude Code envelope (zero-config for users), groups percentages and reset times under one TZ label, dim-anchors the 'last main-agent response' caveat, adds an active-model segment, and uses git remote URL for repo name so Docker mounts show the real project. 7 files changed, 484 insertions, 127 deletions; 303 new test lines.
+
+**Next steps**:
+- Run ag flush to land VERSION bump + state files on main
+
+**Blockers**: None
+

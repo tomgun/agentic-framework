@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- Statusline zero-config rate limits + Docker repo-name (PR open) (Updated: 2026-05-03 16:22 UTC)
+- R-101 statusline follow-up shipped (v0.85.1) (Updated: 2026-05-14 09:23 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
