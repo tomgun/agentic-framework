@@ -44,5 +44,37 @@ assertions:
     tests:
       - tests/validate_framework.sh::F-0221
 
+  - id: AC-004
+    text: "memory-check.sh: resolves MEMORY.md path via main repo root (--git-common-dir), not the worktree path returned by --show-toplevel"
+    type: structural
+    verify: |
+      grep -q "git-common-dir" .agentic/lib/tools/memory-check.sh &&
+      grep -q "MAIN_REPO_ROOT" .agentic/lib/tools/memory-check.sh
+    tests:
+      - tests/test_memory_check.sh
+
+  - id: AC-005
+    text: "memory-check.sh: stale advisory emits structured PATCH N/N blocks keyed by section anchors instead of a generic 're-read the file' instruction"
+    type: structural
+    verify: |
+      test -x .agentic/lib/tools/memory-diff.sh &&
+      grep -q "memory-diff.sh" .agentic/lib/tools/memory-check.sh
+    tests:
+      - tests/test_memory_check.sh
+
 nfr_refs: []
-migrations: []
+migrations:
+  - id: M-001
+    date: 2026-05-14
+    reason: "T-0023: memory-check.sh worktree-safe resolution + structured PATCH output"
+    trigger: implementation_discovery
+    changes:
+      - added_assertion: AC-004
+      - added_assertion: AC-005
+    notes: |
+      Three pre-existing bugs in memory-check.sh (wrong SEED_FILE path,
+      worktree path mis-resolution, missing version marker) made the script
+      a no-op. Fixes added with new helper memory-diff.sh that produces
+      section-anchored PATCH blocks. Migration applied manually because
+      `ag contract migrate` (which requires pyyaml) is unavailable in the
+      sandbox container; structure matches what the tool would write.
