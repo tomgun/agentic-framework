@@ -1,15 +1,10 @@
 [
   {
     "type": "task",
-    "description": "T-0078: Fix ag done subprocess env leak \u2014 unset ROOT_DIR/FRAMEWORK_ROOT before verification subprocesses (F-003)",
-    "added_at": "2026-04-10T13:26:02Z",
-    "added_by": "agent"
-  },
-  {
-    "type": "task",
     "description": "T-0094: Investigate ExitPlanMode PostToolUse \u2014 does Claude Code emit PostToolUse for built-in tools? (F-004/F-023)",
     "added_at": "2026-04-10T13:26:03Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-05-14T15:26:24Z"
   },
   {
     "type": "task",
