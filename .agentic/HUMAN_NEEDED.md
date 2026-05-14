@@ -128,6 +128,15 @@ _No active items_
 - **Impact**: Blocking: [specify what's blocked]
 
 
+
+### HN-0092: PR #249: T-0078 subprocess env leak fix
+- **Type**: review
+- **Added**: 2026-05-14
+- **Context**: https://github.com/tomgun/agentic-framework/pull/249 — scrub framework env vars at ag done verification subprocess boundaries. Two-point fix (operations.sh:546 + contracts.py:514), regression test, T-0100 follow-up filed for verify-contracts.sh:66 parent-boot poisoning.
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0090: PR #247: R-101 token-ledger visible
