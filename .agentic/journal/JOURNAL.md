@@ -6291,3 +6291,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: v5 still in progress — investigation premature
 
+
+### Session: 2026-05-14 21:04 - T-0023: smarter memory-seed sync
+
+**Why**: Original script was a no-op (path bug), and even when it fired the stale advisory said 'go re-read the file' — high behavioral burden for the agent and prone to silent drift
+
+**Decision**: Section-anchor-keyed diff via comments (<!-- section: slug -->) over header-text matching; renames now produce MODIFY blocks rather than REMOVE+ADD churn
+
+**What changed**:
+- Fixed three latent bugs in memory-check.sh (wrong SEED_FILE path, --show-toplevel vs --git-common-dir, missing version marker) and added structured PATCH output via new memory-diff.sh. Section anchors (<!-- section: slug -->) let the diff treat renames as MODIFY instead of REMOVE+ADD. Migration entry M-001 on F-022 adds AC-004/AC-005.
+
+**Next steps**:
+- Run ag commit and PR
+
+**Blockers**: ag contract migrate unavailable in container (no pyyaml); migration applied by hand mirroring the tool's structure
+

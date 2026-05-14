@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- T-0094 deferred to post-v5; T-0023 (memory-seed worktree bug) is next (Updated: 2026-05-14 15:47 UTC)
+- T-0023 ready to commit: memory-check.sh worktree fix + structured PATCH output (Updated: 2026-05-14 21:04 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**
