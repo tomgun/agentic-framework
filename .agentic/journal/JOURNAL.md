@@ -6261,3 +6261,18 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-05-14 10:11 - T-0078: ag done subprocess env leak fix
+
+**Why**: 5 phantom test failures because paths.sh:36-42 honors inherited ROOT_DIR, so subprocesses spawned by ag done's verification ran against the caller's project root instead of the sandbox
+
+**Decision**: Scope to two named leak points; do NOT touch operations.sh:511 (verify-contracts.sh legitimately needs ROOT_DIR for cross-checkout invocations) or paths.sh precedence (R-209 territory). File parent-boot poisoning as T-0100 follow-up rather than expand scope.
+
+**What changed**:
+- Scrubbed framework-internal env vars (ROOT_DIR/PROJECT_ROOT/MAIN_PROJECT_ROOT/AGENTIC_ROOT/AGENTIC_LIB/AGENTS_JSON + defensive FRAMEWORK_ROOT) at the two subprocess boundaries where ag done dispatches user verify commands: legacy-markdown branch (operations.sh:546) and YAML contract branch (contracts.py:513-525). Added tests/test_subprocess_env_isolation.sh with 8 regression checks covering both paths plus the cross-checkout sanity case (verify-contracts.sh:511 still honors explicit ROOT_DIR override).
+
+**Next steps**:
+- Land PR, verify the 5 phantom functional failures resolve, pick up T-0100 (verify-contracts.sh:66 parent-boot poisoning follow-up) if reproducible.
+
+**Blockers**: Pre-existing VERSION drift (root=0.85.1 vs lib=0.84.3) shows in validate_framework.sh; unrelated to this fix.
+

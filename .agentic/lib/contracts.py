@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -22,6 +23,21 @@ from pathlib import Path
 from typing import Any, Optional
 
 from ids import get_depth, MAX_DEPTH
+
+
+# Framework-internal env vars that must NOT leak into assertion subprocesses.
+# paths.sh:36-42 + :162-163 export these; if a verify command inherits them,
+# it will resolve to the caller's project root instead of the assertion's
+# sandbox (T-0078). PROJECT_ROOT is deliberately absent — it's re-injected
+# below with the explicit project_root argument.
+_LEAK_VARS = (
+    "ROOT_DIR",
+    "MAIN_PROJECT_ROOT",
+    "AGENTIC_ROOT",
+    "AGENTIC_LIB",
+    "AGENTS_JSON",
+    "FRAMEWORK_ROOT",
+)
 
 
 # ---------------------------------------------------------------------------
@@ -511,9 +527,9 @@ def verify_assertion(assertion: Assertion, project_root: Path) -> VerificationRe
         )
 
     try:
-        env = {"PROJECT": str(project_root), "PROJECT_ROOT": str(project_root)}
-        import os
-        full_env = {**os.environ, **env}
+        base_env = {k: v for k, v in os.environ.items() if k not in _LEAK_VARS}
+        env_overrides = {"PROJECT": str(project_root), "PROJECT_ROOT": str(project_root)}
+        full_env = {**base_env, **env_overrides}
         result = subprocess.run(
             assertion.verify,
             shell=True,

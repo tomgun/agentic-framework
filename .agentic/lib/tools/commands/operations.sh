@@ -543,7 +543,13 @@ cmd_verify() {
         for cmd in "${commands[@]}"; do
             echo -e "${BLUE}Running: $cmd${NC}"
             local _verify_output=""
-            _verify_output=$(bash -c "$cmd" 2>&1)
+            # Scrub framework-internal env vars so the verify command can't
+            # inherit the caller's project root (see T-0078: ROOT_DIR/PROJECT_ROOT
+            # leak via paths.sh:36-42 + L162-163 exports caused 5 phantom failures).
+            _verify_output=$(env -u ROOT_DIR -u PROJECT_ROOT -u MAIN_PROJECT_ROOT \
+                                 -u AGENTIC_ROOT -u AGENTIC_LIB -u AGENTS_JSON \
+                                 -u FRAMEWORK_ROOT \
+                                 bash -c "$cmd" 2>&1)
             local _verify_rc=$?
             if [ "$_verify_rc" -eq 0 ]; then
                 echo -e "${GREEN}✓ PASSED${NC}"
