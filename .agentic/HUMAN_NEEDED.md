@@ -130,6 +130,15 @@ _No active items_
 
 
 
+
+### HN-0093: PR #250 — T-0023 memory-check.sh worktree fix + structured PATCH output
+- **Type**: pr-review
+- **Added**: 2026-05-15
+- **Context**: Two commits on feature/T-0023: 55c1c8d6 (feature core, 8 files) + 317d80d7 (state, 4 files). All 23 pre-commit gates passed; validate_framework.sh 847/0. F-022 contract migration M-001 added AC-004/AC-005 — applied by hand because sandbox lacks pyyaml. https://github.com/tomgun/agentic-framework/pull/250
+- **Why human needed**: Requires human action/decision
+- **Impact**: Blocking: [specify what's blocked]
+
+
 ## Resolved
 
 ### HN-0092: PR #249: T-0078 subprocess env leak fix
