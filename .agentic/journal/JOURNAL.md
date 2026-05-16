@@ -6306,3 +6306,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: ag contract migrate unavailable in container (no pyyaml); migration applied by hand mirroring the tool's structure
 
+
+### Session: 2026-05-16 16:33 - T-0023: review fixes
+
+**Why**: Reviewer ran independent fresh-context review; my own tests passed but didn't catch any of these because they were too permissive
+
+**What changed**:
+- Code review found 3 blockers: grep -c bug producing '0\n0', GNU-only find -printf breaks on macOS, F-022 migration violated contract.schema.json (id pattern + dict-vs-string changes). Fixed all three plus a missing section anchor on '## Documentation', tightened the shell test with a fixture-pair sanity check, and tightened the LLM test to require numbered PATCH refs + Edit old_string/new_string semantics.
+
+**Next steps**:
+- Push to PR #250
+
+**Blockers**: None
+
