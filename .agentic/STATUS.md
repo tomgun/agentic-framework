@@ -5,7 +5,7 @@
 Purpose: the living "truth" of where the Agentic Framework development is today.
 
 ## Current session state
-- T-0023 ready to commit: memory-check.sh worktree fix + structured PATCH output (Updated: 2026-05-14 21:04 UTC)
+- ADR-001 roadmap execution: T-0090: Remove deadweight work/ artifacts from instruction files — only review.md + tasks.yaml consumed (DEV-003) (T-0090: Remove deadweight work/ artifacts from instruction files — only review.md + tasks.yaml consumed (DEV-003)) is current backlog item (Updated: 2026-05-16 16:43 UTC)
 
 ## Current focus
 - **F-031: Spec System Overhaul — YAML Contracts (HIGH PRIORITY, MULTI-SESSION)**

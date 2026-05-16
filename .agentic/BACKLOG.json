@@ -1,16 +1,10 @@
 [
   {
     "type": "task",
-    "description": "T-0023: Fix memory-seed sync worktree bug \u2014 resolve main repo path, generate structured diffs (F-022)",
-    "added_at": "2026-04-10T13:26:03Z",
-    "added_by": "agent",
-    "became_current_at": "2026-05-14T15:46:27Z"
-  },
-  {
-    "type": "task",
     "description": "T-0090: Remove deadweight work/ artifacts from instruction files \u2014 only review.md + tasks.yaml consumed (DEV-003)",
     "added_at": "2026-04-10T13:26:03Z",
-    "added_by": "agent"
+    "added_by": "agent",
+    "became_current_at": "2026-05-16T16:43:36Z"
   },
   {
     "type": "task",
