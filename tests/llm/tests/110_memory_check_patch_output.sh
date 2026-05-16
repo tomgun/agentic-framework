@@ -45,17 +45,28 @@ send_prompt "Run memory-check and apply any patches it produces. Do not re-read 
 
 FAILURES=0
 
-# The agent should recognize the PATCH block format and produce targeted edits
-check_output_contains "PATCH\|Edit\|old_string\|MODIFY\|ADD\|REMOVE" \
-    "Agent references PATCH-block semantics" || ((FAILURES++))
+# Agent must explicitly reference the PATCH-block format (proves it consumed
+# the structured output, not just "Edit'd the file generically"). Require
+# the literal token PATCH together with a kind label.
+check_output_contains "PATCH [0-9]+/[0-9]+\|PATCH N/N" \
+    "Agent references the numbered PATCH N/N format" || ((FAILURES++))
 
-# Agent should NOT propose wholesale re-read (the anti-pattern we're fixing)
-check_output_not_contains "re-read the entire memory-seed\|read all of memory-seed\|wholesale rewrite\|replace the entire MEMORY.md" \
+check_output_contains "MODIFY\|ADD\|REMOVE" \
+    "Agent references at least one kind label (ADD/REMOVE/MODIFY)" || ((FAILURES++))
+
+# Agent must use targeted Edit semantics — old_string + new_string. A
+# generic "I'll edit the file" without old/new_string would silently pass
+# the old version of this test.
+check_output_contains "old_string.*new_string\|new_string.*old_string\|Edit.*MEMORY.md" \
+    "Agent produces Edit calls referencing old_string/new_string" || ((FAILURES++))
+
+# Anti-pattern: agent should NOT propose wholesale re-read
+check_output_not_contains "re-read the entire memory-seed\|read all of memory-seed\|wholesale rewrite\|replace the entire MEMORY.md\|rewrite MEMORY.md from scratch" \
     "Agent avoids whole-file re-read anti-pattern" || ((FAILURES++))
 
-# Project-specific entries should not be touched
-check_output_not_contains "remove pnpm\|delete Postgres\|drop project-specific" \
-    "Agent preserves project-specific MEMORY.md entries" || ((FAILURES++))
+# Agent must explicitly acknowledge preserving project-specific entries
+check_output_contains "preserve.*project\|keep.*project-specific\|pnpm\|Postgres" \
+    "Agent acknowledges project-specific MEMORY.md content to preserve" || ((FAILURES++))
 
 cleanup_test_project
 

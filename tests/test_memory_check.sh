@@ -182,14 +182,65 @@ FAKE_HOME=$(mktemp -d)
 # A stale MEMORY.md with an old seed version line
 STALE_MEMORY=$'# Memory\n<!-- memory-seed v0.54.1 -->\n\npre-commit sequence\ntoken-efficient scripts\nag commit\nag done\n'
 OUT=$(_run_check_isolated "$FAKE_HOME" "$STALE_MEMORY")
+# Tighter than substring-match: require stale advisory + at least one
+# PATCH header + at least one kind label (ADD|REMOVE|MODIFY) + the
+# follow-up apply-instructions block. A broken implementation that
+# silently fails the diff resolver would print 'stale' but no PATCH.
 if echo "$OUT" | grep -q 'Memory: stale' \
-   && echo "$OUT" | grep -qE '^PATCH [0-9]+/[0-9]+'; then
+   && echo "$OUT" | grep -qE '^PATCH [0-9]+/[0-9]+' \
+   && echo "$OUT" | grep -qE '(ADD|REMOVE|MODIFY) section' \
+   && echo "$OUT" | grep -q 'Apply each PATCH block'; then
     pass
 else
-    fail "expected stale advisory + PATCH blocks; got:
+    fail "expected stale + PATCH header + kind label + apply instructions; got:
 $OUT"
 fi
 rm -rf "$FAKE_HOME"
+
+# Fixture-based sectioning assertion — a broken implementation cannot pass
+test_case "memory-diff produces deterministic patches from known fixtures"
+TMP=$(mktemp -d)
+cat > "$TMP/old.md" <<'EOF'
+<!-- memory-seed v0.50.0 -->
+
+<!-- section: alpha -->
+## Alpha
+line one
+line two
+
+<!-- section: beta -->
+## Beta
+beta content
+EOF
+cat > "$TMP/new.md" <<'EOF'
+<!-- memory-seed v0.51.0 -->
+
+<!-- section: alpha -->
+## Alpha
+line one
+line two
+line three
+
+<!-- section: gamma -->
+## Gamma
+new section
+EOF
+OUT=$(bash "$MEMORY_DIFF" "$TMP/old.md" "$TMP/new.md" 2>/dev/null)
+# Exactly three patches: alpha MODIFY, beta REMOVE, gamma ADD
+PATCH_COUNT=$(echo "$OUT" | grep -cE '^PATCH [0-9]+/[0-9]+')
+ALPHA_OK=$(echo "$OUT" | grep -c 'MODIFY section.*alpha' || true)
+BETA_OK=$(echo "$OUT" | grep -c 'REMOVE section.*beta' || true)
+GAMMA_OK=$(echo "$OUT" | grep -c 'ADD section.*gamma' || true)
+LINE_THREE_IN_DIFF=$(echo "$OUT" | grep -c '^+line three' || true)
+if [ "$PATCH_COUNT" -eq 3 ] && [ "$ALPHA_OK" -ge 1 ] \
+   && [ "$BETA_OK" -ge 1 ] && [ "$GAMMA_OK" -ge 1 ] \
+   && [ "$LINE_THREE_IN_DIFF" -ge 1 ]; then
+    pass
+else
+    fail "fixture expected 3 patches (alpha MODIFY + beta REMOVE + gamma ADD) with 'line three' in alpha diff; got PATCH_COUNT=$PATCH_COUNT alpha=$ALPHA_OK beta=$BETA_OK gamma=$GAMMA_OK line3=$LINE_THREE_IN_DIFF
+$OUT"
+fi
+rm -rf "$TMP"
 
 test_case "memory-check passes (OK) when version matches and sentinels present"
 FAKE_HOME=$(mktemp -d)
@@ -216,6 +267,17 @@ if [ -d "$MAIN_REPO/.agentic" ]; then
     pass
 else
     fail "computed main repo '$MAIN_REPO' has no .agentic/"
+fi
+
+# Anchor parity in seed file: every '## ' header has a matching anchor
+test_case "memory-seed.md has one <!-- section: --> anchor per ## header"
+SEED="$FRAMEWORK_ROOT/.agentic/lib/init/memory-seed.md"
+HEADERS=$(grep -c '^## ' "$SEED")
+ANCHORS=$(grep -c '^<!-- section:' "$SEED")
+if [ "$HEADERS" -eq "$ANCHORS" ]; then
+    pass
+else
+    fail "headers=$HEADERS anchors=$ANCHORS — every '## ' must have a <!-- section: slug --> sibling"
 fi
 
 # ──────────────────────────────────────────────────────────────

@@ -59,6 +59,7 @@ Exiting plan mode creates a DRAFT. The framework BLOCKS code edits and session s
 5. After APPROVED → run `ag transition F-XXXX implementation`
 **Enforcement**: PreToolUse denies code edits when DRAFT plan exists. Stop.sh denies session end. Review evidence (review.md) required for APPROVED status in autonomous_formal.
 
+<!-- section: documentation -->
 ## Documentation — Part of the Deliverable
 Docs ship with code, not after merge. Before creating a PR:
 1. Check freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`

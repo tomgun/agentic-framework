@@ -64,17 +64,19 @@ assertions:
 
 nfr_refs: []
 migrations:
-  - id: M-001
-    date: 2026-05-14
-    reason: "T-0023: memory-check.sh worktree-safe resolution + structured PATCH output"
+  - id: M-2026-05-15-001
+    date: "2026-05-15"
     trigger: implementation_discovery
+    reason: >
+      T-0023: memory-check.sh was effectively a no-op due to three latent
+      bugs (wrong SEED_FILE path, --show-toplevel returning worktree path
+      instead of main repo path, missing memory-seed vX.Y.Z marker).
+      Fixes shipped along with a new memory-diff.sh helper that emits
+      section-anchored PATCH N/N blocks the agent applies as targeted
+      Edit calls. Migration applied by hand because `ag contract migrate`
+      requires pyyaml which is not present in the sandbox container;
+      structure matches what the tool would write.
     changes:
-      - added_assertion: AC-004
-      - added_assertion: AC-005
-    notes: |
-      Three pre-existing bugs in memory-check.sh (wrong SEED_FILE path,
-      worktree path mis-resolution, missing version marker) made the script
-      a no-op. Fixes added with new helper memory-diff.sh that produces
-      section-anchored PATCH blocks. Migration applied manually because
-      `ag contract migrate` (which requires pyyaml) is unavailable in the
-      sandbox container; structure matches what the tool would write.
+      - "Added AC-004: memory-check.sh resolves MEMORY.md path via main repo root (--git-common-dir), not worktree path"
+      - "Added AC-005: memory-check.sh stale advisory emits section-anchored PATCH N/N blocks via memory-diff.sh"
+    approved_by: agent_review

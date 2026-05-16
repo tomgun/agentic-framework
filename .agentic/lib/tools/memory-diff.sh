@@ -111,11 +111,12 @@ _emit_patch() {
 _emit_patches() {
     local old_dir="$1" new_dir="$2"
 
-    # Collect slugs from both sides
+    # Collect slugs from both sides. `find -printf` is GNU-only — BSD find
+    # (macOS) has no equivalent. Use -exec basename for portability.
     local old_slugs new_slugs all_slugs
-    old_slugs=$(find "$old_dir" -maxdepth 1 -name '*.body' -printf '%f\n' 2>/dev/null \
+    old_slugs=$(find "$old_dir" -maxdepth 1 -name '*.body' -exec basename {} \; 2>/dev/null \
                 | sed 's/\.body$//' | sort)
-    new_slugs=$(find "$new_dir" -maxdepth 1 -name '*.body' -printf '%f\n' 2>/dev/null \
+    new_slugs=$(find "$new_dir" -maxdepth 1 -name '*.body' -exec basename {} \; 2>/dev/null \
                 | sed 's/\.body$//' | sort)
     all_slugs=$(printf '%s\n%s\n' "$old_slugs" "$new_slugs" | sort -u | grep -v '^$' || true)
 
@@ -146,8 +147,13 @@ _emit_patches() {
         changes+="$slug $kind"$'\n'
     done <<< "$all_slugs"
 
-    local total
-    total=$(printf '%s' "$changes" | grep -c . || echo 0)
+    # grep -c on empty input prints "0" and exits 1. The naive
+    # `... | grep -c . || echo 0` then captures "0\n0", which breaks the
+    # subsequent integer comparison. Count non-empty lines directly.
+    local total=0
+    if [ -n "$changes" ]; then
+        total=$(printf '%s' "$changes" | grep -c .)
+    fi
 
     if [ "$total" -eq 0 ]; then
         echo "(no structural changes; only formatting or pre-anchor content)" >&2
