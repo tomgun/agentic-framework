@@ -1,7 +1,12 @@
 # Memory Seed — Agentic Framework
+<!-- memory-seed v0.85.2 -->
+<!-- Bump this marker whenever the seed changes. memory-check.sh diffs against the
+     commit that introduced the version line, so the marker MUST land in a commit
+     that also contains the substantive seed changes. -->
 
 All work is managed by `ag` commands. The CLI enforces the workflow — never skip steps.
 
+<!-- section: key-commands -->
 ## Key Commands
 - `ag start F-XXXX "Title"` — begin feature (creates work item, starts planning)
 - `ag transition F-XXXX <state>` — advance workflow (checks artifacts first)
@@ -13,6 +18,7 @@ All work is managed by `ag` commands. The CLI enforces the workflow — never sk
 
 Decision routing: current state → OVERVIEW.md, work log with reasoning → JOURNAL.md (use `--decision` to mark choices), ADR for significant tradeoffs (formal), user preferences → `ag intel remember`.
 
+<!-- section: trigger-words -->
 ## Trigger Words
 - "phase done/mark phase/phase progress/which phase" → STOP. Run `ag phase list F-XXXX` to see phases, `ag phase done F-XXXX <id>` to mark complete.
 - "pending user input/contract input" → STOP. Run `ag contract pending`. Process each pending contract.
@@ -41,7 +47,9 @@ Decision routing: current state → OVERVIEW.md, work log with reasoning → JOU
 - Before workflow phases: run `ag intel architecture` (planning), `ag intel spec F-XXXX` (specs), `ag intel implement F-XXXX` (coding), `ag intel test F-XXXX` (testing) for phase-aware quality guidance.
 - NEVER write code for multiple features outside of `ag auto` commands.
 - **Wrong rationalizations:** "I can do it directly faster" — NO. "User said autonomous = skip ceremony" — NO. Autonomous means use the autonomous pipeline, not bypass it.
+- "memory: stale / `PATCH N/N` output / memory check produced patches / sectioned diff for MEMORY.md" → STOP. The advisory `memory-check.sh` emits structured `PATCH N/N — ADD|REMOVE|MODIFY section "..."` blocks when the seed has drifted from your auto-memory. Apply each PATCH block to your `MEMORY.md`: `MODIFY` blocks contain unified-diff `-`/`+` lines you map directly to `Edit` calls (`old_string` from `-` lines, `new_string` from `+` lines); `ADD` blocks insert a new section; `REMOVE` blocks delete one. Preserve project-specific entries outside framework sections.
 
+<!-- section: after-plan-mode -->
 ## After Plan Mode Exits — Auto-Continue (do NOT stop)
 Exiting plan mode creates a DRAFT. The framework BLOCKS code edits and session stop until resolved. Auto-continue immediately:
 1. Save plan to `.agentic/journal/plans/YYYY-MM-DD-F-XXXX-plan.md` with `**Status**: DRAFT` (injected automatically)
@@ -51,6 +59,7 @@ Exiting plan mode creates a DRAFT. The framework BLOCKS code edits and session s
 5. After APPROVED → run `ag transition F-XXXX implementation`
 **Enforcement**: PreToolUse denies code edits when DRAFT plan exists. Stop.sh denies session end. Review evidence (review.md) required for APPROVED status in autonomous_formal.
 
+<!-- section: documentation -->
 ## Documentation — Part of the Deliverable
 Docs ship with code, not after merge. Before creating a PR:
 1. Check freshness: `bash .agentic/lib/tools/docs.sh --check-freshness --trigger feature_done --manifest F-XXXX`
@@ -58,6 +67,7 @@ Docs ship with code, not after merge. Before creating a PR:
 3. Include doc changes in the same PR as code
 `ag done` enforces `docs_gate` (blocking in formal profiles) — but that's the safety net, not the trigger.
 
+<!-- section: rules -->
 ## Rules
 - Follow CLI prompts. It loads role-specific guidance at each phase.
 - Write artifacts to `.agentic/work/F-XXXX/` (plan.md, spec.md, review.md, journal.md).
@@ -70,6 +80,7 @@ Docs ship with code, not after merge. Before creating a PR:
 - **Track what you build**: When `feature_tracking=yes`, update FEATURES.md. Otherwise, update OVERVIEW.md (Core Capabilities section). Claude hooks (Stop.sh, UserPromptSubmit) nudge if you write implementation code but forget to update the design doc.
 - **Enforcement hierarchy** (v5 redesign): Tier 0 git-layer gates (`precommit_gate.py` + `prepush_gate.py` — fire in a process the agent doesn't manage; sanctioned bypass via `ag commit --skip-gate` / `ag push --skip-gate`, audited to events.jsonl) > Agent hooks (real-time, in-session: Claude hooks, Cursor hooks) > Skills (just-in-time) > ag commands (workflow gates) > legacy pre-commit (defense-in-depth, R-301 retires) > instruction files (behavioral). **Honest limit**: pre-commit cannot itself observe `git commit --no-verify` (the flag short-circuits hooks); pre-push catches the same range.
 
+<!-- section: framework-enforcement -->
 ## What the Framework Enforces Structurally (you can't bypass these)
 - **Spec-first**: PreToolUse denies code edits without spec+AC (formal)
 - **DRAFT plan blocks code**: PreToolUse denies code edits when DRAFT plan exists (formal)

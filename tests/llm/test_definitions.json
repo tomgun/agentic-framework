@@ -2125,6 +2125,28 @@
         "file_exists": [],
         "file_not_exists": []
       }
+    },
+    {
+      "id": "110_memory_check_patch_output",
+      "description": "Agent applies targeted Edit calls from memory-check PATCH blocks instead of whole-file re-read",
+      "section": "memory",
+      "category": "Important",
+      "llm_test_id": "LLM-110",
+      "profile": "discovery",
+      "setup": {
+        "files": {}
+      },
+      "prompt": "Run memory-check and apply any patches it produces. Do not re-read the whole memory-seed; apply only the structured PATCH blocks.",
+      "expected": {
+        "output_contains": [
+          "PATCH|Edit|old_string|MODIFY|ADD|REMOVE"
+        ],
+        "output_not_contains": [
+          "re-read the entire memory-seed|read all of memory-seed|wholesale rewrite|replace the entire MEMORY.md"
+        ],
+        "file_exists": [],
+        "file_not_exists": []
+      }
     }
   ]
 }
