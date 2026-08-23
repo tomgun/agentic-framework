@@ -6319,3 +6319,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-08-23 10:16 - Repo archived — v6 rebuild moved to agentic-af-for-claude
+
+**Decision**: Archive this repo; v6 = new repo agentic-af-for-claude, Claude Code-first, ~2.5k LOC budget, CI-as-wall, derived state, shipped=code+tests+docs match spec
+
+**What changed**:
+- Reviewed the framework end-to-end (3 explorer agents), concluded with the repo's own retrospectives that ~90% of complexity compensated for 2025-era agent unreliability now handled natively by Claude Code. User approved a ground-up v6 rebuild in a new repo (github.com/tomgun/agentic-af-for-claude): extract-and-rebuild from specs/lessons, never porting code. Extraction shipped: VISION.md (full value inventory from PRINCIPLES/OVERVIEW/ADR-002/CONTRIBUTIONS), CAPABILITIES.md (disposition of every capability incl. NFR/ADR/feedback/epics — nothing dropped silently), ANTIPATTERNS.md (14 evidence-cited hard rules), spec format + F-001..F-014 seeds, BACKLOG queue, founding plan with 2-round multi-agent review record (critic/advocate/platform panel).
+
+**Next steps**:
+- All further work happens in the new repo; sessions start there. This repo is read-only design history.
+
+**Blockers**: None
+

@@ -1,5 +1,12 @@
 # Agentic AI Framework
 
+> ## 📦 ARCHIVED (2026-08-23)
+> This repo is preserved as read-only design history. Active development moved to
+> **[agentic-af-for-claude](https://github.com/tomgun/agentic-af-for-claude)** — a ground-up
+> v6 rebuild (Claude Code–first plugin + small deterministic checker) that distills this
+> repo's specs and lessons. The why, the architecture, and the multi-agent review record
+> live in the new repo's `product/plans/2026-08-founding-plan.md`.
+
 **Portable, token-efficient, spec-and-test-driven framework for agentic/assisted software development.**
 
 *Shortname: Agentic AF*
