@@ -1,11 +1,14 @@
 # Agentic AI Framework
 
-> ## 📦 ARCHIVED (2026-08-23)
-> This repo is preserved as read-only design history. Active development moved to
-> **[agentic-af-for-claude](https://github.com/tomgun/agentic-af-for-claude)** — a ground-up
-> v6 rebuild (Claude Code–first plugin + small deterministic checker) that distills this
-> repo's specs and lessons. The why, the architecture, and the multi-agent review record
-> live in the new repo's `product/plans/2026-08-founding-plan.md`.
+> ## ⏸️ PAUSED (2026-08-23) — focus is now on Claude AF
+> Development effort is concentrated on **[agentic-af-for-claude](https://github.com/tomgun/agentic-af-for-claude)**
+> ("Claude AF") — a ground-up v6 rebuild (Claude Code–first plugin + small deterministic
+> checker) that distills this repo's specs and lessons. The why, architecture, and
+> multi-agent review record live in the new repo's `product/plans/2026-08-founding-plan.md`.
+>
+> This multitool repo is **paused, not archived**. It stopped mid-way through the v5
+> redesign; **[CONTINUATION.md](CONTINUATION.md)** records exactly where it stands, the
+> known landmines, and the order of work to resume multitool development here.
 
 **Portable, token-efficient, spec-and-test-driven framework for agentic/assisted software development.**
 

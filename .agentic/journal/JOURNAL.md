@@ -6332,3 +6332,16 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-08-23 10:53 - Correction: repo PAUSED (not archived) — focus on Claude AF
+
+**Decision**: Pause not archive; CONTINUATION.md is the resume contract
+
+**What changed**:
+- Adjusted the close-out per user direction: this multitool repo stays unarchived and resumable. Added CONTINUATION.md capturing the pause-time state from the full-repo review: v5 Phase 0 shipped but gates inert (core.hooksPath points at legacy bash chain, ag.sh re-asserts it), TODO/backlog refinement never applied, STATUS.md/HUMAN_NEEDED.md drifted, two state machines, and the recommended resume order (fix hooks wall -> apply refinement -> v5 Phase 3 deletions -> re-cut R-items against Claude AF learnings). Multitool support is this repo's remaining raison d'etre; Claude AF deliberately dropped it.
+
+**Next steps**:
+- Resume here only if multitool demand returns; otherwise all work in agentic-af-for-claude.
+
+**Blockers**: None
+
