@@ -6319,3 +6319,29 @@ sign fixes, gate wiring bug, smoke test gates, CLAUDE.md journal format fix. Ide
 
 **Blockers**: None
 
+
+### Session: 2026-08-23 10:16 - Repo archived — v6 rebuild moved to agentic-af-for-claude
+
+**Decision**: Archive this repo; v6 = new repo agentic-af-for-claude, Claude Code-first, ~2.5k LOC budget, CI-as-wall, derived state, shipped=code+tests+docs match spec
+
+**What changed**:
+- Reviewed the framework end-to-end (3 explorer agents), concluded with the repo's own retrospectives that ~90% of complexity compensated for 2025-era agent unreliability now handled natively by Claude Code. User approved a ground-up v6 rebuild in a new repo (github.com/tomgun/agentic-af-for-claude): extract-and-rebuild from specs/lessons, never porting code. Extraction shipped: VISION.md (full value inventory from PRINCIPLES/OVERVIEW/ADR-002/CONTRIBUTIONS), CAPABILITIES.md (disposition of every capability incl. NFR/ADR/feedback/epics — nothing dropped silently), ANTIPATTERNS.md (14 evidence-cited hard rules), spec format + F-001..F-014 seeds, BACKLOG queue, founding plan with 2-round multi-agent review record (critic/advocate/platform panel).
+
+**Next steps**:
+- All further work happens in the new repo; sessions start there. This repo is read-only design history.
+
+**Blockers**: None
+
+
+### Session: 2026-08-23 10:53 - Correction: repo PAUSED (not archived) — focus on Claude AF
+
+**Decision**: Pause not archive; CONTINUATION.md is the resume contract
+
+**What changed**:
+- Adjusted the close-out per user direction: this multitool repo stays unarchived and resumable. Added CONTINUATION.md capturing the pause-time state from the full-repo review: v5 Phase 0 shipped but gates inert (core.hooksPath points at legacy bash chain, ag.sh re-asserts it), TODO/backlog refinement never applied, STATUS.md/HUMAN_NEEDED.md drifted, two state machines, and the recommended resume order (fix hooks wall -> apply refinement -> v5 Phase 3 deletions -> re-cut R-items against Claude AF learnings). Multitool support is this repo's remaining raison d'etre; Claude AF deliberately dropped it.
+
+**Next steps**:
+- Resume here only if multitool demand returns; otherwise all work in agentic-af-for-claude.
+
+**Blockers**: None
+
